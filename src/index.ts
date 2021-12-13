@@ -30,4 +30,6 @@ function checkForNewVersion() {
     });
   
     notifier.notify();
-  }
+}
+
+exhCli();
