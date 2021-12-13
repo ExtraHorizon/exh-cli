@@ -28,3 +28,17 @@ yarn add @extrahorizon/exh-cli
 ```
 {% endtab %}
 {% endtabs %}
+
+## Configuring your credentials
+
+To start using the ExtraHorizon cli you need to configure your credentials. You need to create a file called `credentials` in the `~/.exh` directory.
+
+{% code title="~/.exh/credentials" %}
+```
+API_HOST=env.customer.extrahorizon.io
+API_OAUTH_CONSUMER_KEY=****************************
+API_OAUTH_CONSUMER_SECRET=****************************
+API_OAUTH_TOKEN=****************************
+API_OAUTH_TOKEN_SECRET=***************************
+```
+{% endcode %}
