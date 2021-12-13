@@ -1,5 +1,5 @@
 {
-  "name": "exh-cli",
+  "name": "@extrahorizon/exh-cli",
   "version": "1.0.0",
   "main": "bin/index.js",
   "license": "MIT",

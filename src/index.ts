@@ -1,6 +1,8 @@
 import tasks from './tasks';
 import data from './data';
 
+checkForNewVersion();
+
 export async function exhCli() {
     try{
         const command = process.argv[2];
@@ -15,3 +17,15 @@ export async function exhCli() {
         process.exit(1);
     }
 }
+
+function checkForNewVersion() {
+    const updateNotifier = require('update-notifier');
+    const pkg = require('../package.json');
+  
+    const notifier = updateNotifier({
+      pkg,
+      updateCheckInterval: 0
+    });
+  
+    notifier.notify();
+  }
