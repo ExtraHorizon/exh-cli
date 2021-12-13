@@ -1,7 +1,8 @@
 {
   "name": "@extrahorizon/exh-cli",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "main": "bin/index.js",
+  "exports": "./build/index.js",
   "license": "MIT",
   "author": "Qompium",
   "scripts": {

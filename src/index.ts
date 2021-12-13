@@ -1,3 +1,5 @@
+#! /usr/bin/env node
+
 import tasks from './tasks';
 import data from './data';
 
