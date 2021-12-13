@@ -31,8 +31,8 @@ jobs:
       - name: Print version
         run: echo ${{ steps.extract_version.outputs.version }}
       - name: Create .npmrc
-        run: 
-          echo "@extrahorizon:registry=https://npm.pkg.github.com" >> .npmrc
+        run: |
+          echo "@extrahorizon:registry=https://npm.pkg.github.com" > .npmrc
           echo "//npm.pkg.github.com/:_authToken=${{secrets.GITHUB_TOKEN}}" >> .npmrc
       - uses: actions/setup-node@v1
         with:
