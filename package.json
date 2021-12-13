@@ -7,6 +7,9 @@
     "start": "yarn test",
     "build": "tsc"
   },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  },
   "bin": {
     "exh": "./bin/index.js"
   },
