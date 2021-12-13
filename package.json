@@ -1,0 +1,28 @@
+{
+  "name": "exh-cli",
+  "version": "1.0.0",
+  "main": "bin/index.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "yarn test",
+    "build": "tsc"
+  },
+  "bin": {
+    "exh": "./bin/index.js"
+  },
+  "devDependencies": {
+    "@types/dotenv-safe": "^8.1.2",
+    "@types/jsonschema": "^1.1.1",
+    "@types/lodash": "^4.14.178",
+    "@types/node": "^16.11.12",
+    "@types/update-notifier": "^5.1.0",
+    "dotenv-safe": "^8.2.0",
+    "typescript": "^4.5.3"
+  },
+  "dependencies": {
+    "@extrahorizon/javascript-sdk": "^5.2.0-dev.160",
+    "jsonschema": "^1.4.0",
+    "lodash": "^4.17.21",
+    "update-notifier": "^5.1.0"
+  }
+}

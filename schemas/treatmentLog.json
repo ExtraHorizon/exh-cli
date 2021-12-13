@@ -1,0 +1,18 @@
+{
+    "name": "treatmentlog",
+    "description": "description of treatement log",
+    "stasuses": {
+        "new": {}
+    },
+    "creationTransition": {
+        "toStatus": "new",
+        "type": "manual"
+    },
+    "properties": {
+        "current": {
+            "type": "number",
+            "minimum": 100,
+            "maximum": 5000
+        }
+    }
+}
