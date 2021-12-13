@@ -4,8 +4,36 @@ import * as path from 'path';
 
 import {extractOptions} from '../../helpers/options';
 
+const help = `
+Usage: exh tasks functions update <functionName> <options>
+
+Options
+  --code                Returns a list of existing functions
+  --entryPoint          The name of the code function that should be invoked. example 'index.handler'
+  --runtime             possible runtimes: nodejs12.x, nodejs14.x, python3.7, python3.8, python3.9, ruby2.7, java8, java11, go1.x, dotnetcore3.1
+  --description         A description for this functions
+  --timeLimit           A maximum timelimit for this function in seconds. min: 3 max: 300
+  --memoryLimit         The allocated memory for this function. min: 128 max: 10240
+  --env                 Environment Variables set for this function. This option can be used multiple times.
+  -h,--help             Documentation
+
+Please visit: https://docs.extrahorizon.com/extrahorizon-cli/ for more information.
+`;
 
 export default async function update(arg:string[]) {
+    const command = arg[0];
+    switch(command){
+        case '-h': 
+        case '--help':
+        case undefined:
+            console.log("\x1b[33m",help);
+        break;
+        default: await updateFunction(arg); break;
+
+    }
+}
+
+export async function updateFunction(arg:string[]) {
     const functionName = arg[0];
     if(!functionName) throw new Error('Please provide a function name => `exh tasks update yourFunctionName <options>`');
     if(!/^[A-Za-z0-9]+/g.test(functionName)) throw new Error('please only alphanumberic characters for your function name');

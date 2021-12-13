@@ -4,8 +4,38 @@ import * as path from 'path';
 
 import {extractOptions} from '../../helpers/options';
 
+const help = `
+Usage: exh tasks functions create <functionName> <options>
+
+Required options
+  --code                Returns a list of existing functions
+  --entryPoint          The name of the code function that should be invoked. example 'index.handler'
+  --runtime             possible runtimes: nodejs12.x, nodejs14.x, python3.7, python3.8, python3.9, ruby2.7, java8, java11, go1.x, dotnetcore3.1
+
+Other options
+  --description         A description for this functions
+  --timeLimit           A maximum timelimit for this function in seconds. min: 3 max: 300
+  --memoryLimit         The allocated memory for this function. min: 128 max: 10240
+  --env                 Environment Variables set for this function. This option can be used multiple times.
+  -h,--help             Documentation
+
+Please visit: https://docs.extrahorizon.com/extrahorizon-cli/ for more information.
+`;
 
 export default async function create(arg:string[]) {
+    const command = arg[0];
+    switch(command){
+        case '-h': 
+        case '--help':
+        case undefined:
+            console.log("\x1b[33m",help);
+        break;
+        default: await createFunction(arg); break;
+
+    }
+}
+
+export async function createFunction(arg:string[]) {
     const functionName = arg[0];
     if(!functionName) throw new Error('Please provide a function name => `exh tasks create yourFunctionName <options>`');
     if(!/^[A-Za-z0-9]+/g.test(functionName)) throw new Error('please only alphanumberic characters for your function name');
@@ -40,7 +70,7 @@ export function extractCreateFunctionOptions(arg: string[]) {
         { name:'entryPoint', required:true,schema:{type:'string',minLength:1,maxLength:200}},
         { name:'runtime', required:true,schema:{type:'string',enum:['nodejs12.x', 'nodejs14.x', 'python3.7', 'python3.8', 'python3.9', 'ruby2.7', 'java8', 'java11', 'go1.x', 'dotnetcore3.1' ]}},
         { name:'timeLimit', required:false, schema:{type:'number',minimum:3, maximum:300}},
-        { name:'memoryLimit', required:true, schema:{type:'number',minimum:128, maximum:10240}},
+        { name:'memoryLimit', required:false, schema:{type:'number',minimum:128, maximum:10240}},
         { name:'env', required:false, schema:{type:'string',pattern:'^([A-Za-z0-9-_]+)=(.)+$'}},
     ]);
 

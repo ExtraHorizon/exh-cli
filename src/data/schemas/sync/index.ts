@@ -2,6 +2,35 @@ import * as path from 'path';
 import { flatListFiles } from './listFilesInDir';
 import { readJsonFile } from './readJson';
 import { syncSchema } from './syncSchema';
+
+const help = `
+Usage: exh data schemas sync <targetDir>
+
+Options
+  -h,--help             Documentation
+
+Please visit: https://docs.extrahorizon.com/extrahorizon-cli/ for more information.
+`;
+
+export default async function sync(arg:string[]){
+    const command = arg[0];
+    switch(command){
+        case '-h': 
+        case '--help':
+        case undefined:
+            console.log("\x1b[33m",help);
+        break;
+        default: await syncSchemas(arg); break;
+    }
+}
+
+export async function syncSchemas(arg:string[]){
+    const relativePath = arg[0]? arg[0] : '.';
+    const targetSchemaDir = path.join(process.cwd(), relativePath);
+
+    await syncTargetDir(targetSchemaDir);
+}
+
 /**
  * synchronizes all target schemas at the specified directory
  * @param {string} targetDir path to the directory containing all of the target schemas
@@ -25,13 +54,8 @@ export async function syncTargetDir(targetDir) {
         const targetSchema = await readJsonFile(filePath);
 
         // synchronize with data service
-        try{
-            await syncSchema(targetSchema);
-            process.stdout.write('\n');
-        } catch (err) {
-            throw err;
-        }
-        
+        await syncSchema(targetSchema);
+        process.stdout.write('\n');
     }
 
 }

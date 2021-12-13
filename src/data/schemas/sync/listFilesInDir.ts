@@ -8,8 +8,10 @@ import { readdirSync, statSync } from 'fs';
  */
 export async function flatListFiles(dirPath) {
     let buffer = [];
+    const files = [];
+    
+    files.push(...readdirSync(dirPath));
 
-    const files = readdirSync(dirPath);
 
     for (const fileName of files) {
         const filePath = path.join(dirPath, fileName);
