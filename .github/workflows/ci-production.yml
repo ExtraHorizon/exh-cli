@@ -6,19 +6,6 @@ on:
       - master
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Use Node LTS
-        uses: actions/setup-node@v1
-        with:
-          node-version: 14
-          registry-url: https://npm.pkg.github.com/
-          scope: '@extrahorizon'
-      - run: yarn
-
   publish-gpr:
     needs: build
     runs-on: ubuntu-latest
