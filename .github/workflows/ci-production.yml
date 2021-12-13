@@ -17,13 +17,7 @@ jobs:
           node-version: 14
           registry-url: https://npm.pkg.github.com/
           scope: '@extrahorizon'
-      - run: yarn install
-      - run: yarn test
-      - name: Upload test results
-        uses: actions/upload-artifact@v2
-        with:
-          name: test-results
-          path: test-results/
+      - run: yarn
 
   publish-gpr:
     needs: build
@@ -36,12 +30,14 @@ jobs:
         uses: Saionaro/extract-package-version@v1.0.6
       - name: Print version
         run: echo ${{ steps.extract_version.outputs.version }}
+      - name: Create .npmrc
+        run: echo "@extrahorizon:registry=https://npm.pkg.github.com" >> .npmrc
       - uses: actions/setup-node@v1
         with:
           node-version: 14
           registry-url: https://npm.pkg.github.com/
           scope: '@extrahorizon'
-      - run: yarn install
+      - run: yarn
       - run: yarn build
       - run: git config --global user.email "$GITHUB_ACTOR@users.noreply.github.com" && git config --global user.name "$GITHUB_ACTOR"
       - run: git tag -a v${{steps.extract_version.outputs.version}} -m "Tagging v${{steps.extract_version.outputs.version}}"
@@ -49,3 +45,9 @@ jobs:
       - run: yarn publish --registry https://npm.pkg.github.com/
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+
+
+- name: Create .npmrc
+    run: |
+      echo "@extrahorizon:registry=https://npm.pkg.github.com" >> .npmrc
