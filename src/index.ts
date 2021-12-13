@@ -5,13 +5,27 @@ import data from './data';
 
 checkForNewVersion();
 
+const help = `ExtraHorizon cli
+
+Usage: exh [service] [command]
+
+Services
+  - data
+  - tasks
+
+Please visit: https://docs.extrahorizon.com/extrahorizon-cli/ for more information.
+`;
+
 export async function exhCli() {
     try{
         const command = process.argv[2];
         switch(command){
             case 'tasks': await tasks(process.argv.slice(3)); break;
             case 'data': await data(process.argv.slice(3)); break;
-            default: console.log('Please specifiy a command'); break;
+            case '-h': console.log(help); break;
+            case '--help': console.log(help); break;
+            case undefined: console.log(help); break;
+            default: console.log(`error Command "${command}" not found.\ninfo Visit https://docs.extrahorizon.com/extrahorizon-cli/ for documentation about this command.`); break;
         }
     }
     catch(e){
