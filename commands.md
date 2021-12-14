@@ -52,13 +52,25 @@ The cli will then check wether the schema already exists or create a new one and
 ### List tasks
 
 ```
-exh tasks list
+exh tasks functions list
 ```
 
-The list tasks command will list all functions currently configured in the&#x20;
+This command will list all functions currently configured in the task service.
 
-### Create a new task
+### Create a new function
 
-### Update a task
+```
+exh tasks functions create <functionName> <options>
+```
 
-### Delete task
+### Update a function
+
+```
+exh tasks functions update <functionName> <options>
+```
+
+### Delete function
+
+```
+exh tasks functions delete <functionName>
+```
