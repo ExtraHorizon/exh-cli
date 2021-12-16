@@ -48,29 +48,3 @@ Inside this directory you can define schema's and save them with a .json extensi
 {% endcode %}
 
 The cli will then check wether the schema already exists or create a new one and look for the differences and make sure these are synchronized.
-
-### List tasks
-
-```
-exh tasks functions list
-```
-
-This command will list all functions currently configured in the task service.
-
-### Create a new function
-
-```
-exh tasks functions create <functionName> <options>
-```
-
-### Update a function
-
-```
-exh tasks functions update <functionName> <options>
-```
-
-### Delete function
-
-```
-exh tasks functions delete <functionName>
-```
