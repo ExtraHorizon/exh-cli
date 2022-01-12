@@ -6,9 +6,9 @@ import {
 export class SyncSchema {
   private ds: DataService;
 
-  private current: any;
+  private current: any = null;
 
-  private target: any;
+  private target: any = null;
 
   static createSchemaSync(sdk: any): SyncSchema {
     return new SyncSchema(sdk);
@@ -18,8 +18,7 @@ export class SyncSchema {
     this.ds = DataService.createDataService(sdk);
   }
 
-  async sync(current: any, target: any) {
-    this.current = current;
+  async sync(target: any) {
     this.target = target;
 
     if (!this.target.name) {
@@ -28,9 +27,9 @@ export class SyncSchema {
     }
     console.log(`Syncing ${this.target.name}`);
 
-    let currentSchema = await this.ds.fetchSchemaByName(this.target.name);
+    this.current = await this.ds.fetchSchemaByName(this.target.name);
 
-    if (!currentSchema) {
+    if (!this.current) {
       currentSchema = await this.ds.createSchema(this.target.name, this.target.description);
     }
 
@@ -319,4 +318,3 @@ function deepDiff(object: any, other: any) {
     }
   });
 }
-

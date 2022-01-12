@@ -41,8 +41,7 @@ export async function syncTargetDir(sdk: any, targetDir: string) {
     const targetSchema = await readJsonFile(filePath);
 
     // synchronize with data service
-    await syncSchema.sync(sdk, targetSchema);
+    await syncSchema.sync(targetSchema);
     process.stdout.write('\n');
   }
 }
-
