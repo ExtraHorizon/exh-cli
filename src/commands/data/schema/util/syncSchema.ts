@@ -30,7 +30,7 @@ export class SyncSchema {
     this.current = await this.ds.fetchSchemaByName(this.target.name);
 
     if (!this.current) {
-      currentSchema = await this.ds.createSchema(this.target.name, this.target.description);
+      this.current = await this.ds.createSchema(this.target.name, this.target.description);
     }
 
     //  root attributes: update
