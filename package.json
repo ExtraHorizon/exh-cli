@@ -33,6 +33,8 @@
   },
   "dependencies": {
     "@extrahorizon/javascript-sdk": "^5.2.0-dev.160",
+    "ajv": "^8.8.2",
+    "chalk": "^4.0.0",
     "jsonschema": "^1.4.0",
     "lodash": "^4.17.21",
     "update-notifier": "^5.1.0",
