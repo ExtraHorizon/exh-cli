@@ -164,4 +164,22 @@ export class DataService {
   async deleteTransition(schemaId:string, transitionId:string) {
     return await this.sdk.raw.delete(`/data/v1/${schemaId}/transitions/${transitionId}`);
   }
+
+  /**
+ * create an index
+ * @param {string} schemaId     the schema identifier
+ * @param {string} index      the identifier for the index to remove
+ */
+  async createIndex(schemaId:string, index: any) {
+    return await this.sdk.raw.post(`/data/v1/${schemaId}/indexes`, index);
+  }
+
+  /**
+ * delete an existing index
+ * @param {string} schemaId     the schema identifier
+ * @param {string} indexId      the identifier for the index to remove
+ */
+  async deleteIndex(schemaId:string, indexId:string) {
+    return await this.sdk.raw.delete(`/data/v1/${schemaId}/indexes/${indexId}`);
+  }
 }
