@@ -8,13 +8,14 @@ export const command = 'sync';
 export const desc = 'sync all schemas in a directory with the ExH cloud';
 export const builder = (yargs: any) => epilogue(yargs).options({
   target: {
+    demandOption: true,
     describe: 'Directory containing the schemas which need to be synced',
     type: 'string',
   },
 });
 
 export const handler = async ({ sdk, target }) => {
-  await syncTargetDir(sdk, path.join(process.cwd(), target || '.'));
+  await syncTargetDir(sdk, path.resolve(target || '.'));
 };
 
 /**

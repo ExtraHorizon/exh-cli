@@ -1,0 +1,196 @@
+{
+    "type": "object",
+
+    "properties": {
+        "name": {
+            "type": "string"
+        },
+        "description": {
+            "type": "string"
+        },
+
+        "createMode": {
+            "enum": [ "default", "permissionRequired" ],
+            "type": "string"
+        },
+        "deleteMode": {
+            "enum": [ "permissionRequired", "linkedUsersOnly" ],
+            "type": "string"
+        },
+        "readMode": {
+            "enum": [ "default", "allUsers", "enlistedInLinkedGroups" ],
+            "type": "string"
+        },
+        "updateMode": {
+            "enum": [ "default", "creatorOnly", "disabled", "linkedGroupsStaffOnly" ],
+            "type": "string"
+        },
+        "groupSyncMode": {
+            "type": "string",
+            "enum": [ "disabled", "creatorPatientEnlistments", "linkedUsersPatientEnlistments" ]
+        },
+        "defaultLimit": {
+            "type": "integer"
+        },
+        "maximumLimit": {
+            "type": "integer"
+        },
+        "statuses": {
+            "patternProperties": {
+                "^[a-f-]+": {
+                    "type": "object"
+                }
+            },
+            "type": "object"
+        },
+        "creationTransition": {
+            "properties": {
+                "actions": { 
+                  "$ref": "#/definitions/actions" 
+                },
+                "conditions": {
+                    "$ref": "#/definitions/conditions"
+                },
+                "toStatus": {
+                    "pattern": "^[a-f-]*",
+                    "type": "string"
+                },
+                "type": {
+                    "const": "manual"
+                }
+            },
+            "additionalProperties": false,
+            "required": [
+                "type",
+                "toStatus"
+            ],
+            "type": "object"
+        },
+        "transitions": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                   "name": {
+                        "type": "string"
+                    },
+                    "type": {
+                        "enum": [
+                            "manual",
+                            "automatic"
+                        ],
+                        "type": "string"
+                    },
+                    "fromStatuses": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": "array"
+                    },
+                    "toStatus": {
+                        "type": "string"
+                    },
+                    "actions": {
+                        "$ref": "#/definitions/actions"
+                    },
+                    "conditions": {
+                        "$ref": "#/definitions/conditions"
+                    }
+                },
+                "additionalProperties": false,
+                "required": [
+                    "name",
+                    "type",
+                    "fromStatuses",
+                    "toStatus"
+                ]
+            }
+        },
+        "indexes": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "fields": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "name": {
+                                    "type": "string"
+                                },
+                                "type": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "options": {
+                        "type": "object",
+                        "properties": {
+                            "unique": {
+                                "type": "boolean"
+                            },
+                            "sparse": {
+                                "type": "boolean"
+                            }
+                        },
+                        "additionalProperties": false
+                    }
+                },
+                "additionalProperties": false,
+                "required": [ "name", "fields"]
+            }
+        },
+        "properties": {
+            "type": "object"
+        }
+    },
+    "required": [
+        "name",
+        "description",
+        "statuses",
+        "properties"
+    ],
+    "additionalProperties": false,
+    "definitions": {
+        "actions": {
+            "items": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [ "task", "set", "unset", "addItems", "removeItems", "linkCreator", "linkUserFromData", "linkEnlistedGroups", "linkGroupFromData" ]
+                  }
+                },
+                "required": [ "type" ]
+            },
+            "type": "array"
+        },
+        "conditions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                  "configuration": {
+                      "type": "object"
+                  },
+                  "type": {
+                      "enum": [
+                          "input",
+                          "initiatorHasRelationToUserInData",
+                          "initiatorHasRelationToGroupInData",
+                          "document"
+                      ],
+                      "type": "string"
+                  }
+              },
+              "additionalProperties": false,
+              "required": [ "type", "configuration" ]
+            }
+        }
+    }
+}

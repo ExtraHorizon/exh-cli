@@ -19,6 +19,9 @@ checkForNewVersion();
 /* eslint-disable @typescript-eslint/no-floating-promises */
 yargs(hideBin(process.argv)).middleware(async () => {
   /* Inject sdk authentication into every command */
+  if (process.env.NO_SDK) {
+    return { sdk: 'no-sdk' };
+  }
   try {
     const sdk = await ExH();
     return { sdk };
@@ -26,5 +29,6 @@ yargs(hideBin(process.argv)).middleware(async () => {
     throw new Error('Failed to get credentials. Make sure they are specified in ~/.exh/credentials');
   }
 }).commandDir('commands')
+  .strict()
   .demandCommand(1)
   .parse();
