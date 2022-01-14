@@ -11,7 +11,6 @@ export function epilogue(y: yargs.Argv): yargs.Argv {
     }
     if (err) {
       console.log(chalk.red(err.message));
-      console.log(chalk.red(err.stack));
     } else {
       console.log(chalk.red(msg));
     }

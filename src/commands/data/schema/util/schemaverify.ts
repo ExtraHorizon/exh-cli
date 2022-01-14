@@ -55,7 +55,7 @@ export class SchemaVerify {
         properties: this.schema.properties,
       };
       if (!this.ajv.validateSchema(tmpSchema)) {
-        return { ok: false, errors: this.ajv.errors };
+        return { ok: false, errors: transformAjvErrors('', this.ajv.errors) };
       }
     }
     return { ok: true, errors: [] };
