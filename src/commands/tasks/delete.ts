@@ -14,6 +14,6 @@ export const handler = async ({ sdk, name }) => {
   if (response.data?.affectedRecords) {
     console.log(chalk.green('Successfully deleted task', name));
   } else {
-    console.log(chalk.red('Failed to delete task, name'));
+    console.log(chalk.red('Failed to delete task', name));
   }
 };
