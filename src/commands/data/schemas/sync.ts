@@ -9,15 +9,15 @@ import { handler as verifyHandler } from './verify';
 export const command = 'sync';
 export const desc = 'Sync all schemas in a directory with the ExH cloud';
 export const builder = (yargs: any) => epilogue(yargs).options({
-  target: {
+  dir: {
     demandOption: true,
     describe: 'Directory containing the schemas which need to be synced',
     type: 'string',
   },
 });
 
-export const handler = async ({ sdk, target }) => {
-  await syncTargetDir(sdk, path.resolve(target || '.'));
+export const handler = async ({ sdk, dir }) => {
+  await syncTargetDir(sdk, path.resolve(dir || '.'));
 };
 
 /**
