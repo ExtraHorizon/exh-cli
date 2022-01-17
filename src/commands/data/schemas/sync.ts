@@ -1,11 +1,13 @@
 import * as path from 'path';
+import * as chalk from 'chalk';
 import { flatListFiles } from './util/listFilesInDir';
 import { readJsonFile } from './util/readJson';
 import { SyncSchema } from './util/syncSchema';
 import { epilogue } from '../../../helpers/util';
+import { handler as verifyHandler } from './verify';
 
 export const command = 'sync';
-export const desc = 'sync all schemas in a directory with the ExH cloud';
+export const desc = 'Sync all schemas in a directory with the ExH cloud';
 export const builder = (yargs: any) => epilogue(yargs).options({
   target: {
     demandOption: true,
@@ -23,6 +25,9 @@ export const handler = async ({ sdk, target }) => {
  * @param {string} targetDir path to the directory containing all of the target schemas
  */
 export async function syncTargetDir(sdk: any, targetDir: string) {
+  /* Do a verification of the schema before syncing it */
+  await verifyHandler({ dir: targetDir, file: null });
+
   // list all the target files inside of the directory
   const targetFiles = await flatListFiles(targetDir);
 
@@ -36,7 +41,7 @@ export async function syncTargetDir(sdk: any, targetDir: string) {
       continue;
     }
 
-    console.log(`Synchronizing ${path.basename(filePath)}`);
+    console.log(chalk.bold(`Synchronizing ${path.basename(filePath)}`));
 
     // parse to object
     const targetSchema = await readJsonFile(filePath);

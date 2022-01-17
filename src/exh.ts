@@ -18,7 +18,7 @@ export default async function create() {
 
   const credentialsFile = fs.readFileSync(path.join(process.env.HOME, '/.exh/credentials'), 'utf-8');
   const credentials = credentialsFile.split(/\r?\n/).map(l => l.split(/=/)).filter(i => i.length === 2)
-    .reduce<ExHCredentials>((r, v) => { r[v[0]] = v[1]; return r; }, {});
+    .reduce<ExHCredentials>((r, v) => { r[v[0]] = v[1]; return r; }, {}); /* eslint-disable-line */
 
   if (!credentials.API_HOST) throw new Error('Missing credentials parameter API_HOST');
   if (!credentials.API_OAUTH_CONSUMER_KEY) throw new Error('Missing credential parameters API_OAUTH_CONSUMER_KEY');

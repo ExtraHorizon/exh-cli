@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import * as chalk from 'chalk';
 import { epilogue } from '../../helpers/util';
 
 export const command = 'create';
@@ -63,12 +64,9 @@ export const builder = (yargs: any) => epilogue(yargs).options({
   });
 
 export const handler = async ({ sdk, name, code, entryPoint, runtime, description, timeLimit, memoryLimit, env }) => {
-  const envArr = Array.isArray(env) ? env : [env];
+  let envArr = Array.isArray(env) ? env : [env];
+  envArr = envArr.map(e => e.split('=')).filter(e => e.length === 2).reduce((prev, curr) => ({ ...prev, [curr[0]]: { value: curr[1] } }), {});
 
-  if (process.env.DEBUG) {
-    console.log('Create task called:', sdk, name, code, entryPoint, runtime, description, timeLimit, memoryLimit, env);
-    return;
-  }
   const file = fs.readFileSync(path.join(process.cwd(), code));
 
   const functions = (await sdk.raw.get('/tasks/v1/functions')).data.data;
@@ -77,7 +75,7 @@ export const handler = async ({ sdk, name, code, entryPoint, runtime, descriptio
 
   const response = await sdk.raw.post('/tasks/v1/functions', {
     name,
-    description,
+    description: description || 'none',
     code: file.toString('base64'),
     entryPoint,
     runtime,
@@ -85,5 +83,5 @@ export const handler = async ({ sdk, name, code, entryPoint, runtime, descriptio
     memoryLimit,
     environmentVariables: envArr,
   });
-  console.log(response.data);
+  console.log(chalk.green('Successfully created task', response.data.name));
 };

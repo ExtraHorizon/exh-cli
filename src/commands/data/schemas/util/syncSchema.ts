@@ -221,7 +221,7 @@ export class SyncSchema {
     // evaluate missing
     const missingTransitions:any = _.differenceBy(
       this.target.transitions,
-      this.target.transitions,
+      this.current.transitions,
       'name'
     );
 
