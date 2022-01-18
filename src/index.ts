@@ -18,11 +18,16 @@ function checkForNewVersion() {
 checkForNewVersion();
 
 /* eslint-disable @typescript-eslint/no-floating-promises */
-yargs(hideBin(process.argv)).middleware(async () => {
+yargs(hideBin(process.argv)).middleware(async argv => {
   /* Check if output is tty or not */
   let isTTY = true;
   if (!tty.isatty(process.stdout.fd)) {
     isTTY = false;
+  }
+
+  if (argv.email && argv.password) {
+    /* Login command, don't authenticate with sdk */
+    return { isTTY };
   }
 
   /* Inject sdk authentication into every command */

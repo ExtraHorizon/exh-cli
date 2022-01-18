@@ -57,7 +57,7 @@ export const builder = (yargs: any) => epilogue(yargs).options({
     }
     if (!/^[A-Za-z0-9]+/g.test(name)) throw new Error('Please use only alphanumberic characters for your function name');
 
-    if (!fs.existsSync(path.join(process.cwd(), code)) || !fs.lstatSync(path.join(process.cwd(), code)).isFile()) {
+    if (!fs.existsSync(path.join(process.cwd(), code)) || !fs.statSync(path.join(process.cwd(), code)).isFile()) {
       throw new Error('please provide a valid file path for your code');
     }
     return true;

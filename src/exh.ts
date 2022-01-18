@@ -1,6 +1,6 @@
 import { createOAuth1Client } from '@extrahorizon/javascript-sdk';
 import * as fs from 'fs';
-import * as path from 'path';
+import { EXH_CONFIG_FILE } from './constants';
 
 interface ExHCredentials {
     API_HOST?: string;
@@ -16,7 +16,7 @@ let sdk = null;
 export default async function create() {
   if (initialized) return sdk;
 
-  const credentialsFile = fs.readFileSync(path.join(process.env.HOME, '/.exh/credentials'), 'utf-8');
+  const credentialsFile = fs.readFileSync(EXH_CONFIG_FILE, 'utf-8');
   const credentials = credentialsFile.split(/\r?\n/).map(l => l.split(/=/)).filter(i => i.length === 2)
     .reduce<ExHCredentials>((r, v) => { r[v[0]] = v[1]; return r; }, {}); /* eslint-disable-line */
 
