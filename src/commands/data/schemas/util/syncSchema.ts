@@ -305,65 +305,38 @@ export class SyncSchema {
       return;
     }
 
+    const newIndexes: any = [];
+    let removedIndexes: any = [];
+
     /* Remove the system indexes which cannot be managed by the user */
-    const filteredCurrentIndexes = this.current.indexes.filter((index: any) => index.system === false);
+    const filteredCurrentIndexes = this.current.indexes.filter((index: any) => index.system === false).map((idx:any) => ({ idx, marked: false }));
 
-    /* Gather indexes which need to be added */
-    const missingIndexes:any = _.differenceBy(
-      this.target.indexes,
-      filteredCurrentIndexes,
-      'name'
-    );
-
-    /* Gather indexes which need to be removed */
-    const excessIndexes:any = _.differenceBy(
-      filteredCurrentIndexes,
-      this.target.indexes,
-      'name'
-    );
-
-    /* Helper function for comparing indexes (ignore auto-generated id in comparison) */
-    const compareIndexes = (targetIndex: any, currentIndex: any) => _.isEqual(
-      targetIndex,
-      _.omit(currentIndex, ['id'])
-    );
-
-    /* Gather indexes which need to be updated */
-    const incorrectIndexes:any = _.differenceWith(
-    // targets, omit missing
-      _.differenceBy(this.target.indexes, missingIndexes, 'name'),
-      // current, omit excess
-      _.differenceBy(filteredCurrentIndexes, excessIndexes, 'name'),
-      // compare via helper function
-      compareIndexes
-    );
-
-    /*  Add missing indexes */
-    for (const targetIndex of missingIndexes) {
-      console.log(`Indexes: adding ${targetIndex.name}`);
-      await this.ds.createIndex(this.current.id, targetIndex);
+    for (const newIdx of this.target.indexes) {
+      let found = false;
+      for (const oldIdx of filteredCurrentIndexes) {
+        if (_.isEqual(_.omit(oldIdx.idx, ['name', 'id', 'system']), _.omit(newIdx, ['name']))) {
+          found = true;
+          oldIdx.marked = true;
+          break;
+        }
+      }
+      if (!found) {
+        newIndexes.push(newIdx);
+      }
     }
 
-    // update - helper function
-    const findIndexByName = (name: string) => _.find(
-      this.current.indexes,
-      index => index.name === name
-    );
+    removedIndexes = filteredCurrentIndexes.filter((idx:any) => idx.marked === false);
 
-    /* Update existing indexes */
-    for (const targetIndex of incorrectIndexes) {
-      /* There's no update function so we'll need to delete and re-create */
-      console.log(`Indexes: updating ${targetIndex.name}`);
-      console.log('\t-> Deleting old index');
-      await this.ds.deleteIndex(this.current.id, findIndexByName(targetIndex.name).id);
-      console.log('\t-> Re-creating index');
-      await this.ds.createIndex(this.current.id, targetIndex);
+    /*  Delete indexes to be deleted */
+    for (const idx of removedIndexes) {
+      console.log(`Indexes: remove ${idx.name}`);
+      await this.ds.deleteIndex(this.current.id, idx.id);
     }
 
-    //  delete excess
-    for (const currentIndex of excessIndexes) {
-      console.log(`Indexes: removing ${currentIndex.name}`);
-      await this.ds.deleteIndex(this.current.id, currentIndex.id);
+    /* Create new indexes */
+    for (const idx of newIndexes) {
+      console.log('\t-> Creating index');
+      await this.ds.createIndex(this.current.id, idx);
     }
   }
 }
