@@ -123,7 +123,8 @@
                                     "type": "string"
                                 },
                                 "type": {
-                                    "type": "string"
+                                    "type": "string",
+                                    "enum": ["asc", "desc"]
                                 }
                             }
                         }

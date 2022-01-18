@@ -325,17 +325,17 @@ export class SyncSchema {
       }
     }
 
-    removedIndexes = filteredCurrentIndexes.filter((idx:any) => idx.marked === false);
+    removedIndexes = filteredCurrentIndexes.filter((idx:any) => idx.marked === false).map((idx:any) => idx.idx);
 
     /*  Delete indexes to be deleted */
     for (const idx of removedIndexes) {
-      console.log(`Indexes: remove ${idx.name}`);
+      console.log(`Indexes: remove index ${idx.id}`);
       await this.ds.deleteIndex(this.current.id, idx.id);
     }
 
     /* Create new indexes */
     for (const idx of newIndexes) {
-      console.log('\t-> Creating index');
+      console.log('\t-> Creating new index');
       await this.ds.createIndex(this.current.id, idx);
     }
   }
