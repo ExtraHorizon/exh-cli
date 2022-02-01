@@ -12,7 +12,7 @@ exports.handler(()=>{
 
 If you are using visual studio code, this should look something like this:
 
-![](../.gitbook/assets/image.png)
+![](../../.gitbook/assets/image.png)
 
 ### Creating a packaged zip file
 
@@ -24,17 +24,17 @@ zip code.zip index.js
 
 This will put our **index.js** file in the root of code.zip. You can also include dependencies by including the node\_modules folder in your zip file. This should look like this.
 
-![](<../.gitbook/assets/Schermafbeelding 2021-12-16 om 15.23.22.png>)
+![](<../../.gitbook/assets/Schermafbeelding 2021-12-16 om 15.23.22.png>)
 
 ### Deploying with the ExH CLI
 
-Once our script is packaged in a zip file we can deploy it to the task service using the EXH CLI Tool.&#x20;
+Once our script is packaged in a zip file we can deploy it to the task service using the EXH CLI Tool.
 
 ```
-exh tasks functions create hello-world \
+exh tasks create hello-world \
    --code=code.zip \
    --entryPoint=index.handler \
-   --runtime="nodejs12.x"
+   --runtime="nodejs14.x"
 ```
 
 To create a function we need to provide:
@@ -44,6 +44,11 @@ To create a function we need to provide:
 * The entryPoint in this case our handler function in the index.js file and;
 * The runtime needed to run our code.
 
-![](<../.gitbook/assets/Schermafbeelding 2021-12-16 om 15.30.57.png>)
+![](<../../.gitbook/assets/Schermafbeelding 2021-12-16 om 15.30.57.png>)
 
 You can see a hello-world function has been created in the task service. Visit the [Task service documentation](https://app.gitbook.com/o/-MkCjSW-Ht0-VBM7yuP9/s/-Mi5veV04lYlkS769Dcp/) on how to create a task and run it.
+
+### Tips
+
+* When bundling your task in a zip file, make sure that you also include the `node_modules` directory if necessary
+* Make sure not include any developer dependencies when bundling your task. Otherwise the size of your task might be too big (there is a 10MB limit). You can easily strip developer dependencies by using `npm install --production` or `yarn install --production`
