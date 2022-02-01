@@ -3,7 +3,7 @@
 To get started with the ExtraHorizon CLI (exh-cli) you'll need to install it and get credentials which will allow you to access the backend.
 
 * [Installation](installation.md)
-* configure credentials
+* [configure credentials](https://docs.extrahorizon.com/cli/#configuring-your-credentials)
 * [command overview](./#general)
 
 ### Configuring your credentials
@@ -34,8 +34,8 @@ That's it! You should now be ready to use exh-cli
 
 ### Command Overview
 
-* ****[**Data**](features/commands.md) **->**commands related to data service management
-* ****[**Tasks**](features/tasks/) **->**command related to task service management
+* ****[**Data**](commands/commands.md) **->**commands related to data service management
+* ****[**Tasks**](commands/tasks/) **->**command related to task service management
 
 You can always use the `--help` option in order to get help on a certain command. For example
 

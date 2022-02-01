@@ -2,13 +2,12 @@
 
 * [Getting started](README.md)
 * [Installation](installation.md)
-* [Commands](commands.md)
 
 ## features
 
-* [Data](features/commands.md)
-* [Tasks](features/tasks/README.md)
-  * [Hello world Task](features/tasks/hello-world-task.md)
+* [Data](commands/commands.md)
+* [Tasks](commands/tasks/README.md)
+  * [Hello world Task](commands/tasks/hello-world-task.md)
 
 ## other
 
