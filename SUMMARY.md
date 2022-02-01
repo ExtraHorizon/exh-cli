@@ -1,10 +1,14 @@
 # Table of contents
 
 * [Getting started](README.md)
-* [Commands](commands/README.md)
-  * [Data](commands/commands.md)
-  * [Tasks](commands/tasks/README.md)
-    * [Hello world Task](commands/tasks/hello-world-task.md)
+* [Installation](installation.md)
+* [Commands](commands.md)
+
+## features
+
+* [Data](features/commands.md)
+* [Tasks](features/tasks/README.md)
+  * [Hello world Task](features/tasks/hello-world-task.md)
 
 ## other
 

@@ -2,60 +2,11 @@
 
 To get started with the ExtraHorizon CLI (exh-cli) you'll need to install it and get credentials which will allow you to access the backend.
 
-## Installation <a href="#installation" id="installation"></a>
+* [Installation](installation.md)
+* configure credentials
+* [command overview](./#general)
 
-#### Configuring .npmrc
-
-Assuming you've created a project (using `npm init` or equivalent), you need to create a file called `.npmrc` at the root level of your project and add the following lines:
-
-```
-@extrahorizon:registry=https://npm.pkg.github.com
-//npm.pkg.github.com/:_authToken=${AUTH_TOKEN}
-```
-
-Replace ${AUTH\_TOKEN} with your personal access token. You can get a new one at [https://github.com/settings/tokens/new](https://github.com/settings/tokens/new). Make sure you enable the `read:packages` scope.
-
-Explanation from GitHub on how to add your token can be found here [https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry#authenticating-to-github-packages](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry#authenticating-to-github-packages)
-
-{% hint style="info" %}
-You can also add the `.npmrc` to your home directory. In which case it will apply to all your projects.
-{% endhint %}
-
-#### Install CLI
-
-Next, install exh-cli in your project as a developer dependency.
-
-{% tabs %}
-{% tab title="npm" %}
-```
-npm install -D @extrahorizon/exh-cli
-```
-{% endtab %}
-
-{% tab title="yarn" %}
-```
-yarn add -D @extrahorizon/exh-cli
-```
-{% endtab %}
-{% endtabs %}
-
-In you want to use exh-cli in all your projects, you can also install it globally using
-
-{% tabs %}
-{% tab title="npm" %}
-```
-npm install -g @extrahorizon/exh-cli
-```
-{% endtab %}
-
-{% tab title="yarn" %}
-```
-yarn global add @extrahorizon/exh-cli
-```
-{% endtab %}
-{% endtabs %}
-
-#### Configuring your credentials
+### Configuring your credentials
 
 Next we will configure the credentials which exh-cli needs  to access the ExtraHorizon cloud.  You should have an account on the ExtraHorizon cloud. If not, please contact your representative.
 
@@ -80,3 +31,43 @@ API_OAUTH_TOKEN_SECRET=***************************
 {% endcode %}
 
 That's it! You should now be ready to use exh-cli
+
+### Command Overview
+
+* ****[**Data**](features/commands.md) **->**commands related to data service management
+* ****[**Tasks**](features/tasks/) **->**command related to task service management
+
+You can always use the `--help` option in order to get help on a certain command. For example
+
+```
+exh data schemas --help
+```
+
+will return
+
+```
+build data schemas <command>
+
+Manage data schemas
+
+Commands:
+  build data schemas delete  Delete a schema
+  build data schemas list    List all schemas
+  build data schemas sync    Sync all schemas in a directory with the ExH cloud
+  build data schemas verify  Syntactically verify a local schema
+
+Options:
+  --help     Show help                                                 [boolean]
+  --version  Show version number                                       [boolean]
+
+Visit https://docs.extrahorizon.com/extrahorizon-cli/ for more information.
+```
+
+and then you can dig down further asking help for a specific command such as
+
+```
+exh {service} {subcCommands...} --help
+
+//an example
+exh data schemas sync --help
+```
