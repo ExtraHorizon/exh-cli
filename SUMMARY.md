@@ -1,7 +1,11 @@
 # Table of contents
 
 * [Getting started](README.md)
-* [Installation](installation.md)
+
+## setup
+
+* [Installation](setup/installation.md)
+* [Credentials](setup/credentials.md)
 
 ## features
 
