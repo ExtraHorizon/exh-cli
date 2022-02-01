@@ -1,0 +1,6 @@
+{
+  "extends": ["@qompium/eslint-config-q-node"],
+  "parserOptions": {
+    "project": "./tsconfig.json"
+  }
+}
