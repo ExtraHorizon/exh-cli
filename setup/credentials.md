@@ -14,7 +14,7 @@ This command will create credentials in your home directory in `.exh/credentials
 
 {% code title="Example ~/.exh/credentials" %}
 ```
-API_HOST=env.customer.extrahorizon.io
+API_HOST=https://env.customer.extrahorizon.io
 API_OAUTH_CONSUMER_KEY=****************************
 API_OAUTH_CONSUMER_SECRET=****************************
 API_OAUTH_TOKEN=****************************
