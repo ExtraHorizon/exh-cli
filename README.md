@@ -1,6 +1,10 @@
 # Getting started
 
-To get started with the ExtraHorizon CLI (exh-cli) you'll need to install it and get credentials which will allow you to access the backend.
+{% hint style="warning" %}
+The ExtraHorizon CLI is currently in **Beta**
+{% endhint %}
+
+$To get started with the ExtraHorizon CLI (exh-cli) you'll need to install it and get credentials which will allow you to access the backend.
 
 * [Installation](setup/installation.md)
 * [configure credentials](setup/credentials.md)
