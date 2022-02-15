@@ -1,7 +1,9 @@
 import * as fs from 'fs';
-import * as path from 'path';
+import { unlink } from 'fs/promises';
+import * as ospath from 'path';
 import * as chalk from 'chalk';
 import { epilogue } from '../../helpers/util';
+import { zipFileFromDirectory } from './util';
 
 export const command = 'create';
 export const desc = 'Create a new task';
@@ -12,8 +14,13 @@ export const builder = (yargs: any) => epilogue(yargs).options({
     type: 'string',
   },
   code: {
-    demandOption: true,
-    describe: 'Zip\'d contents of the directory containing the (compile) task code',
+    demandOption: false,
+    describe: 'Zip\'d contents of the directory containing the (compiled) task code. Use either this option or the path option',
+    type: 'string',
+  },
+  path: {
+    demandOption: false,
+    describe: 'This will zip the directory provided by path for you and upload the generated zip file. Use either this option or the code option',
     type: 'string',
   },
   entryPoint: {
@@ -48,7 +55,7 @@ export const builder = (yargs: any) => epilogue(yargs).options({
     default: [],
   },
 })
-  .check(({ timeLimit, memoryLimit, name, code }) => {
+  .check(({ timeLimit, memoryLimit, name, code, path }) => {
     if (timeLimit !== undefined && (timeLimit < 3 || timeLimit > 900)) {
       throw new Error('ERROR: timeLimit out of bounds!');
     }
@@ -57,17 +64,31 @@ export const builder = (yargs: any) => epilogue(yargs).options({
     }
     if (!/^[A-Za-z0-9]+/g.test(name)) throw new Error('Please use only alphanumberic characters for your task name');
 
-    if (!fs.existsSync(path.join(process.cwd(), code)) || !fs.statSync(path.join(process.cwd(), code)).isFile()) {
+    if (code && (!fs.existsSync(ospath.join(process.cwd(), code)) || !fs.statSync(ospath.join(process.cwd(), code)).isFile())) {
       throw new Error('please provide a valid file path for your code');
+    }
+    if (path && (!fs.existsSync(ospath.join(process.cwd(), path)) || fs.statSync(ospath.join(process.cwd(), path)).isFile())) {
+      console.log(ospath.join(process.cwd(), path));
+      throw new Error('please provide a valid directory path for your code');
+    }
+
+    if ((code && path) || (!code && !path)) {
+      throw new Error('Either path or code must be specified (but not both at the same time)');
     }
     return true;
   });
 
-export const handler = async ({ sdk, name, code, entryPoint, runtime, description, timeLimit, memoryLimit, env }) => {
+export const handler = async ({ sdk, name, code, path, entryPoint, runtime, description, timeLimit, memoryLimit, env }) => {
   let envArr = Array.isArray(env) ? env : [env];
+  let uploadFilePath = code;
   envArr = envArr.map(e => e.split('=')).filter(e => e.length === 2).reduce((prev, curr) => ({ ...prev, [curr[0]]: { value: curr[1] } }), {});
 
-  const file = fs.readFileSync(path.join(process.cwd(), code));
+  if (path) {
+    uploadFilePath = await zipFileFromDirectory(ospath.join(process.cwd(), path));
+  } else {
+    uploadFilePath = ospath.join(process.cwd(), code);
+  }
+  const file = fs.readFileSync(uploadFilePath);
 
   const functions = (await sdk.raw.get('/tasks/v1/functions')).data.data;
   const myFunction = functions.find((f:any) => f.name === name);
@@ -83,5 +104,10 @@ export const handler = async ({ sdk, name, code, entryPoint, runtime, descriptio
     memoryLimit,
     environmentVariables: envArr,
   });
+
+  /* Remove temp file */
+  if (path) {
+    await unlink(uploadFilePath);
+  }
   console.log(chalk.green('Successfully created task', response.data.name));
 };
