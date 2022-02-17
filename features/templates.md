@@ -23,7 +23,7 @@ exh templates get --name=mytemplate
 Or by `id`
 
 ```
-exh templates get --name=620d0eaacff47e000714b13d
+exh templates get --id=620d0eaacff47e000714b13d
 ```
 
 ## Synchronizing template
