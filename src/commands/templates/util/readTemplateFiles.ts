@@ -24,7 +24,7 @@ export async function readTemplateJson(fileName: string) {
   return readJsonFile(fileName);
 }
 
-async function readTemplateFolder(subFolder: string) {
+export async function readTemplateFolder(subFolder: string) {
   const templateFile = await readTemplateJson(path.join(subFolder, 'template.json'));
 
   const templateFields = await readTemplateFolderFieldFiles(subFolder);
