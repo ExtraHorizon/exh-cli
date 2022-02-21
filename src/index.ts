@@ -34,13 +34,11 @@ yargs(hideBin(process.argv)).middleware(async argv => {
   if (process.env.NO_SDK) {
     return { sdk: 'no-sdk', isTTY };
   }
-  try {
-    const sdk = await ExH();
-    return { sdk, isTTY };
-  } catch (err) {
-    throw new Error('Failed to get credentials. Make sure they are specified in ~/.exh/credentials');
-  }
+
+  const sdk = await ExH();
+  return { sdk, isTTY };
 }).commandDir('commands')
   .strict()
   .demandCommand(1)
+  .completion('completion')
   .parse();
