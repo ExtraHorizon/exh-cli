@@ -50,8 +50,12 @@ export const handler = async ({ name, repo }) => {
   console.log(`Creating new repo ${chalk.green(name)}...`);
   try {
     await asyncExec(`git clone ${repo} ${name}`);
-    /* Adjust package name */
-    await changePackageFile(name);
+    /* Try to adjust package name. If this fails, no problem. Could be a non-js repo */
+    try {
+      await changePackageFile(name);
+    } catch (err) { /* empty */ }
+
+    console.log('Initializing git');
     /* Make clean repo & commit files */
     await asyncExec(`cd ${name} && rm -rf .git && git init . && git add . && git commit -m "First commit"`);
     console.log('Done! 🎉');
