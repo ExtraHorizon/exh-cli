@@ -4,6 +4,16 @@
 For more information on tasks and the task service, please read through the [task service documentation](https://docs.extrahorizon.com/extrahorizon/for-developers/automation/task-service)
 {% endhint %}
 
+### Create new task
+
+The Extra Horizon CLI provides a great way for you to bootstrap your new task. Doing `exh tasks create-repo your-task-name` will create a fresh repository for you on your local machine called `your-task-name`, initialise git & set the task name. It contains a sample task and will make sure you hit the ground running.
+
+If you have your own template repository you want to start from, you can even specify the repository using the `repo` option. For example:
+
+```
+exh tasks create-repo my-task-name --repo=https://github.com/mycompany/my-template
+```
+
 ### List tasks
 
 ```
