@@ -28,9 +28,9 @@ exh tasks list
 
 This command will list all tasks currently configured in the task service.
 
-### Create a new function
+### Upload a new task
 
-You can create a new function by uploading your packaged code to the task service.
+You can create a new task by uploading your packaged code to the task service.
 
 ```
 exh tasks create <options>
@@ -38,13 +38,13 @@ exh tasks create <options>
 
 Take a look at our [Hello-world example](hello-world-task.md) for a nodeJS function.
 
-### Update a function
+### Update a task
 
 ```
 exh tasks update <options>
 ```
 
-### Delete function
+### Delete a task
 
 ```
 exh tasks delete <options>
