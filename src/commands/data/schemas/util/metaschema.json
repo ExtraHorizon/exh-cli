@@ -188,6 +188,7 @@
   "additionalProperties": false,
   "definitions": {
     "afterActions": {
+      "type": "array",
       "items": {
         "type": "object",
         "properties": {
