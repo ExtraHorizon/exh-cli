@@ -4,7 +4,7 @@ import * as yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import { UpdateNotifier } from 'update-notifier';
 import * as tty from 'tty';
-import ExH from './exh';
+import { sdkAuth, sdkInitOnly } from './exh';
 
 function checkForNewVersion() {
   const pkg = require('../package.json'); // eslint-disable-line @typescript-eslint/no-var-requires
@@ -25,9 +25,10 @@ yargs(hideBin(process.argv)).middleware(async argv => {
     isTTY = false;
   }
 
-  if (argv.email && argv.password) {
+  if (argv.host && argv.consumerKey && argv.consumerSecret) {
+    const sdk = await sdkInitOnly(argv.host as string, argv.consumerKey as string, argv.consumerSecret as string);
     /* Login command, don't authenticate with sdk */
-    return { isTTY };
+    return { sdk, isTTY };
   }
 
   /* Inject sdk authentication into every command */
@@ -35,7 +36,7 @@ yargs(hideBin(process.argv)).middleware(async argv => {
     return { sdk: 'no-sdk', isTTY };
   }
 
-  const sdk = await ExH();
+  const sdk = await sdkAuth();
   return { sdk, isTTY };
 }).commandDir('commands')
   .strict()

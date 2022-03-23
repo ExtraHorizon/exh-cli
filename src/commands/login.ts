@@ -1,6 +1,6 @@
-import axios from 'axios';
 import * as fs from 'fs/promises';
 import * as chalk from 'chalk';
+import { OAuth1Client } from '@extrahorizon/javascript-sdk';
 import { epilogue } from '../helpers/util';
 import { EXH_CONFIG_FILE_DIR, EXH_CONFIG_FILE } from '../constants';
 
@@ -33,8 +33,14 @@ export const builder = (yargs: any) => epilogue(yargs).options({
     describe: 'Consumer secret',
   },
 });
-export const handler = async ({ host, email, password, consumerKey, consumerSecret }) => {
-  const { data: response } = await axios.post(`${host}/auth/v2/oauth1/tokens`, { email, password });
+
+export const handler = async ({ sdk, host, email, password, consumerKey, consumerSecret }:
+  {sdk: OAuth1Client; host:string; email: string; password: string; consumerKey: string; consumerSecret: string;}) => {
+  // authenticate
+  const response = await sdk.auth.authenticate({
+    email,
+    password,
+  });
 
   /* Create directory if it doesn't exist yet */
   try {
