@@ -59,7 +59,7 @@ async function buildAndUploadTemplates(service: TemplateService, templateObject:
   }
 }
 
-async function syncTargetDir(service: TemplateService, targetDir: string) {
+export async function syncTargetDir(service: TemplateService, targetDir: string) {
   const templateFilesByName = await readTemplateFiles(targetDir);
   await buildAndUploadTemplates(service, templateFilesByName);
 }

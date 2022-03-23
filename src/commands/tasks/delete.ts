@@ -10,10 +10,14 @@ export const builder = (yargs: any) => epilogue(yargs).option('name', {
 });
 
 export const handler = async ({ sdk, name }) => {
-  const response = await sdk.raw.delete(`/tasks/v1/functions/${name}`);
-  if (response.data?.affectedRecords) {
-    console.log(chalk.green('Successfully deleted task', name));
-  } else {
-    console.log(chalk.red('Failed to delete task', name));
+  try {
+    const response = await sdk.raw.delete(`/tasks/v1/functions/${name}`);
+    if (response.data?.affectedRecords) {
+      console.log(chalk.green('Successfully deleted task', name));
+    } else {
+      console.log(chalk.red('Failed to delete task', name));
+    }
+  } catch (err) {
+    console.log(chalk.red('Failed to delete task:', err.message));
   }
 };
