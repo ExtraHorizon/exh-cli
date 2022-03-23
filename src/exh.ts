@@ -13,7 +13,17 @@ interface ExHCredentials {
 let initialized = false;
 let sdk = null;
 
-export default async function create() {
+export async function sdkInitOnly(apiHost: string, consumerKey: string, consumerSecret: string) {
+  if (initialized) return sdk;
+  sdk = createOAuth1Client({
+    consumerKey,
+    consumerSecret,
+    host: apiHost,
+  });
+  return sdk;
+}
+
+export async function sdkAuth() {
   if (initialized) return sdk;
   let credentials: any = {};
 
