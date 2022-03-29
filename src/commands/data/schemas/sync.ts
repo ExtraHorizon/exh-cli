@@ -1,9 +1,9 @@
 import * as path from 'path';
 import * as chalk from 'chalk';
+import { epilogue } from '../../../helpers/util';
 import { flatListFiles } from './util/listFilesInDir';
 import { readJsonFile } from './util/readJson';
 import { SyncSchema } from './util/syncSchema';
-import { epilogue } from '../../../helpers/util';
 import { handler as verifyHandler } from './verify';
 
 export const command = 'sync';
