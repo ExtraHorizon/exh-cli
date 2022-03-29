@@ -60,6 +60,7 @@ but this can be very tedious to use. Instead you can create a `task-config.json`
   "environment": {
     "setting1": "value1",
     "secret": "$MYSECRET"
+  }
 }
 ```
 
