@@ -65,8 +65,8 @@ export const builder = (yargs: any) => epilogue(yargs).options({
     default: [],
   },
 })
-  .check(async ({ path, entryPoint, runTime, name, code }) => {
-    if (!path && (!name || !code || !runTime || !entryPoint)) {
+  .check(async ({ path, entryPoint, runtime, name, code }) => {
+    if (!path && (!name || !code || !runtime || !entryPoint)) {
       throw new Error('Need to specify either a task config file or all parameters separately');
     }
     return true;
