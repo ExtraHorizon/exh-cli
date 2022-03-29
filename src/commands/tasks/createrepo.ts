@@ -35,9 +35,20 @@ async function asyncExec(cmd: string):Promise<string> {
 }
 
 async function changePackageFile(name: string) {
-  const pkg = JSON.parse((await readFile(`${name}/package.json`)).toString());
-  pkg.name = name;
-  await writeFile(`${name}/package.json`, JSON.stringify(pkg, null, 4));
+  try {
+    const pkg = JSON.parse((await readFile(`${name}/package.json`)).toString());
+    pkg.name = name;
+    await writeFile(`${name}/package.json`, JSON.stringify(pkg, null, 4));
+  } catch (err) {
+    console.log('WARN: package.json not found. (possibly not a javascript repository');
+  }
+
+  try {
+    const taskConfig = JSON.parse((await readFile(`${name}/task-config.json`)).toString());
+    taskConfig.name = name;
+    taskConfig.description = `${name} task`;
+    await writeFile(`${name}/task-config.json`, JSON.stringify(taskConfig, null, 4));
+  } catch (err) { /* */ }
 }
 
 export const handler = async ({ name, repo, git }) => {
