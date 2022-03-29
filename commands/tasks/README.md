@@ -73,7 +73,7 @@ exh tasks sync --path /my/path/task-config.json
 which will synchronize your task with the requested configuration.
 
 {% hint style="info" %}
-If you need to pass secrets to the task configuration, but you understandably do not want to commit this secret in a configuration file, you can use variables such `$MYSECRET` in the above example. When parsing the configuration file, `exh` will replace this value with an environment variable of the same name. This way, CI systems are able to provision secrets while safeguarding their confidentiality.
+If you need to pass secrets to the task configuration, but do not want to commit this secret in a configuration file, you can use variables such as`$MYSECRET` in the above example. When parsing the configuration file, `exh` will replace this value with an environment variable of the same name. This way, CI systems are able to provision secrets while safeguarding their confidentiality.
 {% endhint %}
 
 #### Synchronizing multiple tasks
