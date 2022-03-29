@@ -13,6 +13,7 @@
 * [Tasks](commands/tasks/README.md)
   * [Hello world Task](commands/tasks/hello-world-task.md)
 * [Templates](features/templates.md)
+* [Repository configuration](features/repository-configuration.md)
 
 ## other
 
