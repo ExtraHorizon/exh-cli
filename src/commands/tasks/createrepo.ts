@@ -1,6 +1,6 @@
-import * as chalk from 'chalk';
-import { readFile, writeFile } from 'fs/promises';
 import { exec } from 'child_process';
+import { readFile, writeFile } from 'fs/promises';
+import * as chalk from 'chalk';
 import { epilogue } from '../../helpers/util';
 
 export const command = 'create-repo <name>';
@@ -11,9 +11,14 @@ export const builder = (yargs: any) => epilogue(yargs).positional('name', {
   type: 'string',
 }).options({
   repo: {
-    description: 'repo template to clone',
+    description: 'repository template to clone',
     type: 'string',
     default: 'https://github.com/ExtraHorizon/template-task',
+  },
+  git: {
+    description: 'also initializes the cloned repository as a fresh git repository',
+    type: 'boolean',
+    default: false,
   },
 });
 
@@ -30,12 +35,23 @@ async function asyncExec(cmd: string):Promise<string> {
 }
 
 async function changePackageFile(name: string) {
-  const pkg = JSON.parse((await readFile(`${name}/package.json`)).toString());
-  pkg.name = name;
-  await writeFile(`${name}/package.json`, JSON.stringify(pkg, null, 4));
+  try {
+    const pkg = JSON.parse((await readFile(`${name}/package.json`)).toString());
+    pkg.name = name;
+    await writeFile(`${name}/package.json`, JSON.stringify(pkg, null, 4));
+  } catch (err) {
+    console.log('WARN: package.json not found. (possibly not a javascript repository');
+  }
+
+  try {
+    const taskConfig = JSON.parse((await readFile(`${name}/task-config.json`)).toString());
+    taskConfig.name = name;
+    taskConfig.description = `${name} task`;
+    await writeFile(`${name}/task-config.json`, JSON.stringify(taskConfig, null, 4));
+  } catch (err) { /* */ }
 }
 
-export const handler = async ({ name, repo }) => {
+export const handler = async ({ name, repo, git }) => {
   /*
     0. Check if git is installed.
     1. Clone template task repo
@@ -55,9 +71,12 @@ export const handler = async ({ name, repo }) => {
       await changePackageFile(name);
     } catch (err) { /* empty */ }
 
-    console.log('Initializing git');
-    /* Make clean repo & commit files */
-    await asyncExec(`cd ${name} && rm -rf .git && git init . && git add . && git commit -m "First commit"`);
+    await asyncExec(`cd ${name} && rm -rf .git`);
+    if (git) {
+      console.log('Initializing git');
+      /* Make clean repo & commit files */
+      await asyncExec(`cd ${name} && git init . && git add . && git commit -m "First commit"`);
+    }
     console.log('Done! 🎉');
   } catch (err) {
     /* Clean up in case of error */

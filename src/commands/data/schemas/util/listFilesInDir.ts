@@ -1,5 +1,5 @@
-import * as path from 'path';
 import { readdirSync, statSync } from 'fs';
+import * as path from 'path';
 
 /**
  * recursively list files inside a target dir
@@ -31,4 +31,3 @@ export async function flatListFiles(dirPath: string): Promise<string[]> {
 
   return buffer;
 }
-

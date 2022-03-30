@@ -1,9 +1,9 @@
 #! /usr/bin/env node
 
+import * as tty from 'tty';
+import { UpdateNotifier } from 'update-notifier';
 import * as yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
-import { UpdateNotifier } from 'update-notifier';
-import * as tty from 'tty';
 import { sdkAuth, sdkInitOnly } from './exh';
 
 function checkForNewVersion() {
@@ -28,12 +28,12 @@ yargs(hideBin(process.argv)).middleware(async argv => {
   if (argv.host && argv.consumerKey && argv.consumerSecret) {
     const sdk = await sdkInitOnly(argv.host as string, argv.consumerKey as string, argv.consumerSecret as string);
     /* Login command, don't authenticate with sdk */
-    return { sdk, isTTY };
+    return { sdk, isTTY } as any;
   }
 
   /* Inject sdk authentication into every command */
   if (process.env.NO_SDK) {
-    return { sdk: 'no-sdk', isTTY };
+    return { sdk: 'no-sdk', isTTY } as any;
   }
 
   const sdk = await sdkAuth();

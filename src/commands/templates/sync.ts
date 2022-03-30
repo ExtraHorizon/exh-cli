@@ -1,8 +1,8 @@
-import * as ospath from 'path';
 import * as fs from 'fs';
+import * as ospath from 'path';
 import { epilogue } from '../../helpers/util';
-import { readTemplateFiles, readTemplateFolder, readTemplateJson } from './util/readTemplateFiles';
 import { buildTemplates } from './util/buildTemplates';
+import { readTemplateFiles, readTemplateFolder, readTemplateJson } from './util/readTemplateFiles';
 import { TemplateService } from './util/templateService';
 import { uploadTemplate } from './util/uploadTemplate';
 import { removeFileNameExtension } from './util/utils';
@@ -59,7 +59,7 @@ async function buildAndUploadTemplates(service: TemplateService, templateObject:
   }
 }
 
-async function syncTargetDir(service: TemplateService, targetDir: string) {
+export async function syncTargetDir(service: TemplateService, targetDir: string) {
   const templateFilesByName = await readTemplateFiles(targetDir);
   await buildAndUploadTemplates(service, templateFilesByName);
 }
