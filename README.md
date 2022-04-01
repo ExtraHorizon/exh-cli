@@ -5,6 +5,8 @@ will be extended with additional functionality.
 
 ## Installation
 
+*Note: The exh-cli requires at least node version 14*
+
 To install in your project:
 
 Using `npm`:
