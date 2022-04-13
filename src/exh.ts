@@ -1,5 +1,5 @@
-import { createOAuth1Client } from '@extrahorizon/javascript-sdk';
 import * as fs from 'fs';
+import { createOAuth1Client } from '@extrahorizon/javascript-sdk';
 import { EXH_CONFIG_FILE } from './constants';
 
 interface ExHCredentials {

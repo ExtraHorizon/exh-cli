@@ -1,8 +1,7 @@
-import * as archiver from 'archiver';
-import { v4 as uuidv4 } from 'uuid';
 import { createWriteStream, unlink } from 'fs';
 import { tmpdir } from 'os';
-import * as ospath from 'path';
+import * as archiver from 'archiver';
+import { v4 as uuidv4 } from 'uuid';
 
 export async function zipFileFromDirectory(path: string): Promise<string> {
   return new Promise((res, rej) => {
@@ -22,7 +21,7 @@ export async function zipFileFromDirectory(path: string): Promise<string> {
     });
 
     archive.pipe(output);
-    archive.directory(path, ospath.basename(path));
+    archive.directory(`${path}/`, false);
     archive.finalize();
   });
 }
