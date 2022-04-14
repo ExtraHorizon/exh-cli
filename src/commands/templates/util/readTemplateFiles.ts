@@ -1,3 +1,4 @@
+import * as fs from 'fs/promises';
 import * as path from 'path';
 import { listFolderContent, readTextFile, readJsonFile, removeFileNameExtension } from './utils';
 
@@ -8,12 +9,11 @@ export async function readTemplateFiles(targetFolder: string) {
   for (const fileName of fileNames) {
     const filePath = path.join(targetFolder, fileName);
 
-    if (fileName.endsWith('.json')) {
-      const templateName = removeFileNameExtension(fileName);
-
-      templateFilesByName[templateName] = await readTemplateJson(filePath);
-    } else {
+    if ((await fs.stat(filePath)).isDirectory()) {
       templateFilesByName[fileName] = await readTemplateFolder(filePath);
+    } else if (fileName.endsWith('.json')) {
+      const templateName = removeFileNameExtension(fileName);
+      templateFilesByName[templateName] = await readTemplateJson(filePath);
     }
   }
 
