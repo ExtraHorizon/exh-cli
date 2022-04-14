@@ -1,7 +1,6 @@
 import * as fs from 'fs/promises';
 import * as ospath from 'path';
 import * as chalk from 'chalk';
-import { DEFAULT_REPO_CONFIG } from '../constants';
 import { epilogue } from '../helpers/util';
 import { syncTargetDir as syncSchemas } from './data/schemas/sync';
 import { handler as syncTask } from './tasks/sync';
@@ -34,7 +33,8 @@ If not, the local directory is assumed with a default configuration which assume
   });
 
 async function validateRepoConfig(targetPath: string, config: any) {
-  const checkDirAccess = async (basePath:string, paths: string[]) => {
+  const checkDirAccess = async (basePath:string, paths: string[]): Promise<string[]> => {
+    const result = [];
     if (!Array.isArray(paths)) {
       throw new Error('Not an array');
     }
@@ -43,35 +43,47 @@ async function validateRepoConfig(targetPath: string, config: any) {
       try {
         await fs.access(ospath.join(basePath, p));
       } catch (err) {
-        throw new Error(`'${p}' directory not found`);
+        console.log(chalk.yellow(`Warning: '${p}' directory not found`));
+        continue;
       }
       if (!(await fs.stat(ospath.join(basePath, p))).isDirectory()) {
         throw new Error(`${p} is not a directory`);
       }
+      result.push(p);
     }
+    return result;
   };
 
-  if (config.schemas) {
-    await checkDirAccess(targetPath, config.schemas);
+  const newConfig = { ...config };
+  for (const [key] of Object.entries(config)) {
+    newConfig[key] = await checkDirAccess(targetPath, config[key]);
   }
-  if (config.templates) {
-    await checkDirAccess(targetPath, config.templates);
+  return newConfig;
+}
+
+async function getDefaultConfig(targetPath: string): Promise<any> {
+  const config = {};
+  const sections = ['schemas', 'templates', 'tasks'];
+
+  for (const s of sections) {
+    try {
+      await fs.access(ospath.join(targetPath, s));
+      config[s] = [s];
+    } catch (err) { continue; }
   }
-  if (config.tasks) {
-    await checkDirAccess(targetPath, config.tasks);
-  }
+  return config;
 }
 
 export const handler = async ({ sdk, path }) => {
   const targetPath = ospath.join(process.cwd(), path || '.');
-  let cfg = DEFAULT_REPO_CONFIG;
+  let cfg = await getDefaultConfig(targetPath);
 
   /* Read config file */
   try {
     cfg = JSON.parse((await fs.readFile(ospath.join(targetPath, REPO_CONFIG_FILE))).toString());
   } catch (err) { /* */ }
 
-  await validateRepoConfig(targetPath, cfg);
+  cfg = await validateRepoConfig(targetPath, cfg);
 
   /* Sync all schemas */
   if (cfg.schemas) {
