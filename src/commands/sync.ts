@@ -1,12 +1,11 @@
 import * as fs from 'fs/promises';
 import * as ospath from 'path';
 import * as chalk from 'chalk';
+import { getRepoConfig, REPO_CONFIG_FILE } from '../helpers/repoConfig';
 import { epilogue } from '../helpers/util';
 import { syncTargetDir as syncSchemas } from './data/schemas/sync';
 import { handler as syncTask } from './tasks/sync';
 import { handler as syncTemplates } from './templates/sync';
-
-const REPO_CONFIG_FILE = 'repo-config.json';
 
 export const command = 'sync';
 export const desc = 'Upload all schemas, templates & tasks to the cloud environment';
@@ -18,6 +17,25 @@ export const builder = (yargs: any) => epilogue(yargs)
 If not, the local directory is assumed with a default configuration which assumes tasks are in a 'tasks' folder, schemas in  a 'schemas' folder and templates in a 'templates' folder`,
       type: 'string',
     },
+    schemas: {
+      demandOption: false,
+      describe: 'Sync schemas only',
+      type: 'boolean',
+      default: false,
+    },
+    tasks: {
+      demandOption: false,
+      describe: 'Sync tasks only',
+      type: 'boolean',
+      default: false,
+    },
+    templates: {
+      demandOption: false,
+      describe: 'Sync templates only',
+      type: 'boolean',
+      default: false,
+    },
+
   }).check(async ({ path }) => {
     if (path !== undefined) {
       try {
@@ -32,68 +50,22 @@ If not, the local directory is assumed with a default configuration which assume
     return true;
   });
 
-async function validateRepoConfig(targetPath: string, config: any) {
-  const checkDirAccess = async (basePath:string, paths: string[]): Promise<string[]> => {
-    const result = [];
-    if (!Array.isArray(paths)) {
-      throw new Error('Not an array');
-    }
-
-    for (const p of paths) {
-      try {
-        await fs.access(ospath.join(basePath, p));
-      } catch (err) {
-        console.log(chalk.yellow(`Warning: '${p}' directory not found`));
-        continue;
-      }
-      if (!(await fs.stat(ospath.join(basePath, p))).isDirectory()) {
-        throw new Error(`${p} is not a directory`);
-      }
-      result.push(p);
-    }
-    return result;
-  };
-
-  const newConfig = { ...config };
-  for (const [key] of Object.entries(config)) {
-    newConfig[key] = await checkDirAccess(targetPath, config[key]);
-  }
-  return newConfig;
-}
-
-async function getDefaultConfig(targetPath: string): Promise<any> {
-  const config = {};
-  const sections = ['schemas', 'templates', 'tasks'];
-
-  for (const s of sections) {
-    try {
-      await fs.access(ospath.join(targetPath, s));
-      config[s] = [s];
-    } catch (err) { continue; }
-  }
-  return config;
-}
-
-export const handler = async ({ sdk, path }) => {
+export const handler = async ({ sdk, path, schemas, tasks, templates }) => {
   const targetPath = ospath.join(process.cwd(), path || '.');
-  let cfg = await getDefaultConfig(targetPath);
+  const cfg = await getRepoConfig(targetPath, true);
 
-  /* Read config file */
-  try {
-    cfg = JSON.parse((await fs.readFile(ospath.join(targetPath, REPO_CONFIG_FILE))).toString());
-  } catch (err) { /* */ }
-
-  cfg = await validateRepoConfig(targetPath, cfg);
+  const syncAll = !(schemas || tasks || templates);
 
   /* Sync all schemas */
-  if (cfg.schemas) {
+  if ((syncAll || schemas) && cfg.schemas) {
     console.log(chalk.green('\n ⚙️  Syncing schemas ...'));
     for (const schema of cfg.schemas) {
       await syncSchemas(sdk, ospath.join(targetPath, schema));
     }
   }
+
   /* Sync all templates */
-  if (cfg.templates) {
+  if ((syncAll || templates) && cfg.templates) {
     console.log(chalk.green('\n ⚙️  Syncing templates...'));
     for (const template of cfg.templates) {
       await syncTemplates({ sdk, path: ospath.join(targetPath, template), template: null });
@@ -101,7 +73,7 @@ export const handler = async ({ sdk, path }) => {
   }
 
   /* Sync all tasks */
-  if (cfg.tasks) {
+  if ((syncAll || tasks) && cfg.tasks) {
     console.log(chalk.green('\n ⚙️  Syncing tasks...'));
     for (const task of cfg.tasks) {
       await syncTask({ sdk, path: ospath.join(targetPath, task) });
