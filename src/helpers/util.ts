@@ -1,5 +1,6 @@
-import * as yargs from 'yargs';
+import { exec } from 'child_process';
 import * as chalk from 'chalk';
+import * as yargs from 'yargs';
 import { CommandError } from './error';
 
 /* Alas, global epilogues are not supported yet in yargs */
@@ -17,5 +18,17 @@ export function epilogue(y: yargs.Argv): yargs.Argv {
     console.log('\nUsage:');
     console.log(argv.help());
     process.exit(1);
+  });
+}
+
+export async function asyncExec(cmd: string):Promise<string> {
+  return new Promise((res, rej) => {
+    exec(cmd, (err, stdout) => {
+      if (err) {
+        rej(err);
+        return;
+      }
+      res(stdout);
+    });
   });
 }
