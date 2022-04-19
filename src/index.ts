@@ -41,5 +41,5 @@ yargs(hideBin(process.argv)).middleware(async argv => {
 }).commandDir('commands')
   .strict()
   .demandCommand(1)
-  .completion('completion')
+  .completion('generate_completion', false)
   .parse();
