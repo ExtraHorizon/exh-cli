@@ -1,7 +1,6 @@
-import { exec } from 'child_process';
 import { readFile, writeFile } from 'fs/promises';
 import * as chalk from 'chalk';
-import { epilogue } from '../../helpers/util';
+import { asyncExec, epilogue } from '../../helpers/util';
 
 export const command = 'create-repo <name>';
 export const desc = 'Create a new task repository';
@@ -21,18 +20,6 @@ export const builder = (yargs: any) => epilogue(yargs).positional('name', {
     default: false,
   },
 });
-
-async function asyncExec(cmd: string):Promise<string> {
-  return new Promise((res, rej) => {
-    exec(cmd, (err, stdout) => {
-      if (err) {
-        rej(err);
-        return;
-      }
-      res(stdout);
-    });
-  });
-}
 
 async function changePackageFile(name: string) {
   try {
