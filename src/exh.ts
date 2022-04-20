@@ -26,20 +26,34 @@ export async function sdkInitOnly(apiHost: string, consumerKey: string, consumer
 export async function sdkAuth() {
   if (initialized) return sdk;
   let credentials: any = {};
+  let haveCredFile = false;
+  const needed = ['API_HOST', 'API_OAUTH_CONSUMER_KEY', 'API_OAUTH_CONSUMER_SECRET', 'API_OAUTH_TOKEN', 'API_OAUTH_TOKEN_SECRET'];
 
+  const error = missing => {
+    let message = 'Failed to retrieve all credentials. ';
+    if (!haveCredFile) {
+      message += 'Couldn\'t open ~/.exh/credentials. ';
+    }
+    if (missing.length) {
+      message += `Missing properties: ${missing.join(',')}`;
+    }
+    throw new Error(message);
+  };
+
+  /* First try to load from file */
   try {
+    haveCredFile = true;
     const credentialsFile = fs.readFileSync(EXH_CONFIG_FILE, 'utf-8');
     credentials = credentialsFile.split(/\r?\n/).map(l => l.split(/=/)).filter(i => i.length === 2)
       .reduce<ExHCredentials>((r, v) => { r[v[0]] = v[1]; return r; }, {}); /* eslint-disable-line */
-  } catch (err) {
-    throw new Error('Failed to open credentials file. Make sure they are correctly specified in ~/.exh/credentials');
-  }
+  } catch (err) { /* */ }
 
-  if (!credentials.API_HOST) throw new Error('Missing credentials parameter API_HOST');
-  if (!credentials.API_OAUTH_CONSUMER_KEY) throw new Error('Missing credential parameters API_OAUTH_CONSUMER_KEY');
-  if (!credentials.API_OAUTH_CONSUMER_SECRET) throw new Error('Missing credential parameters API_OAUTH_CONSUMER_SECRET');
-  if (!credentials.API_OAUTH_TOKEN) throw new Error('Missing credentials parameter API_OAUTH_TOKEN');
-  if (!credentials.API_OAUTH_TOKEN_SECRET) throw new Error('Missing credentials parameter API_OAUTH_TOKEN_SECRET');
+  /* Override with environment variables if present */
+  needed.forEach(v => { credentials[v] = process.env[v] ?? credentials[v]; });
+
+  /* Check if we're missing any properties & throw error if needed */
+  const missingProperties = needed.filter(p => credentials[p] === undefined);
+  if (missingProperties.length) { error(missingProperties); }
 
   sdk = createOAuth1Client({
     consumerKey: credentials.API_OAUTH_CONSUMER_KEY,
@@ -54,7 +68,7 @@ export async function sdkAuth() {
       tokenSecret: credentials.API_OAUTH_TOKEN_SECRET,
     });
   } catch (err) {
-    throw new Error('Failed to authenticate. Please check credentials');
+    throw new Error(`Failed to authenticate. All credentials found but some might be wrong or no longer valid.\nError was: "${err}"`);
   }
   initialized = true;
   return sdk;
