@@ -260,6 +260,7 @@ async function syncSingleTask(sdk:any, config: TaskConfig) {
   console.log('after readFile');
 
   const allFunctions = (await sdk.raw.get('/tasks/v1/functions')).data.data;
+  console.log('after allFunctions');
   const myFunction = allFunctions.find((f:any) => f.name === config.name);
   if (myFunction === undefined) {
     await createTask(sdk, config, file);
