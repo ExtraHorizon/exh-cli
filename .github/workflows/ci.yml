@@ -1,0 +1,67 @@
+name: Publish @extrahorizon/exh-cli
+on:
+  push:
+    branches:
+      - dev
+      - master
+  workflow_dispatch:
+    
+
+jobs:
+  get-environment-name:
+    runs-on: ubuntu-latest
+    outputs:
+      envname: ${{ steps.get-env.outputs.environmentname }}
+    steps:
+      - name: Get environment
+        id: get-env
+        uses: QActions/get-env@init
+        with:
+          ref: ${{ github.ref }}
+  
+
+  build:
+    needs: get-environment-name
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        
+      - name: Prepare .npmrc
+        uses: QActions/prepare-npmrc@init
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_PACKAGES_FULL_READ_ACCESS_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      - name: Setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14
+          cache: yarn
+          
+      - name: Build package
+        run: |
+          yarn
+          yarn build
+          
+      - name: Add Suffix
+        if: needs.get-environment-name.outputs.envname == 'development'
+        run: yarn add-suffix
+      
+      - name: Extract version
+        id: extract_version
+        uses: Saionaro/extract-package-version@v1.0.6
+        
+      - name: Create GitHub tag
+        run: |
+          git config --global user.email "$GITHUB_ACTOR@users.noreply.github.com" && git config --global user.name "$GITHUB_ACTOR"
+          git tag -a v${{steps.extract_version.outputs.version}} -m "Tagging v${{steps.extract_version.outputs.version}}"
+          git push --tags && git push
+          
+      - name: Publish to production
+        if: needs.get-environment-name.outputs.envname == 'production'
+        run: yarn publish --registery https://npm.pkg.github.com/
+        
+      - name: Publish to dev
+        if: needs.get-environment-name.outputs.envname == 'development'
+        run: yarn publish --registery https://npm.pkg.github.com/ --tag dev

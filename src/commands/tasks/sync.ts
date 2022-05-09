@@ -250,10 +250,14 @@ async function syncSingleTask(sdk:any, config: TaskConfig) {
   /* load configuration & overload parameters passed through command line */
 
   /* Check if everything is there */
+  console.log('before verifyConfig');
   await verifyConfig(config);
 
+  console.log('after verifyConfig');
   const uploadFilePath = await zipFileFromDirectory(config.path);
+  console.log('after uploadFilePath');
   const file = await fs.readFile(uploadFilePath);
+  console.log('after readFile');
 
   const allFunctions = (await sdk.raw.get('/tasks/v1/functions')).data.data;
   const myFunction = allFunctions.find((f:any) => f.name === config.name);
