@@ -23,3 +23,10 @@ API_OAUTH_TOKEN_SECRET=***************************
 {% endcode %}
 
 That's it! You should now be ready to use exh-cli
+
+### Environment variables
+
+Instead of using a credentials, it is also possible to pass your credentials as environment variables.  You can even have both! If there is a credentials file and you pass environment variables to the cli, the environment variables will override those in the credentials file
+
+This is convenient when integrating the client in CI/CD or if you want to temporarily override a certain variable in the file.
+
