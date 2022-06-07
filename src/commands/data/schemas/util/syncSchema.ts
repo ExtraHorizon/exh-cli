@@ -69,8 +69,8 @@ export class SyncSchema {
  */
   async #syncRootAttributes() {
     const diff = deepDiff(
-      _.pick(this.target, 'description', 'defaultLimit', 'maximumLimit', 'createMode', 'readMode', 'updateMode', 'groupSyncMode'),
-      _.pick(this.current, 'description', 'defaultLimit', 'maximumLimit', 'createMode', 'readMode', 'updateMode', 'groupSyncMode')
+      _.pick(this.target, 'description', 'defaultLimit', 'maximumLimit', 'createMode', 'readMode', 'updateMode', 'deleteMode', 'groupSyncMode'),
+      _.pick(this.current, 'description', 'defaultLimit', 'maximumLimit', 'createMode', 'readMode', 'updateMode', 'deleteMode', 'groupSyncMode')
     );
 
     if (Object.keys(diff).length > 0) {
@@ -105,7 +105,7 @@ export class SyncSchema {
     );
 
     // calculate properties which have changed
-    const incorrectProperties:any = deepDiff(
+    const incorrectProperties: any = deepDiff(
       _(this.target.properties).omit(missingProperties).value(),
       _(this.current.properties).omit(excessProperties).value()
     );
@@ -160,7 +160,7 @@ export class SyncSchema {
     }
 
     // update existing statuses where needed
-    const incorrectStatuses:any = deepDiff(
+    const incorrectStatuses: any = deepDiff(
       _.omit(this.target.statuses, missingStatuses),
       this.current.statuses
     );
@@ -219,14 +219,14 @@ export class SyncSchema {
     }
 
     // evaluate missing
-    const missingTransitions:any = _.differenceBy(
+    const missingTransitions: any = _.differenceBy(
       this.target.transitions,
       this.current.transitions,
       'name'
     );
 
     // evaluate excess
-    const excessTransitions:any = _.differenceBy(
+    const excessTransitions: any = _.differenceBy(
       this.current.transitions,
       this.target.transitions,
       'name'
@@ -239,8 +239,8 @@ export class SyncSchema {
     ); // (ignore auto-generated id in comparison)
 
     // evaluate incorrect
-    const incorrectTransitions:any = _.differenceWith(
-    // targets, omit missing
+    const incorrectTransitions: any = _.differenceWith(
+      // targets, omit missing
       _.differenceBy(this.target.transitions, missingTransitions, 'name'),
       // current, omit excess
       _.differenceBy(this.current.transitions, excessTransitions, 'name'),
@@ -309,7 +309,7 @@ export class SyncSchema {
     let removedIndexes: any = [];
 
     /* Remove the system indexes which cannot be managed by the user */
-    const filteredCurrentIndexes = this.current.indexes.filter((index: any) => index.system === false).map((idx:any) => ({ idx, marked: false }));
+    const filteredCurrentIndexes = this.current.indexes.filter((index: any) => index.system === false).map((idx: any) => ({ idx, marked: false }));
 
     for (const newIdx of this.target.indexes) {
       let found = false;
@@ -325,7 +325,7 @@ export class SyncSchema {
       }
     }
 
-    removedIndexes = filteredCurrentIndexes.filter((idx:any) => idx.marked === false).map((idx:any) => idx.idx);
+    removedIndexes = filteredCurrentIndexes.filter((idx: any) => idx.marked === false).map((idx: any) => idx.idx);
 
     /*  Delete indexes to be deleted */
     for (const idx of removedIndexes) {
