@@ -214,7 +214,9 @@
               "linkCreator",
               "linkUserFromData",
               "linkEnlistedGroups",
-              "linkGroupFromData"
+              "linkGroupFromData",
+              "measurementReviewedNotification",
+              "notifyAlgoQueueManager"
             ]
           }
         },
