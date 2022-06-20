@@ -1,8 +1,8 @@
 import * as fs from 'fs/promises';
-import * as chalk from 'chalk';
 import { OAuth1Client } from '@extrahorizon/javascript-sdk';
-import { epilogue } from '../helpers/util';
+import * as chalk from 'chalk';
 import { EXH_CONFIG_FILE_DIR, EXH_CONFIG_FILE } from '../constants';
+import { epilogue } from '../helpers/util';
 
 export const command = 'login';
 export const desc = 'Retrieve credentials from ExH';

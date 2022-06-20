@@ -1,9 +1,21 @@
 import Ajv from 'ajv';
 
-export interface TestResult {
-  test?: string;
+export enum TestId {
+  META_SCHEMA = 1,
+  PROPERTY_VERIFY= 2,
+  INPUT_CONDITIONS= 3,
+  STATUS_CHECK = 4,
+  CONDITION_TYPES = 5,
+}
+
+interface InternalTestResult {
   ok: boolean;
   errors: any[];
+}
+
+export interface TestResult extends InternalTestResult{
+  id: TestId;
+  test: string;
 }
 
 function transformAjvErrors(offsetPath: string, errors: any): string[] {
@@ -32,14 +44,14 @@ export class SchemaVerify {
   }
 
   * RunChecks(): Generator<TestResult> {
-    yield { test: 'Check if the schema is in the correct form', ...this.#verifyMetaSchema() };
-    yield { test: 'Check if the properties object is valid JSON schema', ...this.#verifyProperties() };
-    yield { test: 'Check if all input conditions of transitions are valid JSON schema', ...this.#verifyInputConditions() };
-    yield { test: 'Check if all statuses are accounted for', ...this.#verifyStatuses() };
-    yield { test: 'Check if all condition types are used in the correct transitions', ...this.#verifyConditionTypes() };
+    yield { id: TestId.META_SCHEMA, test: 'Check if the schema is in the correct form', ...this.#verifyMetaSchema() };
+    yield { id: TestId.PROPERTY_VERIFY, test: 'Check if the properties object is valid JSON schema', ...this.#verifyProperties() };
+    yield { id: TestId.INPUT_CONDITIONS, test: 'Check if all input conditions of transitions are valid JSON schema', ...this.#verifyInputConditions() };
+    yield { id: TestId.STATUS_CHECK, test: 'Check if all statuses are accounted for', ...this.#verifyStatuses() };
+    yield { id: TestId.CONDITION_TYPES, test: 'Check if all condition types are used in the correct transitions', ...this.#verifyConditionTypes() };
   }
 
-  #verifyMetaSchema(): TestResult {
+  #verifyMetaSchema(): InternalTestResult {
     const validate = this.ajv.compile(this.metaSchema);
     if (!validate(this.schema)) {
       return { ok: false, errors: transformAjvErrors('', validate.errors) };
@@ -47,7 +59,7 @@ export class SchemaVerify {
     return { ok: true, errors: [] };
   }
 
-  #verifyProperties(): TestResult {
+  #verifyProperties(): InternalTestResult {
     if (this.schema.properties) {
       const tmpSchema = {
         $schema: 'http://json-schema.org/draft-07/schema#',
@@ -62,7 +74,7 @@ export class SchemaVerify {
   }
 
   /* Verify that all statuses which are used in transitions, exist in the status list */
-  #verifyStatuses(): TestResult {
+  #verifyStatuses(): InternalTestResult {
     let ok = true;
     const errors: any[] = [];
     let statusList: Set<string> = new Set();
@@ -86,7 +98,7 @@ export class SchemaVerify {
     return { ok, errors };
   }
 
-  #verifyInputConditions(): TestResult {
+  #verifyInputConditions(): InternalTestResult {
     let ok = true;
     const errors: any[] = [];
 
@@ -124,7 +136,7 @@ export class SchemaVerify {
     return { ok, errors };
   }
 
-  #verifyConditionTypes(): TestResult {
+  #verifyConditionTypes(): InternalTestResult {
     let ok = true;
     const errors = [];
     /* input & initiator conditions can only be used in either the creationTransition or manual transitions */

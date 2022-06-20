@@ -7,4 +7,3 @@ export async function readJsonFile(filePath: string) {
   const file = await readFile(filePath);
   return JSON.parse(file.toString());
 }
-

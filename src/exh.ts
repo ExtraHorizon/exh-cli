@@ -3,11 +3,11 @@ import { createOAuth1Client } from '@extrahorizon/javascript-sdk';
 import { EXH_CONFIG_FILE } from './constants';
 
 interface ExHCredentials {
-    API_HOST?: string;
-    API_OAUTH_CONSUMER_KEY?: string;
-    API_OAUTH_CONSUMER_SECRET?: string;
-    API_OAUTH_TOKEN?: string;
-    API_OAUTH_TOKEN_SECRET?: string;
+  API_HOST?: string;
+  API_OAUTH_CONSUMER_KEY?: string;
+  API_OAUTH_CONSUMER_SECRET?: string;
+  API_OAUTH_TOKEN?: string;
+  API_OAUTH_TOKEN_SECRET?: string;
 }
 
 let initialized = false;
@@ -62,7 +62,7 @@ export async function sdkAuth() {
   });
 
   try {
-  // authenticate
+    // authenticate
     await sdk.auth.authenticate({
       token: credentials.API_OAUTH_TOKEN,
       tokenSecret: credentials.API_OAUTH_TOKEN_SECRET,
