@@ -16,14 +16,25 @@ test('Empty object must trigger an error', () => {
 });
 
 test('Minimal schema must not trigger an error', () => {
-  const verify = new SchemaVerify(ajv, { name: 'test', description: 'test', statuses: {}, properties: {} }, metaschema);
+  const verify = new SchemaVerify(ajv, { name: 'test', description: 'test', statuses: { new: {} }, properties: {}, creationTransition: { type: 'manual', toStatus: 'new' } }, metaschema);
   for (const check of verify.RunChecks()) {
     expect(check.ok).toBe(true);
   }
 });
 
+test('Creation transition is mandatory', () => {
+  const verify = new SchemaVerify(ajv, { name: 'test', description: 'test', statuses: { }, properties: {} }, metaschema);
+  for (const check of verify.RunChecks()) {
+    if (check.id === TestId.META_SCHEMA) {
+      expect(check.ok).toBe(false);
+    } else {
+      expect(check.ok).toBe(true);
+    }
+  }
+});
+
 test('Invalid JSON schema in properties must trigger an error', () => {
-  const verify = new SchemaVerify(ajv, { name: 'test', description: 'test', statuses: {}, properties: { foo: 'bar' } }, metaschema);
+  const verify = new SchemaVerify(ajv, { name: 'test', description: 'test', statuses: { new: {} }, properties: { foo: 'bar' }, creationTransition: { type: 'manual', toStatus: 'new' } }, metaschema);
   for (const check of verify.RunChecks()) {
     if (check.id === TestId.PROPERTY_VERIFY) {
       expect(check.ok).toBe(false);
@@ -85,6 +96,7 @@ test('Invalid JSON schema in transition input condition must trigger an error', 
   const verify = new SchemaVerify(ajv, { name: 'test',
     description: 'test',
     statuses: { new: {}, processed: {} },
+    creationTransition: { type: 'manual', toStatus: 'new' },
     transitions: [
       {
         name: 'toProcessed',
@@ -115,6 +127,7 @@ test('Valid JSON schema in transition condition must not trigger an error', () =
   const verify = new SchemaVerify(ajv, { name: 'test',
     description: 'test',
     statuses: { new: {}, processed: {} },
+    creationTransition: { type: 'manual', toStatus: 'new' },
     transitions: [
       {
         name: 'toProcessed',
@@ -146,6 +159,7 @@ test('Using a status which is not defined should trigger an error', () => {
   const verify = new SchemaVerify(ajv, { name: 'test',
     description: 'test',
     statuses: { new: {} },
+    creationTransition: { type: 'manual', toStatus: 'new' },
     transitions: [
       {
         name: 'toProcessed',
@@ -192,6 +206,7 @@ test('Using input conditions in non-manual transitions must give an error', () =
   const verify = new SchemaVerify(ajv, { name: 'test',
     description: 'test',
     statuses: { new: {}, processed: {} },
+    creationTransition: { type: 'manual', toStatus: 'new' },
     transitions: [
       {
         name: 'toProcessed',
