@@ -1,12 +1,12 @@
-import Ajv from 'ajv';
 import * as fs from 'fs';
 import * as path from 'path';
+import Ajv from 'ajv';
 import * as chalk from 'chalk';
-import * as metaschema from './util/metaschema.json';
 import { CommandError } from '../../../helpers/error';
 import { epilogue } from '../../../helpers/util';
-import { SchemaVerify } from './util/schemaverify';
 import { flatListFiles } from './util/listFilesInDir';
+import * as metaschema from './util/metaschema.json';
+import { SchemaVerify } from './util/schemaverify';
 
 export const command = 'verify';
 export const desc = 'Syntactically verify a local schema';
@@ -35,7 +35,7 @@ export const handler = async ({ file, dir }) => {
   let files: string[] = [];
 
   if (dir) {
-    files = await flatListFiles(dir);
+    files = await flatListFiles(dir, '.json');
   } else { /* enforced by check() */
     files = [file];
   }
@@ -44,7 +44,6 @@ export const handler = async ({ file, dir }) => {
     let schema: any = {};
     console.log(chalk.bold('Checking', schemaPath));
     try {
-    /* eslint-disable-next-line @typescript-eslint/no-var-requires */
       schema = require(path.resolve(schemaPath));
     } catch (err) {
       console.log(chalk.red(`Failed to load schema file ${file}. Possibly not a valid JSON file`));

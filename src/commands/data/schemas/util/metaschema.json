@@ -184,6 +184,7 @@
     "name",
     "description",
     "statuses",
+    "creationTransition",
     "properties"
   ],
   "additionalProperties": false,

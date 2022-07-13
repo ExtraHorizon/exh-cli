@@ -4,30 +4,30 @@ import * as path from 'path';
 /**
  * recursively list files inside a target dir
  * @param {string} dirPath path to the target directory, can be a relative path from where the function is called
+ * @param {string} [extensionFilter] optional, only return files with this extension
  * @returns {string[]} the flattened list of file paths inside the directory
  */
-export async function flatListFiles(dirPath: string): Promise<string[]> {
-  const buffer = [];
-  const files = [];
+export function flatListFiles(dirPath: string, extensionFilter?: string): string[] {
+  const files = readdirSync(dirPath);
 
-  files.push(...readdirSync(dirPath));
-
-  for (const fileName of files) {
-    const filePath = path.join(dirPath, fileName);
+  return files.flatMap(file => {
+    const filePath = path.join(dirPath, file);
     const fileStat = statSync(filePath);
 
     // check if the target file is a directory
     if (fileStat.isDirectory()) {
       // parse list files inside dirs recursively
-      const fileArray = await flatListFiles(filePath);
-      fileArray.map(string => path.join(filePath, string));
-
-      // append result to buffer
-      buffer.push(...fileArray);
-    } else if (fileStat.isFile()) {
-      buffer.push(filePath);
+      return flatListFiles(filePath, extensionFilter);
     }
-  }
 
-  return buffer;
+    if (fileStat.isFile()) {
+      if (!extensionFilter) {
+        return filePath;
+      }
+      if (filePath.endsWith(extensionFilter)) {
+        return filePath;
+      }
+    }
+    return null;
+  }).filter(file => file);
 }

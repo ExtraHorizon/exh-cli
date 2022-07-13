@@ -3,18 +3,16 @@ import { createOAuth1Client } from '@extrahorizon/javascript-sdk';
 import { EXH_CONFIG_FILE } from './constants';
 
 interface ExHCredentials {
-    API_HOST?: string;
-    API_OAUTH_CONSUMER_KEY?: string;
-    API_OAUTH_CONSUMER_SECRET?: string;
-    API_OAUTH_TOKEN?: string;
-    API_OAUTH_TOKEN_SECRET?: string;
+  API_HOST?: string;
+  API_OAUTH_CONSUMER_KEY?: string;
+  API_OAUTH_CONSUMER_SECRET?: string;
+  API_OAUTH_TOKEN?: string;
+  API_OAUTH_TOKEN_SECRET?: string;
 }
 
-let initialized = false;
 let sdk = null;
 
 export async function sdkInitOnly(apiHost: string, consumerKey: string, consumerSecret: string) {
-  if (initialized) return sdk;
   sdk = createOAuth1Client({
     consumerKey,
     consumerSecret,
@@ -24,7 +22,6 @@ export async function sdkInitOnly(apiHost: string, consumerKey: string, consumer
 }
 
 export async function sdkAuth() {
-  if (initialized) return sdk;
   let credentials: any = {};
   let haveCredFile = false;
   const needed = ['API_HOST', 'API_OAUTH_CONSUMER_KEY', 'API_OAUTH_CONSUMER_SECRET', 'API_OAUTH_TOKEN', 'API_OAUTH_TOKEN_SECRET'];
@@ -42,10 +39,11 @@ export async function sdkAuth() {
 
   /* First try to load from file */
   try {
-    haveCredFile = true;
     const credentialsFile = fs.readFileSync(EXH_CONFIG_FILE, 'utf-8');
-    credentials = credentialsFile.split(/\r?\n/).map(l => l.split(/=/)).filter(i => i.length === 2)
-      .reduce<ExHCredentials>((r, v) => { r[v[0]] = v[1]; return r; }, {}); /* eslint-disable-line */
+    haveCredFile = true;
+    credentials = credentialsFile
+      .split(/\r?\n/).map(l => l.split(/=/)).filter(i => i.length === 2)
+      .reduce<ExHCredentials>((r, v) => { r[v[0].trim()] = v[1].trim(); return r; }, {}); /* eslint-disable-line */
   } catch (err) { /* */ }
 
   /* Override with environment variables if present */
@@ -62,7 +60,7 @@ export async function sdkAuth() {
   });
 
   try {
-  // authenticate
+    // authenticate
     await sdk.auth.authenticate({
       token: credentials.API_OAUTH_TOKEN,
       tokenSecret: credentials.API_OAUTH_TOKEN_SECRET,
@@ -70,6 +68,5 @@ export async function sdkAuth() {
   } catch (err) {
     throw new Error(`Failed to authenticate. All credentials found but some might be wrong or no longer valid.\nError was: "${err}"`);
   }
-  initialized = true;
   return sdk;
 }
