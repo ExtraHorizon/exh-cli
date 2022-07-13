@@ -1,4 +1,3 @@
-
 module.exports = {
   verbose: true,
   testEnvironment: 'node',
@@ -16,7 +15,8 @@ module.exports = {
   // ],
   testPathIgnorePatterns: [
     '/node_modules/',
-    '/tests/__helpers__/'
+    '/tests/__helpers__/',
+    '/build/',
   ],
   reporters: [
     'default',
