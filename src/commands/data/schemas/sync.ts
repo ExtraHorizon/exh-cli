@@ -29,7 +29,7 @@ export async function syncTargetDir(sdk: any, targetDir: string) {
   await verifyHandler({ dir: targetDir, file: null });
 
   // list all the target files inside of the directory
-  const targetFiles = await flatListFiles(targetDir);
+  const targetFiles = await flatListFiles(targetDir, '.json');
 
   const syncSchema = SyncSchema.createSchemaSync(sdk);
 

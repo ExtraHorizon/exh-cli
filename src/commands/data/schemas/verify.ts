@@ -35,7 +35,7 @@ export const handler = async ({ file, dir }) => {
   let files: string[] = [];
 
   if (dir) {
-    files = await flatListFiles(dir);
+    files = await flatListFiles(dir, '.json');
   } else { /* enforced by check() */
     files = [file];
   }
