@@ -2,7 +2,7 @@ import * as fs from 'fs/promises';
 import * as chalk from 'chalk';
 import { runtimeChoices } from '../../constants';
 import { epilogue } from '../../helpers/util';
-import { getValidatedConfigIterator, permissionModes, TaskConfig } from './taskConfig';
+import { assertExecutionPermission, getValidatedConfigIterator, permissionModes, TaskConfig } from './taskConfig';
 import { zipFileFromDirectory } from './util';
 
 /* Structure for the request which will be sent to the backend */
@@ -68,18 +68,17 @@ export const builder = (yargs: any) => epilogue(yargs).options({
     type: 'string',
     default: [],
   },
-  permissionMode: {
+  executionPermission: {
     type: 'string',
     default: 'permissionRequired',
   },
 })
-  .check(async ({ path, entryPoint, runtime, name, code, permissionMode }) => {
+  .check(async ({ path, entryPoint, runtime, name, code, executionPermission }) => {
     if (!path && (!name || !code || !runtime || !entryPoint)) {
       throw new Error('Need to specify either a task config file or all parameters separately');
     }
-    if (permissionMode && !Object.values(permissionModes).includes(permissionMode as unknown as permissionModes)) {
-      throw new Error(`permissionMode needs to be one of ${Object.values(permissionModes).join(' or ')}`);
-    }
+
+    assertExecutionPermission(executionPermission);
     return true;
   });
 

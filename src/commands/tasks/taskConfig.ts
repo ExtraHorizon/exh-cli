@@ -1,3 +1,4 @@
+import { AssertionError } from 'assert';
 import * as fs from 'fs/promises';
 import * as ospath from 'path';
 import { limits, runtimeChoices } from '../../constants';
@@ -20,20 +21,26 @@ export interface TaskConfig {
   executionPermission?: permissionModes;
 }
 
+export function assertExecutionPermission(mode: string): asserts mode is permissionModes | undefined {
+  if (mode !== undefined && !Object.values(permissionModes).includes(mode as permissionModes)) {
+    throw new AssertionError({ message: `executionPermission incorrect. Should be one of ${Object.values(permissionModes).join(',')}` });
+  }
+}
+
 function replaceConfigVariables(config: any): any {
   let result: any;
 
   switch (typeof config) {
     case 'object':
-      if (!Array.isArray(config)) {
-        result = {};
-        for (const [key, value] of Object.entries(config)) {
-          result[key] = replaceConfigVariables(value);
-        }
-      } else {
+      if (Array.isArray(config)) {
         result = [];
         for (const element of config) {
           result.push(replaceConfigVariables(element));
+        }
+      } else {
+        result = {};
+        for (const [key, value] of Object.entries(config)) {
+          result[key] = replaceConfigVariables(value);
         }
       }
       return result;
@@ -83,9 +90,8 @@ export async function validateConfig(config: TaskConfig) {
     throw new Error('Code path not specified');
   }
 
-  if (config.executionPermission && !Object.values(permissionModes).includes(config.executionPermission)) {
-    throw new Error(`executionPermission incorrect. Should be one of ${Object.values(permissionModes).join(',')}`);
-  }
+  assertExecutionPermission(config.executionPermission);
+
   return true;
 }
 
