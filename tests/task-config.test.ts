@@ -20,6 +20,31 @@ afterEach(() => {
 
 
 describe('Loading config file', () => {
+  test('Valid json config should not throw an error', async () => {
+    readFileMock.mockImplementationOnce(async () => Buffer.from(JSON.stringify(validFullConfig)));
+    await expect(loadSingleConfigFile("mypath")).resolves.toBeTruthy();
+  });
+
+  test('Default properties shouldn\'t be added if they are not specified', async () => {
+    const testConfig = {...validFullConfig};
+    delete testConfig.memoryLimit;
+    delete testConfig.timeLimit;
+    delete testConfig.environment;
+    readFileMock.mockImplementationOnce(async () => Buffer.from(JSON.stringify(testConfig)));
+    let resultConfig;
+
+    try {
+      resultConfig = await loadSingleConfigFile("mypath");
+    } catch(err) {
+      expect(err).toBe(null);
+    }
+
+    expect(resultConfig.memoryLimit).toBeUndefined();
+    expect(resultConfig.timeLimit).toBeUndefined();
+    expect(resultConfig.environment).toBeUndefined();
+  });
+
+
   test('Malformed json config file should throw an error', async () => {
     readFileMock.mockImplementationOnce(async () => Buffer.from("{ 'no json': here}"));
     await expect(loadSingleConfigFile("mypath")).rejects.toThrowError(/failed to parse file/);

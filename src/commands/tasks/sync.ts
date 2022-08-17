@@ -12,9 +12,9 @@ interface TaskRequest {
   entryPoint: string;
   code: string;
   runtime: string;
-  timeLimit: number;
-  memoryLimit: number;
-  environmentVariables: Record<string, any>;
+  timeLimit?: number;
+  memoryLimit?: number;
+  environmentVariables?: Record<string, any>;
   executionOptions?: {
     permissionMode: permissionModes;
   };
@@ -117,13 +117,20 @@ async function syncSingleTask(sdk:any, config: TaskConfig) {
     entryPoint: config.entryPoint,
     code: file.toString('base64'),
     runtime: config.runtime,
-    timeLimit: config.timeLimit,
-    memoryLimit: config.memoryLimit,
-    environmentVariables: config.environment,
   };
 
+  /* Add optional values */
   if (config.executionPermission) {
     request.executionOptions = { permissionMode: config.executionPermission };
+  }
+  if (config.timeLimit) {
+    request.timeLimit = config.timeLimit;
+  }
+  if (config.memoryLimit) {
+    request.memoryLimit = config.memoryLimit;
+  }
+  if (config.environment) {
+    request.environmentVariables = config.environment;
   }
 
   if (myFunction === undefined) {
