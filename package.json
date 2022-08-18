@@ -1,20 +1,24 @@
 {
   "name": "@extrahorizon/exh-cli",
   "version": "0.0.16",
-  "main": "build/index.js",
-  "exports": "./build/index.js",
+  "type": "module",
+  "main": "build/index.mjs",
+  "exports": "./build/index.mjs",
   "license": "MIT",
   "author": "Qompium",
+  "engines": {
+    "node": ">=14.16"
+  },
   "scripts": {
     "start": "yarn test",
     "build": "tsc",
-    "test": "jest"
+    "test": "node --experimental-vm-modules node_modules/.bin/jest"
   },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/"
   },
   "bin": {
-    "exh": "./build/index.js"
+    "exh": "./build/index.mjs"
   },
   "files": [
     "build/"
@@ -23,25 +27,25 @@
   "devDependencies": {
     "@qompium/eslint-config-q-node": "^1.5.0",
     "@types/dotenv-safe": "^8.1.2",
-    "@types/jest": "^28.1.3",
+    "@types/jest": "^28.1.7",
     "@types/jsonschema": "^1.1.1",
-    "@types/lodash": "^4.14.182",
-    "@types/node": "^18.0.0",
-    "@types/yargs": "^17.0.10",
+    "@types/lodash": "^4.14.183",
+    "@types/node": "^18.7.6",
+    "@types/yargs": "^17.0.11",
     "dotenv-safe": "^8.2.0",
-    "eslint": "^8.18.0",
-    "jest": "^28.1.1",
-    "mock-fs": "^5.1.2",
-    "ts-jest": "^28.0.5",
+    "eslint": "^8.22.0",
+    "jest": "^28.1.3",
+    "mock-fs": "^5.1.4",
+    "ts-jest": "^28.0.8",
     "typescript": "^4.7.4"
   },
   "dependencies": {
-    "@extrahorizon/javascript-sdk": "^7.0.0",
+    "@extrahorizon/javascript-sdk": "^7.1.0",
     "ajv": "^8.11.0",
     "archiver": "^5.3.1",
     "axios": "^0.27.2",
     "axios-logger": "^2.6.1",
-    "chalk": "^4.0.0",
+    "chalk": "^5.0.1",
     "jsonschema": "^1.4.1",
     "lodash": "^4.17.21",
     "uuid": "^8.3.2",

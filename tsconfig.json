@@ -1,11 +1,12 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "NodeNext",
     "declaration": true,
-    "target": "es2020",
-    "moduleResolution": "node",
+    "target": "ESNext",
+    "moduleResolution": "node16",
+    "esModuleInterop": true,
     "outDir": "./build",
-    "rootDir": "./src",
+    "rootDir": ".",
     "baseUrl": "./",
     "noImplicitAny": false,
     "allowSyntheticDefaultImports": false,
@@ -16,12 +17,6 @@
     "typeRoots": [
       "node_modules/@types"
     ],
-    "paths": {
-      "*": [
-        "node_modules/*",
-        "types/*"
-      ]
-    }
   },
   "include": [
     "src/**/*",
