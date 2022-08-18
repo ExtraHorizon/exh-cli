@@ -39,6 +39,9 @@ export const validFullConfig = {
 	runtime: runtimeChoices[0],
 	path: '/path/here',
 	timeLimit: 300,
-	memoryLimit: 2048
+	memoryLimit: 2048,
+	environment: { 
+		myvar: "123"
+	}
 }
 

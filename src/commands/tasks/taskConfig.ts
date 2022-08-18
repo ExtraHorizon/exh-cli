@@ -72,7 +72,7 @@ export async function validateConfig(config: TaskConfig) {
     throw new Error('ERROR: memoryLimit out of bounds!');
   }
 
-  if (!/^[A-Za-z0-9\-]+$/g.test(config.name)) { throw new Error('Please use only alphanumeric characters for your task name'); }
+  if (!/^[A-Za-z0-9-]+$/g.test(config.name)) { throw new Error('Please use only alphanumeric characters for your task name'); }
   if (!runtimeChoices.includes(config.runtime)) {
     throw new Error(`Runtime should be one of ${runtimeChoices.join(', ')}`);
   }
@@ -116,11 +116,6 @@ export async function loadSingleConfigFile(path:string): Promise<TaskConfig> {
   if (taskConfig.path) {
     taskConfig.path = ospath.join(ospath.dirname(path), taskConfig.path);
   }
-
-  /* For things which aren't mandatory, set sensible defaults anyway */
-  taskConfig.timeLimit ??= 60;
-  taskConfig.memoryLimit ??= 128;
-  taskConfig.environment ??= {};
 
   /* Convert environment variables to the value format that the service expects */
   if (taskConfig.environment) {
@@ -176,9 +171,6 @@ export async function* getValidatedConfigIterator(
   if (memoryLimit) { taskConfig.memoryLimit = memoryLimit; }
   if (executionPermission) { taskConfig.executionPermission = executionPermission; }
 
-  taskConfig.timeLimit ??= 60;
-  taskConfig.memoryLimit ??= 128;
-  taskConfig.environment ??= {};
   if (env && env.length) {
     const envArr = Array.isArray(env) ? env : [env];
     taskConfig.environment = envArr.map(e => e.split('=')).filter(e => e.length === 2).reduce((prev, curr) => ({ ...prev, [curr[0]]: { value: curr[1] } }), {});
