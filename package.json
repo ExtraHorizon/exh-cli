@@ -1,13 +1,14 @@
 {
   "name": "@extrahorizon/exh-cli",
-  "version": "0.0.16",
+  "version": "1.0.0",
   "main": "build/index.js",
   "exports": "./build/index.js",
   "license": "MIT",
   "author": "Qompium",
   "scripts": {
     "start": "yarn test",
-    "build": "tsc",
+    "clean": "rimraf build",
+    "build": "yarn clean && tsc",
     "test": "jest"
   },
   "publishConfig": {
@@ -32,6 +33,7 @@
     "eslint": "^8.18.0",
     "jest": "^28.1.1",
     "mock-fs": "^5.1.2",
+    "rimraf": "^3.0.2",
     "ts-jest": "^28.0.5",
     "typescript": "^4.7.4"
   },
@@ -42,6 +44,7 @@
     "axios": "^0.27.2",
     "axios-logger": "^2.6.1",
     "chalk": "^4.0.0",
+    "joi": "^17.6.0",
     "jsonschema": "^1.4.1",
     "lodash": "^4.17.21",
     "uuid": "^8.3.2",

@@ -3,6 +3,8 @@
 This is the command-line interface to the Extra Horizon platform. It allows you to manage schemas & tasks for now, but
 will be extended with additional functionality.
 
+See [changelog](CHANGELOG.md) for the latest changes.
+
 ## Installation
 
 *Note: The exh-cli requires at least node version 14*
