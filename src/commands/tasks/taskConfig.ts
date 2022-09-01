@@ -1,6 +1,7 @@
 import { AssertionError } from 'assert';
 import * as fs from 'fs/promises';
 import * as ospath from 'path';
+import Joi = require('joi');
 import { limits, runtimeChoices } from '../../constants';
 
 export enum permissionModes {
@@ -19,7 +20,27 @@ export interface TaskConfig {
   memoryLimit?: number;
   environment?: Record<string, any>;
   executionPermission?: permissionModes;
+  retryPolicy?: {
+    enabled: boolean;
+    errorsToRetry: string[];
+  };
 }
+
+const taskConfigSchema = Joi.object({
+  name: Joi.string().pattern(/^[A-Za-z0-9-]+$/).required(),
+  description: Joi.string(),
+  entryPoint: Joi.string().required(),
+  runtime: Joi.string().valid(...runtimeChoices).required(),
+  timeLimit: Joi.number().min(limits.time.min).max(limits.time.max),
+  memoryLimit: Joi.number().min(limits.memory.min).max(limits.memory.max),
+  path: Joi.string(),
+  retryPolicy: Joi.object({
+    enabled: Joi.boolean().required(),
+    errorsToRetry: Joi.array().items(Joi.string()),
+  }),
+  environment: Joi.object().pattern(/.*/, Joi.string()),
+  executionPermission: Joi.string().valid(...Object.values(permissionModes)),
+});
 
 export function assertExecutionPermission(mode: string): asserts mode is permissionModes | undefined {
   if (mode !== undefined && !Object.values(permissionModes).includes(mode as permissionModes)) {
@@ -61,20 +82,10 @@ function replaceConfigVariables(config: any): any {
 }
 
 export async function validateConfig(config: TaskConfig) {
-  if (!config.name) { throw new Error('Task name not specified'); }
-  if (!config.entryPoint) { throw new Error('Entrypoint not specified'); }
-  if (!config.runtime) { throw new Error('Runtime not specified'); }
-
-  if (config.timeLimit !== undefined && (config.timeLimit < limits.time.min || config.timeLimit > limits.time.max)) {
-    throw new Error('ERROR: timeLimit out of bounds!');
-  }
-  if (config.memoryLimit !== undefined && (config.memoryLimit < limits.memory.min || config.memoryLimit > limits.memory.max)) {
-    throw new Error('ERROR: memoryLimit out of bounds!');
-  }
-
-  if (!/^[A-Za-z0-9-]+$/g.test(config.name)) { throw new Error('Please use only alphanumeric characters for your task name'); }
-  if (!runtimeChoices.includes(config.runtime)) {
-    throw new Error(`Runtime should be one of ${runtimeChoices.join(', ')}`);
+  try {
+    Joi.attempt(config, taskConfigSchema);
+  } catch (err) {
+    throw new Error(err.details[0]?.message || 'Unknown config validation error');
   }
 
   if (config.path) {

@@ -1,7 +1,7 @@
 {
   "extends": ["@qompium/eslint-config-q-node"],
   "parserOptions": {
-    "project": "./tsconfig.json"
+    "project": "./tsconfig.eslint.json"
   },
   "overrides": [
     {

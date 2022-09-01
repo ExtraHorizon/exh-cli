@@ -18,6 +18,10 @@ interface TaskRequest {
   executionOptions?: {
     permissionMode: permissionModes;
   };
+  retryPolicy?: {
+    enabled: boolean;
+    errorsToRetry: string[];
+  };
 }
 
 export const command = 'sync';
@@ -131,6 +135,9 @@ async function syncSingleTask(sdk:any, config: TaskConfig) {
   }
   if (config.environment) {
     request.environmentVariables = config.environment;
+  }
+  if (config.retryPolicy) {
+    request.retryPolicy = config.retryPolicy;
   }
 
   if (myFunction === undefined) {
