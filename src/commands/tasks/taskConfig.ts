@@ -18,7 +18,7 @@ export interface TaskConfig {
   description?: string;
   timeLimit?: number;
   memoryLimit?: number;
-  environment?: Record<string, any>;
+  environment?: Record<string, string>;
   executionPermission?: permissionModes;
   retryPolicy?: {
     enabled: boolean;
@@ -128,11 +128,6 @@ export async function loadSingleConfigFile(path:string): Promise<TaskConfig> {
     taskConfig.path = ospath.join(ospath.dirname(path), taskConfig.path);
   }
 
-  /* Convert environment variables to the value format that the service expects */
-  if (taskConfig.environment) {
-    taskConfig.environment =
-      Object.entries(taskConfig.environment).reduce((prev:any, curr:any) => ({ ...prev, [curr[0]]: { value: curr[1] } }), {});
-  }
   return taskConfig;
 }
 
@@ -184,7 +179,7 @@ export async function* getValidatedConfigIterator(
 
   if (env && env.length) {
     const envArr = Array.isArray(env) ? env : [env];
-    taskConfig.environment = envArr.map(e => e.split('=')).filter(e => e.length === 2).reduce((prev, curr) => ({ ...prev, [curr[0]]: { value: curr[1] } }), {});
+    taskConfig.environment = envArr.map(e => e.split('=')).filter(e => e.length === 2).reduce((prev, curr) => ({ ...prev, [curr[0]]: curr[1] }), {});
   }
   await validateConfig(taskConfig);
   yield taskConfig;

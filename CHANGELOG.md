@@ -1,5 +1,9 @@
 # Extrahorizon CLI changelog
 
+
+### v1.0.1
+* Fixed broken environment variables
+
 ### v1.0.0
 
 * Add support for setting execution permission when syncing a task. Options are `permissionRequired`, `allUsers` or `public`.
