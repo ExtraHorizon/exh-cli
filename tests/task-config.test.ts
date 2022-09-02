@@ -12,6 +12,8 @@ const { env } = process;
 beforeEach(() => {
   jest.resetModules();
   process.env = { ...env };
+  accessMock.mockImplementation(async () => true);
+  statMock.mockImplementation(async () => ({ isFile: () => false }));
 });
 
 afterEach(() => {
@@ -21,7 +23,14 @@ afterEach(() => {
 describe('Loading config file', () => {
   test('Valid json config should not throw an error', async () => {
     readFileMock.mockImplementationOnce(async () => Buffer.from(JSON.stringify(validFullConfig)));
-    await expect(loadSingleConfigFile('mypath')).resolves.toBeTruthy();
+    let config: TaskConfig;
+    try {
+      config = await loadSingleConfigFile('mypath');
+    } catch (err) {
+      expect(err).toBeNull();
+      return;
+    }
+    await expect(validateConfig(config)).resolves.toBe(true);
   });
 
   test('Default properties shouldn\'t be added if they are not specified', async () => {
@@ -38,6 +47,7 @@ describe('Loading config file', () => {
       expect(err).toBeNull();
     }
 
+    await expect(validateConfig(resultConfig)).resolves.toBe(true);
     expect(resultConfig.memoryLimit).toBeUndefined();
     expect(resultConfig.timeLimit).toBeUndefined();
     expect(resultConfig.environment).toBeUndefined();
@@ -75,11 +85,6 @@ describe('Loading config file', () => {
 });
 
 describe('Validating config', () => {
-  beforeEach(() => {
-    accessMock.mockImplementation(async () => true);
-    statMock.mockImplementation(async () => ({ isFile: () => false }));
-  });
-
   test('Valid config should pass the test', async () => {
     await expect(validateConfig(validFullConfig)).resolves.toBe(true);
   });

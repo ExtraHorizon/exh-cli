@@ -134,7 +134,8 @@ async function syncSingleTask(sdk:any, config: TaskConfig) {
     request.memoryLimit = config.memoryLimit;
   }
   if (config.environment) {
-    request.environmentVariables = config.environment;
+    request.environmentVariables =
+      Object.entries(config.environment).reduce((prev:any, curr:any) => ({ ...prev, [curr[0]]: { value: curr[1] } }), {});
   }
   if (config.retryPolicy) {
     request.retryPolicy = config.retryPolicy;
