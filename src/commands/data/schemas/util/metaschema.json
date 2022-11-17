@@ -245,10 +245,8 @@
             "type": "string"
           }
         },
-        "additionalProperties": false,
         "required": [
-          "type",
-          "configuration"
+          "type"
         ]
       }
     }
