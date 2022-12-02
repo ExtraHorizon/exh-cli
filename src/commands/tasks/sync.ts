@@ -74,7 +74,6 @@ export const builder = (yargs: any) => epilogue(yargs).options({
   },
   executionPermission: {
     type: 'string',
-    default: 'permissionRequired',
   },
 })
   .check(async ({ path, entryPoint, runtime, name, code, executionPermission }) => {
