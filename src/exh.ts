@@ -44,6 +44,13 @@ export async function sdkAuth() {
     credentials = credentialsFile
       .split(/\r?\n/).map(l => l.split(/=/)).filter(i => i.length === 2)
       .reduce<ExHCredentials>((r, v) => { r[v[0].trim()] = v[1].trim(); return r; }, {}); /* eslint-disable-line */
+
+    /* Also set these as environment variable if they're not present already */
+    for (const k of Object.keys(credentials)) {
+      if (!process.env[k]) {
+        process.env[k] = credentials[k];
+      }
+    }
   } catch (err) { /* */ }
 
   /* Override with environment variables if present */
