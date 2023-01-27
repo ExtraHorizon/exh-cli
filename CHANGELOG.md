@@ -1,5 +1,11 @@
 # Extrahorizon CLI changelog
 
+### v1.0.3
+* Fix setting of execution permission
+* Set credentials as environment variables as well, but only if they're not defined yet
+
+### v1.0.2
+* Fix JSON schema for transition where `configuration` was marked as mandatory
 
 ### v1.0.1
 * Fixed broken environment variables
