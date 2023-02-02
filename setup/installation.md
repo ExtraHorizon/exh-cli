@@ -52,3 +52,40 @@ yarn global add @extrahorizon/exh-cli
 ```
 {% endtab %}
 {% endtabs %}
+
+#### Check if the installation worked
+
+When installed globally, trying running the following command in your Terminal to verify wether it's installed correctly.
+
+{% code lineNumbers="true" %}
+```
+exh --help 
+```
+{% endcode %}
+
+this should give you the following response:
+
+{% code lineNumbers="true" %}
+```
+exh <commando>
+
+Commando's:
+  exh completion           Install shell completion for bash & zsh
+  exh data <command>       Manage data
+  exh login                Retrieve credentials from ExH
+  exh sync                 Upload all schemas, templates & tasks to the cloud
+                           environment
+  exh tasks <command>      Manage tasks
+  exh templates <command>  Manage templates
+
+Opties:
+  --help     Toon help                                               [booleaans]
+  --version  Toon versienummer 
+```
+{% endcode %}
+
+{% hint style="info" %}
+If the command isn't recognized, it might be because the yarn global bin folder isn't in your PATH.
+{% endhint %}
+
+In case your are using bash, you can add `export PATH="$PATH:$(yarn global bin)"` to your `~/.bash_profile` and reload it with `source ~/.bash_profile`&#x20;
