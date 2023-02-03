@@ -8,10 +8,10 @@ Assuming you've created a project (using `npm init` or equivalent), you need to 
 
 ```
 @extrahorizon:registry=https://npm.pkg.github.com
-//npm.pkg.github.com/:_authToken=${AUTH_TOKEN}
+//npm.pkg.github.com/:_authToken=AUTH_TOKEN
 ```
 
-Replace ${AUTH\_TOKEN} with your personal access token. You can get a new one at [https://github.com/settings/tokens/new](https://github.com/settings/tokens/new). Make sure you enable the `read:packages` scope.
+Replace `AUTH_TOKEN` with your personal access token. You can get a new one at [https://github.com/settings/tokens/new](https://github.com/settings/tokens/new). Make sure you enable the `read:packages` scope.
 
 Explanation from GitHub on how to add your token can be found here [https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry#authenticating-to-github-packages](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry#authenticating-to-github-packages)
 
