@@ -11,7 +11,8 @@
 
 * [Data](commands/commands.md)
 * [Tasks](commands/tasks/README.md)
-  * [Hello world Task](commands/tasks/hello-world-task.md)
+  * [Hello world (JS)](commands/tasks/hello-world-task.md)
+  * [Hello world (Py)](features/tasks/hello-world-py.md)
 * [Templates](features/templates.md)
 * [Repository configuration](features/repository-configuration.md)
 
