@@ -1,5 +1,8 @@
 # Extrahorizon CLI changelog
 
+### v1.0.4
+* Security update
+
 ### v1.0.3
 * Fix setting of execution permission
 * Set credentials as environment variables as well, but only if they're not defined yet
