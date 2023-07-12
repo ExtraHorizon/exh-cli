@@ -10,15 +10,48 @@ export const command = 'sync';
 export const desc = 'Sync all schemas in a directory with the ExH cloud';
 export const builder = (yargs: any) => epilogue(yargs).options({
   dir: {
-    demandOption: true,
+    demandOption: false,
     describe: 'Directory containing the schemas which need to be synced',
+    type: 'string',
+  },
+  file: {
+    demandOption: false,
+    describe: 'File containing a schema which needs to be synced',
     type: 'string',
   },
 });
 
-export const handler = async ({ sdk, dir }) => {
-  await syncTargetDir(sdk, path.resolve(dir || '.'));
+export const handler = async ({ sdk, dir, file }) => {
+  if (!file && !dir) {
+    console.log(chalk.red('No target is chosen to be synced. Please use flags "--file" or "--dir" when syncing'));
+    process.exit(1);
+  }
+  if (dir) {
+    await syncTargetDir(sdk, path.resolve(dir || '.'));
+  }
+  if (file) {
+    await syncTargetFile(sdk, path.resolve(file));
+  }
 };
+
+export async function syncTargetFile(sdk: any, targetFile: string) {
+  await verifyHandler({ dir: null, file: targetFile });
+
+  const filePath = path.resolve(targetFile);
+
+  if (!filePath.endsWith('.json')) {
+    console.log(`Ignored ${path.basename(filePath)}, not a JSON file (needs .json extension)`);
+  } else {
+    console.log(chalk.bold(`Synchronizing ${path.basename(filePath)}`));
+
+    // parse to object
+    const targetSchema = await readJsonFile(filePath);
+
+    // synchronize with data service
+    const syncSchema = SyncSchema.createSchemaSync(sdk);
+    await syncSchema.sync(targetSchema);
+  }
+}
 
 /**
  * synchronizes all target schemas at the specified directory
@@ -29,25 +62,11 @@ export async function syncTargetDir(sdk: any, targetDir: string) {
   await verifyHandler({ dir: targetDir, file: null });
 
   // list all the target files inside of the directory
-  const targetFiles = await flatListFiles(targetDir, '.json');
-
-  const syncSchema = SyncSchema.createSchemaSync(sdk);
+  const targetFiles = flatListFiles(targetDir, '.json');
 
   // iterate through array of target files
   for (const filePath of targetFiles) {
-    // safety check, ignore non-JSON files
-    if (!filePath.endsWith('.json')) {
-      console.log(`Ignored ${path.basename(filePath)}, not a JSON file (needs .json extension)`);
-      continue;
-    }
-
-    console.log(chalk.bold(`Synchronizing ${path.basename(filePath)}`));
-
-    // parse to object
-    const targetSchema = await readJsonFile(filePath);
-
-    // synchronize with data service
-    await syncSchema.sync(targetSchema);
+    await syncTargetFile(sdk, filePath);
     process.stdout.write('\n');
   }
 }
