@@ -1,9 +1,19 @@
 #! /usr/bin/env node
 
 import * as tty from 'tty';
+import updateNotifier from 'update-notifier';
 import * as yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import { sdkAuth, sdkInitOnly } from './exh';
+
+function checkVersion() {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const pkg = require('../package.json');
+  const notifier = updateNotifier({ pkg, updateCheckInterval: 0 });
+  notifier.notify();
+}
+
+checkVersion();
 
 /* eslint-disable @typescript-eslint/no-floating-promises */
 yargs(hideBin(process.argv)).middleware(async argv => {
