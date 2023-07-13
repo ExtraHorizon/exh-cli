@@ -1,7 +1,6 @@
 #! /usr/bin/env node
 
 import * as tty from 'tty';
-import updateNotifier from 'update-notifier';
 import * as yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import { sdkAuth, sdkInitOnly } from './exh';
@@ -9,7 +8,11 @@ import { sdkAuth, sdkInitOnly } from './exh';
 function checkVersion() {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const pkg = require('../package.json');
+
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const updateNotifier = require('update-notifier');
   const notifier = updateNotifier({ pkg, updateCheckInterval: 0 });
+
   notifier.notify();
 }
 
