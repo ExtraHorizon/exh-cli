@@ -4,6 +4,11 @@ import * as tty from 'tty';
 import * as yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import { sdkAuth, sdkInitOnly } from './exh';
+// import { OAuth1Client } from '@extrahorizon/javascript-sdk';
+
+// function a(sdk: OAuth1Client) {
+//   sdk.data.statuses.create()
+// }
 
 /* eslint-disable @typescript-eslint/no-floating-promises */
 yargs(hideBin(process.argv)).middleware(async argv => {
