@@ -90,7 +90,7 @@ export class SchemaVerify {
       statusList = new Set([...statusList.values(), this.schema.creationTransition.toStatus]);
     }
 
-    Object.keys(this.schema.statuses).forEach(status => {
+    Object.keys(this.schema.statuses || []).forEach(status => {
       if (!statusList.has(status)) {
         errors.push(`Status '${status}' is defined in the schema statuses but not used in any transition`);
         ok = false;
