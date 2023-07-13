@@ -154,6 +154,31 @@ test('Valid JSON schema in transition condition must not trigger an error', () =
   }
 });
 
+test('Using a status which is not defined in a transition should trigger an error', () => {
+  /* Test for normal transition */
+  const verify = new SchemaVerify(ajv, { name: 'test',
+    description: 'test',
+    statuses: { new: {}, dazed: {}, confused: {} },
+    creationTransition: { type: 'manual', toStatus: 'new' },
+    transitions: [
+      {
+        name: 'toDazed',
+        type: 'automatic',
+        fromStatuses: ['new'],
+        toStatus: 'dazed',
+        conditions: [],
+      },
+    ],
+    properties: {} }, metaschema);
+
+  for (const check of verify.RunChecks()) {
+    if (check.id === TestId.STATUS_CHECK) {
+      expect(check.ok).toBe(false);
+      expect(check.errors).toEqual(["Status 'confused' is defined in the schema statuses but not used in any transition"])
+    }
+  }
+});
+
 test('Using a status which is not defined should trigger an error', () => {
   /* Test for normal transition */
   const verify = new SchemaVerify(ajv, { name: 'test',
