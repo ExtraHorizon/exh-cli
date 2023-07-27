@@ -89,6 +89,37 @@ test('Valid JSON schema in creationTransition input condition must not trigger a
   }
 });
 
+test('Valid JSON schema in transition condition must not trigger an error', () => {
+  const verify = new SchemaVerify(ajv, { name: 'test',
+    description: 'test',
+    statuses: { new: {}, processed: {} },
+    creationTransition: { type: 'manual', toStatus: 'new' },
+    transitions: [
+      {
+        name: 'toProcessed',
+        type: 'manual',
+        fromStatuses: ['new'],
+        toStatus: 'processed',
+        conditions: [
+          {
+            type: 'input',
+            configuration: {
+              type: 'object',
+              properties: {
+                name: { type: 'string' },
+              },
+            },
+
+          },
+        ],
+      },
+    ],
+    properties: {} }, metaschema);
+  for (const check of verify.RunChecks()) {
+    expect(check.ok).toBe(true);
+  }
+});
+
 test('Invalid JSON schema in transition input condition must trigger an error', () => {
   const schema = {
     name: 'test',
