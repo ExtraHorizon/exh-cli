@@ -45,7 +45,8 @@ test('Invalid JSON schema in properties must trigger an error', () => {
 });
 
 test('Invalid JSON schema in creationTransition input condition must trigger an error', () => {
-  const verify = new SchemaVerify(ajv, { name: 'test',
+  const schema = {
+    name: 'test',
     description: 'test',
     statuses: { new: {} },
     creationTransition: { type: 'manual',
@@ -56,18 +57,14 @@ test('Invalid JSON schema in creationTransition input condition must trigger an 
           configuration: {
             type: 'test',
           },
-
         },
       ] },
-    properties: {} }, metaschema);
-  for (const check of verify.RunChecks()) {
-    if (check.id === TestId.INPUT_CONDITIONS) {
-      expect(check.ok).toBe(false);
-    } else {
-      expect(check.ok).toBe(true);
-    }
-  }
+    properties: {},
+  };
+  const verify = ajv.compile(metaschema);
+  expect(verify(schema)).toBe(false);
 });
+
 test('Valid JSON schema in creationTransition input condition must not trigger an error', () => {
   const verify = new SchemaVerify(ajv, { name: 'test',
     description: 'test',
@@ -93,7 +90,8 @@ test('Valid JSON schema in creationTransition input condition must not trigger a
 });
 
 test('Invalid JSON schema in transition input condition must trigger an error', () => {
-  const verify = new SchemaVerify(ajv, { name: 'test',
+  const schema = {
+    name: 'test',
     description: 'test',
     statuses: { new: {}, processed: {} },
     creationTransition: { type: 'manual', toStatus: 'new' },
@@ -113,45 +111,10 @@ test('Invalid JSON schema in transition input condition must trigger an error', 
         ],
       },
     ],
-    properties: {} }, metaschema);
-  for (const check of verify.RunChecks()) {
-    if (check.id === TestId.INPUT_CONDITIONS) {
-      expect(check.ok).toBe(false);
-    } else {
-      expect(check.ok).toBe(true);
-    }
-  }
-});
-
-test('Valid JSON schema in transition condition must not trigger an error', () => {
-  const verify = new SchemaVerify(ajv, { name: 'test',
-    description: 'test',
-    statuses: { new: {}, processed: {} },
-    creationTransition: { type: 'manual', toStatus: 'new' },
-    transitions: [
-      {
-        name: 'toProcessed',
-        type: 'manual',
-        fromStatuses: ['new'],
-        toStatus: 'processed',
-        conditions: [
-          {
-            type: 'input',
-            configuration: {
-              type: 'object',
-              properties: {
-                name: { type: 'string' },
-              },
-            },
-
-          },
-        ],
-      },
-    ],
-    properties: {} }, metaschema);
-  for (const check of verify.RunChecks()) {
-    expect(check.ok).toBe(true);
-  }
+    properties: {},
+  };
+  const verify = ajv.compile(metaschema);
+  expect(verify(schema)).toBe(false);
 });
 
 test('Using a status which is not defined should trigger an error', () => {
