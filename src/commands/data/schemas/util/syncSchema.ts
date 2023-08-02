@@ -5,18 +5,20 @@ import { DataService } from './dataService';
 
 export class SyncSchema {
   private ds: DataService;
+  private dry: boolean;
   private cloudSchema: any = null;
   private localSchema: any = null;
 
-  static createSchemaSync(sdk: any): SyncSchema {
-    return new SyncSchema(sdk);
+  static createSchemaSync(sdk: any, dry?: boolean): SyncSchema {
+    return new SyncSchema(sdk, dry);
   }
 
-  constructor(sdk: any) {
+  constructor(sdk: any, dry?: boolean) {
     this.ds = DataService.createDataService(sdk);
+    this.dry = dry;
   }
 
-  async sync(target: any, dry?: boolean) {
+  async sync(target: any) {
     this.localSchema = target;
 
     if (!this.localSchema.name) {
@@ -28,7 +30,7 @@ export class SyncSchema {
     this.cloudSchema = await this.ds.fetchSchemaByName(this.localSchema.name);
 
     if (!this.cloudSchema) {
-      if (dry) {
+      if (this.dry) {
         console.log(`\t-> Will be created: ${chalk.green(this.localSchema.name)}`);
         return;
       }
@@ -36,25 +38,25 @@ export class SyncSchema {
     }
 
     //  root attributes: update
-    await this.#syncRootAttributes(dry);
+    await this.#syncRootAttributes();
 
     //  properties: add, update & remove
-    await this.#syncProperties(dry);
+    await this.#syncProperties();
 
     //  statuses 1/2: add & update
-    await this.#updateStatuses(dry);
+    await this.#updateStatuses();
 
     //  creationTransition: update
-    await this.#syncCreationTransition(dry);
+    await this.#syncCreationTransition();
 
     // transtions: add, update & remove
-    await this.#syncTransitions(dry);
+    await this.#syncTransitions();
 
     //  statuses 2/2 remove
-    await this.#pruneStatuses(dry);
+    await this.#pruneStatuses();
 
     // Indexes: add, update & remove
-    await this.#syncIndexes(dry);
+    await this.#syncIndexes();
   }
 
   /**
@@ -69,10 +71,10 @@ export class SyncSchema {
  * @param {number} targetSchema.defaultLimit
  * @param {number} targetSchema.maximumLimit
  */
-  async #syncRootAttributes(dry?: boolean) {
+  async #syncRootAttributes() {
     const diff = diffRootAttributes(this.localSchema, this.cloudSchema);
 
-    if (dry) {
+    if (this.dry) {
       logDifferentRootAttributes(this.cloudSchema, diff);
       return;
     }
@@ -90,10 +92,10 @@ export class SyncSchema {
  * @param {object} targetSchema
  * @param {object} targetSchema.properties
  */
-  async #syncProperties(dry?: boolean) {
+  async #syncProperties() {
     const propertiesDiff = compareSchemaKey(this.localSchema, this.cloudSchema, 'properties');
 
-    if (dry) {
+    if (this.dry) {
       logChanges(`Schema ${this.cloudSchema.name} - Properties`, propertiesDiff);
       return;
     }
@@ -135,10 +137,10 @@ export class SyncSchema {
  * @param {object} targetSchema
  * @param {object} targetSchema.statuses
  */
-  async #updateStatuses(dry?: boolean) {
+  async #updateStatuses() {
     const statusDiff = compareSchemaKey(this.localSchema, this.cloudSchema, 'statuses');
 
-    if (dry) {
+    if (this.dry) {
       logChanges(`Schema ${this.cloudSchema.name} - Statuses`, statusDiff);
       return;
     }
@@ -178,14 +180,14 @@ export class SyncSchema {
  * @param {object} targetSchema
  * @param {transition} targetSchema.creationTransition
  */
-  async #syncCreationTransition(dry?: boolean) {
+  async #syncCreationTransition() {
     if (!this.localSchema.creationTransition) {
       console.log(`Skipping creationTransition: No creationTransition defined in local ${this.localSchema.name} schema`);
       return;
     }
 
     if (!_.isEqual(this.cloudSchema.creationTransition, this.localSchema.creationTransition)) {
-      if (dry) {
+      if (this.dry) {
         console.log('Update creation transition');
         return;
       }
@@ -203,10 +205,10 @@ export class SyncSchema {
  * @param {object} targetSchema
  * @param {transition[]} targetSchema.transitions
  */
-  async #syncTransitions(dry?: boolean) {
+  async #syncTransitions() {
     const transitionsDiff = compareSchemaKey(this.localSchema, this.cloudSchema, 'transitions');
 
-    if (dry) {
+    if (this.dry) {
       logChanges(`Schema ${this.cloudSchema.name} - Transitions`, transitionsDiff);
       return;
     }
@@ -237,8 +239,8 @@ export class SyncSchema {
  * @param {object} targetSchema
  * @param {object} targetSchema.statuses
  */
-  async #pruneStatuses(dry?: boolean) {
-    if (dry) {
+  async #pruneStatuses() {
+    if (this.dry) {
       // Logging of removed statuses is done in #updateStatuses
       return;
     }
@@ -255,10 +257,10 @@ export class SyncSchema {
     }
   }
 
-  async #syncIndexes(dry?: boolean) {
+  async #syncIndexes() {
     const { newIndexes, removedIndexes } = compareIndexes(this.localSchema, this.cloudSchema);
 
-    if (dry) {
+    if (this.dry) {
       logChangesInIndexes(this.localSchema, { newIndexes, removedIndexes });
       return;
     }
