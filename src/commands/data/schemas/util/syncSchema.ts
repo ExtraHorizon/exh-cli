@@ -1,8 +1,7 @@
 /* eslint-disable lines-between-class-members */
+import chalk = require('chalk');
 import * as _ from 'lodash';
-import {
-  DataService,
-} from './dataService';
+import { DataService } from './dataService';
 
 export class SyncSchema {
   private ds: DataService;
@@ -17,41 +16,45 @@ export class SyncSchema {
     this.ds = DataService.createDataService(sdk);
   }
 
-  async sync(target: any) {
+  async sync(target: any, dry?: boolean) {
     this.localSchema = target;
 
     if (!this.localSchema.name) {
       console.log('No schema name defined, skipping this file');
       return;
     }
-    console.log(`Syncing ${this.localSchema.name}`);
 
+    console.log(`Syncing ${this.localSchema.name}`);
     this.cloudSchema = await this.ds.fetchSchemaByName(this.localSchema.name);
 
     if (!this.cloudSchema) {
+      if (dry) {
+        console.log(`\t-> Will be created: ${chalk.green(this.localSchema.name)}`);
+        return;
+      }
       this.cloudSchema = await this.ds.createSchema(this.localSchema.name, this.localSchema.description);
     }
 
     //  root attributes: update
-    await this.#syncRootAttributes();
+    await this.#syncRootAttributes(dry);
 
     //  properties: add, update & remove
-    await this.#syncProperties();
+    await this.#syncProperties(dry);
 
     //  statuses 1/2: add & update
-    await this.#updateStatuses();
+    await this.#updateStatuses(dry);
 
     //  creationTransition: update
-    await this.#syncCreationTransition();
+    await this.#syncCreationTransition(dry);
 
     // transtions: add, update & remove
-    await this.#syncTransitions();
+    await this.#syncTransitions(dry);
 
     //  statuses 2/2 remove
-    await this.#pruneStatuses();
+    await this.#pruneStatuses(dry);
 
     // Indexes: add, update & remove
-    await this.#syncIndexes();
+    await this.#syncIndexes(dry);
   }
 
   /**
@@ -66,8 +69,13 @@ export class SyncSchema {
  * @param {number} targetSchema.defaultLimit
  * @param {number} targetSchema.maximumLimit
  */
-  async #syncRootAttributes() {
+  async #syncRootAttributes(dry?: boolean) {
     const diff = diffRootAttributes(this.localSchema, this.cloudSchema);
+
+    if (dry) {
+      logDifferentRootAttributes(this.cloudSchema, diff);
+      return;
+    }
 
     if (Object.keys(diff).length > 0) {
       await this.ds.updateSchema(this.cloudSchema.id, diff);
@@ -82,14 +90,15 @@ export class SyncSchema {
  * @param {object} targetSchema
  * @param {object} targetSchema.properties
  */
-  async #syncProperties() {
-    if (!this.localSchema.properties) {
-      console.log(`Skipping properties: No properties defined in local ${this.localSchema.name} schema`);
+  async #syncProperties(dry?: boolean) {
+    const propertiesDiff = compareSchemaKey(this.localSchema, this.cloudSchema, 'properties');
+
+    if (dry) {
+      logChanges(`Schema ${this.cloudSchema.name} - Properties`, propertiesDiff);
       return;
     }
 
-    const { toAdd, toRemove, toUpdate } = compareSchemaKey(this.localSchema, this.cloudSchema, 'properties');
-
+    const { toAdd, toRemove, toUpdate } = propertiesDiff;
     //  add missing
     for (const key of toAdd) {
       console.log(`properties: adding ${key}`);
@@ -126,13 +135,15 @@ export class SyncSchema {
  * @param {object} targetSchema
  * @param {object} targetSchema.statuses
  */
-  async #updateStatuses() {
-    if (!this.localSchema.statuses) {
-      console.log(`Skipping statuses: No statuses defined in local ${this.localSchema.name} schema`);
+  async #updateStatuses(dry?: boolean) {
+    const statusDiff = compareSchemaKey(this.localSchema, this.cloudSchema, 'statuses');
+
+    if (dry) {
+      logChanges(`Schema ${this.cloudSchema.name} - Statuses`, statusDiff);
       return;
     }
 
-    const { toAdd, toUpdate } = compareSchemaKey(this.localSchema, this.cloudSchema, 'statuses');
+    const { toAdd, toUpdate } = statusDiff;
 
     for (const key of toAdd) {
       console.log(`statuses: adding ${key}`);
@@ -167,13 +178,18 @@ export class SyncSchema {
  * @param {object} targetSchema
  * @param {transition} targetSchema.creationTransition
  */
-  async #syncCreationTransition() {
+  async #syncCreationTransition(dry?: boolean) {
     if (!this.localSchema.creationTransition) {
       console.log(`Skipping creationTransition: No creationTransition defined in local ${this.localSchema.name} schema`);
       return;
     }
 
     if (!_.isEqual(this.cloudSchema.creationTransition, this.localSchema.creationTransition)) {
+      if (dry) {
+        console.log('Update creation transition');
+        return;
+      }
+
       console.log('creation transition: updating');
       await this.ds.updateCreationTransition(this.cloudSchema.id, this.localSchema.creationTransition);
     }
@@ -187,14 +203,15 @@ export class SyncSchema {
  * @param {object} targetSchema
  * @param {transition[]} targetSchema.transitions
  */
-  async #syncTransitions() {
-    if (!this.localSchema.transitions) {
-      console.log(`Skipping transitions: No transitions defined in local ${this.localSchema.name} schema`);
+  async #syncTransitions(dry?: boolean) {
+    const transitionsDiff = compareSchemaKey(this.localSchema, this.cloudSchema, 'transitions');
+
+    if (dry) {
+      logChanges(`Schema ${this.cloudSchema.name} - Transitions`, transitionsDiff);
       return;
     }
 
-    const { toAdd, toRemove, toUpdate } = compareSchemaKey(this.localSchema, this.cloudSchema, 'transitions');
-
+    const { toAdd, toRemove, toUpdate } = transitionsDiff;
     for (const transition of toAdd) {
       console.log(`transitions: adding ${transition.name}`);
       await this.ds.createTransition(this.cloudSchema.id, transition);
@@ -220,11 +237,12 @@ export class SyncSchema {
  * @param {object} targetSchema
  * @param {object} targetSchema.statuses
  */
-  async #pruneStatuses() {
-    if (!this.localSchema.statuses) {
-      console.log(`Skipping statuses: No statuses defined in local ${this.localSchema.name} schema`);
+  async #pruneStatuses(dry?: boolean) {
+    if (dry) {
+      // Logging of removed statuses is done in #updateStatuses
       return;
     }
+
     // calculate excess statuses
     const excessStatuses = _.difference(
       Object.keys(this.cloudSchema.statuses),
@@ -237,13 +255,13 @@ export class SyncSchema {
     }
   }
 
-  async #syncIndexes() {
-    if (!this.localSchema.indexes) {
-      console.log(`Skipping indexes: No indexes defined in local ${this.localSchema.name} schema`);
+  async #syncIndexes(dry?: boolean) {
+    const { newIndexes, removedIndexes } = compareIndexes(this.localSchema, this.cloudSchema);
+
+    if (dry) {
+      logChangesInIndexes(this.localSchema, { newIndexes, removedIndexes });
       return;
     }
-
-    const { newIndexes, removedIndexes } = compareIndexes(this.localSchema, this.cloudSchema);
 
     /*  Delete indexes to be deleted */
     for (const idx of removedIndexes) {
@@ -283,6 +301,53 @@ function diffRootAttributes(localSchema: any, cloudSchema: any) {
     _.pick(localSchema, 'description', 'defaultLimit', 'maximumLimit', 'createMode', 'readMode', 'updateMode', 'deleteMode', 'groupSyncMode'),
     _.pick(cloudSchema, 'description', 'defaultLimit', 'maximumLimit', 'createMode', 'readMode', 'updateMode', 'deleteMode', 'groupSyncMode')
   );
+}
+
+function logDifferentRootAttributes(cloudSchema: any, updatedValues: any) {
+  const changedKeys = Object.keys(updatedValues);
+  console.group(`Schema ${cloudSchema.name} - Root attributes`);
+  if (changedKeys.length < 1) { console.log('No update required.'); }
+  for (const key of changedKeys) {
+    console.log(`${chalk.yellow(key)}:\t ${chalk.red(cloudSchema[key])} => ${chalk.green(updatedValues[key])}`);
+  }
+  console.groupEnd();
+}
+
+function logChanges(group: string, { toAdd, toRemove, toUpdate }: {
+  toAdd: string[];
+  toRemove: string[];
+  toUpdate: string[];
+}) {
+  console.group(group);
+  if (
+    toAdd.length < 1 &&
+    toRemove.length < 1 &&
+    toUpdate.length < 1
+  ) {
+    console.log('No update required');
+  }
+  for (const key of toAdd) {
+    console.log(`Will be added: ${chalk.green(getIdentifier(key))}`);
+  }
+  for (const key of toRemove) {
+    console.log(`Will be removed: ${chalk.red(getIdentifier(key))}`);
+  }
+  for (const key of toUpdate) {
+    console.log(`Will be updated: ${chalk.yellow(getIdentifier(key))}`);
+  }
+  console.groupEnd();
+}
+
+function logChangesInIndexes(schema: any, { newIndexes, removedIndexes }: {
+  newIndexes: any[];
+  removedIndexes: any[];
+}) {
+  const changes = compareArraysByName(newIndexes, removedIndexes);
+  logChanges(`Schema ${schema.name} - Indexes`, {
+    toAdd: changes.toAdd.map(v => v.name),
+    toRemove: changes.toRemove.map(v => v.name),
+    toUpdate: changes.toUpdate.map(v => v.name),
+  });
 }
 
 export function compareSchemaKey(localSchema: any, cloudSchema: any, key: string) {
@@ -403,4 +468,12 @@ function compareIndexes(localSchema: any, cloudSchema: any) {
     .map((index: any) => index.idx);
 
   return { removedIndexes, newIndexes };
+}
+
+function getIdentifier(value: any) {
+  if (typeof value !== 'object') {
+    return value;
+  }
+  if (value.id) { return value.id; }
+  return value.name;
 }
