@@ -1,3 +1,4 @@
+/* eslint-disable lines-between-class-members */
 import * as _ from 'lodash';
 import {
   DataService,
@@ -5,10 +6,8 @@ import {
 
 export class SyncSchema {
   private ds: DataService;
-
-  private current: any = null;
-
-  private target: any = null;
+  private cloudSchema: any = null;
+  private localSchema: any = null;
 
   static createSchemaSync(sdk: any): SyncSchema {
     return new SyncSchema(sdk);
@@ -19,18 +18,18 @@ export class SyncSchema {
   }
 
   async sync(target: any) {
-    this.target = target;
+    this.localSchema = target;
 
-    if (!this.target.name) {
+    if (!this.localSchema.name) {
       console.log('No schema name defined, skipping this file');
       return;
     }
-    console.log(`Syncing ${this.target.name}`);
+    console.log(`Syncing ${this.localSchema.name}`);
 
-    this.current = await this.ds.fetchSchemaByName(this.target.name);
+    this.cloudSchema = await this.ds.fetchSchemaByName(this.localSchema.name);
 
-    if (!this.current) {
-      this.current = await this.ds.createSchema(this.target.name, this.target.description);
+    if (!this.cloudSchema) {
+      this.cloudSchema = await this.ds.createSchema(this.localSchema.name, this.localSchema.description);
     }
 
     //  root attributes: update
@@ -68,13 +67,10 @@ export class SyncSchema {
  * @param {number} targetSchema.maximumLimit
  */
   async #syncRootAttributes() {
-    const diff = deepDiff(
-      _.pick(this.target, 'description', 'defaultLimit', 'maximumLimit', 'createMode', 'readMode', 'updateMode', 'deleteMode', 'groupSyncMode'),
-      _.pick(this.current, 'description', 'defaultLimit', 'maximumLimit', 'createMode', 'readMode', 'updateMode', 'deleteMode', 'groupSyncMode')
-    );
+    const diff = diffRootAttributes(this.localSchema, this.cloudSchema);
 
     if (Object.keys(diff).length > 0) {
-      await this.ds.updateSchema(this.current.id, diff);
+      await this.ds.updateSchema(this.cloudSchema.id, diff);
     }
   }
 
@@ -87,48 +83,36 @@ export class SyncSchema {
  * @param {object} targetSchema.properties
  */
   async #syncProperties() {
-    if (!this.target.properties) {
-      console.log(`Skipping properties: No properties defined in local ${this.target.name} schema`);
+    if (!this.localSchema.properties) {
+      console.log(`Skipping properties: No properties defined in local ${this.localSchema.name} schema`);
       return;
     }
 
-    // calculate missing properties
-    const missingProperties = _.difference(
-      Object.keys(this.target.properties),
-      Object.keys(this.current.properties)
-    );
-
-    // calculate excess properties
-    const excessProperties = _.difference(
-      Object.keys(this.current.properties),
-      Object.keys(this.target.properties)
-    );
-
-    // calculate properties which have changed
-    const incorrectProperties: any = deepDiff(
-      _(this.target.properties).omit(missingProperties).value(),
-      _(this.current.properties).omit(excessProperties).value()
-    );
+    const { toAdd, toRemove, toUpdate } = compareSchemaKey(this.localSchema, this.cloudSchema, 'properties');
 
     //  add missing
-    for (const key of missingProperties) {
+    for (const key of toAdd) {
       console.log(`properties: adding ${key}`);
-      await this.ds.createProperty(this.current.id, {
+      await this.ds.createProperty(this.cloudSchema.id, {
         name: key,
-        configuration: this.target.properties[key],
+        configuration: this.localSchema.properties[key],
       });
     }
 
     //  update existing where needed
-    for (const key of Object.keys(incorrectProperties)) {
+    for (const key of toUpdate) {
       console.log(`properties: updating ${key}`);
-      await this.ds.updateProperty(this.current.id, key, this.target.properties[key]);
+      await this.ds.updateProperty(
+        this.cloudSchema.id,
+        key,
+        this.localSchema.properties[key]
+      );
     }
 
     //  delete excess
-    for (const key of excessProperties) {
+    for (const key of toRemove) {
       console.log(`properties: removing ${key}`);
-      await this.ds.deleteProperty(this.current.id, key);
+      await this.ds.deleteProperty(this.cloudSchema.id, key);
     }
   }
 
@@ -143,32 +127,23 @@ export class SyncSchema {
  * @param {object} targetSchema.statuses
  */
   async #updateStatuses() {
-    if (!this.target.statuses) {
-      console.log(`Skipping statuses: No statuses defined in local ${this.target.name} schema`);
+    if (!this.localSchema.statuses) {
+      console.log(`Skipping statuses: No statuses defined in local ${this.localSchema.name} schema`);
       return;
     }
 
-    // add missing
-    const missingStatuses = _.difference(
-      Object.keys(this.target.statuses),
-      Object.keys(this.current.statuses)
-    );
+    const { toAdd, toUpdate } = compareSchemaKey(this.localSchema, this.cloudSchema, 'statuses');
 
-    for (const key of missingStatuses) {
+    for (const key of toAdd) {
       console.log(`statuses: adding ${key}`);
-      await this.ds.createStatus(this.current.id, key, this.target.statuses[key]);
+      await this.ds.createStatus(this.cloudSchema.id, key, this.localSchema.statuses[key]);
     }
 
-    // update existing statuses where needed
-    const incorrectStatuses: any = deepDiff(
-      _.omit(this.target.statuses, missingStatuses),
-      this.current.statuses
-    );
-
-    for (const key of Object.keys(incorrectStatuses)) {
+    for (const key of toUpdate) {
       console.log(`statuses: updating ${key}`);
-      await this.ds.updateStatus(this.current.id, key, this.target.statuses[key]);
+      await this.ds.updateStatus(this.cloudSchema.id, key, this.localSchema.statuses[key]);
     }
+
     // don't delete yet, first some other data needs to be adjusted
   }
 
@@ -193,14 +168,14 @@ export class SyncSchema {
  * @param {transition} targetSchema.creationTransition
  */
   async #syncCreationTransition() {
-    if (!this.target.creationTransition) {
-      console.log(`Skipping creationTransition: No creationTransition defined in local ${this.target.name} schema`);
+    if (!this.localSchema.creationTransition) {
+      console.log(`Skipping creationTransition: No creationTransition defined in local ${this.localSchema.name} schema`);
       return;
     }
 
-    if (!_.isEqual(this.current.creationTransition, this.target.creationTransition)) {
+    if (!_.isEqual(this.cloudSchema.creationTransition, this.localSchema.creationTransition)) {
       console.log('creation transition: updating');
-      await this.ds.updateCreationTransition(this.current.id, this.target.creationTransition);
+      await this.ds.updateCreationTransition(this.cloudSchema.id, this.localSchema.creationTransition);
     }
   }
 
@@ -213,64 +188,27 @@ export class SyncSchema {
  * @param {transition[]} targetSchema.transitions
  */
   async #syncTransitions() {
-    if (!this.target.transitions) {
-      console.log(`Skipping transitions: No transitions defined in local ${this.target.name} schema`);
+    if (!this.localSchema.transitions) {
+      console.log(`Skipping transitions: No transitions defined in local ${this.localSchema.name} schema`);
       return;
     }
 
-    // evaluate missing
-    const missingTransitions: any = _.differenceBy(
-      this.target.transitions,
-      this.current.transitions,
-      'name'
-    );
+    const { toAdd, toRemove, toUpdate } = compareSchemaKey(this.localSchema, this.cloudSchema, 'transitions');
 
-    // evaluate excess
-    const excessTransitions: any = _.differenceBy(
-      this.current.transitions,
-      this.target.transitions,
-      'name'
-    );
-
-    // evaluate incorrect - helper comparison
-    const compareTransitions = (targetTransition: any, currentTransition: any) => _.isEqual(
-      targetTransition,
-      _.omit(currentTransition, ['id'])
-    ); // (ignore auto-generated id in comparison)
-
-    // evaluate incorrect
-    const incorrectTransitions: any = _.differenceWith(
-      // targets, omit missing
-      _.differenceBy(this.target.transitions, missingTransitions, 'name'),
-      // current, omit excess
-      _.differenceBy(this.current.transitions, excessTransitions, 'name'),
-      // compare via helper function
-      compareTransitions
-    );
-
-    //  add missing
-    for (const targetTransition of missingTransitions) {
-      console.log(`transitions: adding ${targetTransition.name}`);
-      await this.ds.createTransition(this.current.id, targetTransition);
+    for (const transition of toAdd) {
+      console.log(`transitions: adding ${transition.name}`);
+      await this.ds.createTransition(this.cloudSchema.id, transition);
     }
 
-    // update - helper function
-    const findTransitionByName = (name: string) => _.find(
-      this.current.transitions,
-      transition => transition.name === name
-    );
-
-    //  update existing where necessary
-    for (const targetTransition of incorrectTransitions) {
-      console.log(`transitions: updating ${targetTransition.name}`);
-      const currentTransition = findTransitionByName(targetTransition.name);
-      await this.ds.updateTransition(this.current.id, currentTransition.id, targetTransition);
+    for (const transition of toUpdate) {
+      console.log(`transitions: updating ${transition.name}`);
+      const currentTransition = findTransitionByName(transition.name, this.cloudSchema.transitions);
+      await this.ds.updateTransition(this.cloudSchema.id, currentTransition.id, transition);
     }
 
-    //  delete excess
-    for (const currentTransition of excessTransitions) {
-      console.log(`transitions: removing ${currentTransition.name}`);
-      await this.ds.deleteTransition(this.current.id, currentTransition.id);
+    for (const transition of toRemove) {
+      console.log(`transitions: removing ${transition.name}`);
+      await this.ds.deleteTransition(this.cloudSchema.id, transition.id);
     }
   }
 
@@ -283,60 +221,40 @@ export class SyncSchema {
  * @param {object} targetSchema.statuses
  */
   async #pruneStatuses() {
-    if (!this.target.statuses) {
-      console.log(`Skipping statuses: No statuses defined in local ${this.target.name} schema`);
+    if (!this.localSchema.statuses) {
+      console.log(`Skipping statuses: No statuses defined in local ${this.localSchema.name} schema`);
       return;
     }
     // calculate excess statuses
     const excessStatuses = _.difference(
-      Object.keys(this.current.statuses),
-      Object.keys(this.target.statuses)
+      Object.keys(this.cloudSchema.statuses),
+      Object.keys(this.localSchema.statuses)
     );
     //  delete excess statuses
     for (const key of excessStatuses) {
       console.log(`statuses: removing ${key}`);
-      await this.ds.deleteStatus(this.current.id, key);
+      await this.ds.deleteStatus(this.cloudSchema.id, key);
     }
   }
 
   async #syncIndexes() {
-    if (!this.target.indexes) {
-      console.log(`Skipping indexes: No indexes defined in local ${this.target.name} schema`);
+    if (!this.localSchema.indexes) {
+      console.log(`Skipping indexes: No indexes defined in local ${this.localSchema.name} schema`);
       return;
     }
 
-    const newIndexes: any = [];
-    let removedIndexes: any = [];
-
-    /* Remove the system indexes which cannot be managed by the user */
-    const filteredCurrentIndexes = this.current.indexes.filter((index: any) => index.system === false).map((idx: any) => ({ idx, marked: false }));
-
-    for (const newIdx of this.target.indexes) {
-      let found = false;
-      for (const oldIdx of filteredCurrentIndexes) {
-        if (_.isEqual(_.omit(oldIdx.idx, ['name', 'id', 'system']), _.omit(newIdx, ['name']))) {
-          found = true;
-          oldIdx.marked = true;
-          break;
-        }
-      }
-      if (!found) {
-        newIndexes.push(newIdx);
-      }
-    }
-
-    removedIndexes = filteredCurrentIndexes.filter((idx: any) => idx.marked === false).map((idx: any) => idx.idx);
+    const { newIndexes, removedIndexes } = compareIndexes(this.localSchema, this.cloudSchema);
 
     /*  Delete indexes to be deleted */
     for (const idx of removedIndexes) {
       console.log(`Indexes: remove index ${idx.id}`);
-      await this.ds.deleteIndex(this.current.id, idx.id);
+      await this.ds.deleteIndex(this.cloudSchema.id, idx.id);
     }
 
     /* Create new indexes */
     for (const idx of newIndexes) {
       console.log('\t-> Creating new index');
-      await this.ds.createIndex(this.current.id, idx);
+      await this.ds.createIndex(this.cloudSchema.id, idx);
     }
   }
 }
@@ -358,4 +276,131 @@ function deepDiff(object: any, other: any) {
       result[key] = _.isObject(value) && _.isObject(other[key]) ? deepDiff(value, other[key]) : value;
     }
   });
+}
+
+function diffRootAttributes(localSchema: any, cloudSchema: any) {
+  return deepDiff(
+    _.pick(localSchema, 'description', 'defaultLimit', 'maximumLimit', 'createMode', 'readMode', 'updateMode', 'deleteMode', 'groupSyncMode'),
+    _.pick(cloudSchema, 'description', 'defaultLimit', 'maximumLimit', 'createMode', 'readMode', 'updateMode', 'deleteMode', 'groupSyncMode')
+  );
+}
+
+export function compareSchemaKey(localSchema: any, cloudSchema: any, key: string) {
+  if (!localSchema[key] && !cloudSchema[key]) {
+    return {
+      toAdd: [],
+      toRemove: [],
+      toUpdate: [],
+    };
+  }
+
+  if (
+    Array.isArray(localSchema[key]) ||
+    (!localSchema[key] && Array.isArray(cloudSchema[key]))
+  ) {
+    return compareArraysByName(
+      localSchema[key],
+      cloudSchema[key]
+    );
+  }
+  return compareSchemas(
+    localSchema[key],
+    cloudSchema[key]
+  );
+}
+
+function compareSchemas(localSchema: any, cloudSchema: any) {
+  const toAdd = _.difference(
+    Object.keys(localSchema),
+    Object.keys(cloudSchema)
+  );
+
+  // calculate excess properties
+  const toRemove = _.difference(
+    Object.keys(cloudSchema),
+    Object.keys(localSchema)
+  );
+
+  // calculate properties which have changed
+  const toUpdate: any = Object.keys(deepDiff(
+    _(localSchema).omit(toAdd).value(),
+    _(cloudSchema).omit(toRemove).value()
+  ));
+
+  return {
+    toAdd,
+    toRemove,
+    toUpdate,
+  };
+}
+
+function compareArraysByName(localSchema: any[], cloudSchema: any[]) {
+  const toAdd: any[] = _.differenceBy(
+    localSchema,
+    cloudSchema,
+    'name'
+  );
+
+  // evaluate excess
+  const toRemove: any[] = _.differenceBy(
+    cloudSchema,
+    localSchema,
+    'name'
+  );
+
+  // evaluate incorrect
+  const toUpdate: any = _.differenceWith(
+    // local schema, omit missing
+    _.differenceBy(localSchema, toAdd, 'name'),
+    // cloud schema, omit excess
+    _.differenceBy(cloudSchema, toRemove, 'name'),
+    // compare via helper function
+    (targetTransition, currentTransition) => _.isEqual(
+      _.omit(targetTransition, ['id']),
+      _.omit(currentTransition, ['id'])
+    )
+  );
+
+  return {
+    toAdd,
+    toRemove,
+    toUpdate,
+  };
+}
+
+function findTransitionByName(name: string, transitions: any[]) {
+  return _.find(
+    transitions,
+    transition => transition.name === name
+  );
+}
+
+function compareIndexes(localSchema: any, cloudSchema: any) {
+  const localIndexes = localSchema?.indexes ?? [];
+
+  /* Remove the system indexes which cannot be managed by the user */
+  const indexesManagedByUser = cloudSchema.indexes
+    .filter((index: any) => index.system === false)
+    .map((idx: any) => ({ idx, marked: false }));
+
+  const newIndexes: any = [];
+  for (const localIndex of localIndexes) {
+    let existsInCloud = false;
+    for (const cloudIndex of indexesManagedByUser) {
+      if (_.isEqual(_.omit(cloudIndex.idx, ['name', 'id', 'system']), _.omit({ options: {}, ...localIndex }, ['name']))) {
+        existsInCloud = true;
+        cloudIndex.marked = true;
+        break;
+      }
+    }
+    if (!existsInCloud) {
+      newIndexes.push(localIndex);
+    }
+  }
+
+  const removedIndexes = indexesManagedByUser
+    .filter((index: any) => index.marked === false)
+    .map((index: any) => index.idx);
+
+  return { removedIndexes, newIndexes };
 }
