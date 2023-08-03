@@ -75,7 +75,7 @@ export class SyncSchema {
     const diff = diffRootAttributes(this.localSchema, this.cloudSchema);
 
     if (this.dry) {
-      logDifferentRootAttributes(this.cloudSchema, diff);
+      reportRootAttributesChanges(this.cloudSchema, diff);
       return;
     }
 
@@ -96,7 +96,7 @@ export class SyncSchema {
     const propertiesDiff = compareSchemaKey(this.localSchema, this.cloudSchema, 'properties');
 
     if (this.dry) {
-      logChanges(`Schema ${this.cloudSchema.name} - Properties`, propertiesDiff);
+      reportSchemaChanges(`Schema ${this.cloudSchema.name} - Properties`, propertiesDiff);
       return;
     }
 
@@ -141,7 +141,7 @@ export class SyncSchema {
     const statusDiff = compareSchemaKey(this.localSchema, this.cloudSchema, 'statuses');
 
     if (this.dry) {
-      logChanges(`Schema ${this.cloudSchema.name} - Statuses`, statusDiff);
+      reportSchemaChanges(`Schema ${this.cloudSchema.name} - Statuses`, statusDiff);
       return;
     }
 
@@ -209,7 +209,7 @@ export class SyncSchema {
     const transitionsDiff = compareSchemaKey(this.localSchema, this.cloudSchema, 'transitions');
 
     if (this.dry) {
-      logChanges(`Schema ${this.cloudSchema.name} - Transitions`, transitionsDiff);
+      reportSchemaChanges(`Schema ${this.cloudSchema.name} - Transitions`, transitionsDiff);
       return;
     }
 
@@ -261,7 +261,7 @@ export class SyncSchema {
     const { newIndexes, removedIndexes } = compareIndexes(this.localSchema, this.cloudSchema);
 
     if (this.dry) {
-      logChangesInIndexes(this.localSchema, { newIndexes, removedIndexes });
+      reportIndexChanges(this.localSchema, { newIndexes, removedIndexes });
       return;
     }
 
@@ -305,47 +305,49 @@ function diffRootAttributes(localSchema: any, cloudSchema: any) {
   );
 }
 
-function logDifferentRootAttributes(cloudSchema: any, updatedValues: any) {
+function reportRootAttributesChanges(cloudSchema: any, updatedValues: any) {
   const changedKeys = Object.keys(updatedValues);
+
   console.group(`Schema ${cloudSchema.name} - Root attributes`);
-  if (changedKeys.length < 1) { console.log('No update required.'); }
-  for (const key of changedKeys) {
+
+  if (changedKeys.length < 1) {
+    console.log('No update required.');
+    return;
+  }
+
+  changedKeys.forEach(key => {
     console.log(`${chalk.yellow(key)}:\t ${chalk.red(cloudSchema[key])} => ${chalk.green(updatedValues[key])}`);
-  }
+  });
+
   console.groupEnd();
 }
 
-function logChanges(group: string, { toAdd, toRemove, toUpdate }: {
-  toAdd: string[];
-  toRemove: string[];
-  toUpdate: string[];
-}) {
+type Changes = {toAdd: string[]; toRemove: string[]; toUpdate: string[];}
+function reportSchemaChanges(group: string, changes: Changes) {
+  const { toAdd, toRemove, toUpdate } = changes;
+
   console.group(group);
-  if (
-    toAdd.length < 1 &&
-    toRemove.length < 1 &&
-    toUpdate.length < 1
-  ) {
+
+  if (toAdd.length && toRemove.length && toUpdate.length) {
     console.log('No update required');
+    return;
   }
-  for (const key of toAdd) {
-    console.log(`Will be added: ${chalk.green(getIdentifier(key))}`);
-  }
-  for (const key of toRemove) {
-    console.log(`Will be removed: ${chalk.red(getIdentifier(key))}`);
-  }
-  for (const key of toUpdate) {
-    console.log(`Will be updated: ${chalk.yellow(getIdentifier(key))}`);
-  }
+
+  // Report changes to the schema
+  toAdd.forEach(key => console.log(`Will be added: ${chalk.green(getIdentifier(key))}`));
+  toRemove.forEach(key => console.log(`Will be removed: ${chalk.red(getIdentifier(key))}`));
+  toUpdate.forEach(key => console.log(`Will be updated: ${chalk.yellow(getIdentifier(key))}`));
+
   console.groupEnd();
 }
 
-function logChangesInIndexes(schema: any, { newIndexes, removedIndexes }: {
-  newIndexes: any[];
-  removedIndexes: any[];
-}) {
+type IndexChanges = { newIndexes: any[]; removedIndexes: any[];}
+function reportIndexChanges(schema: any, indexChanges: IndexChanges) {
+  const { newIndexes, removedIndexes } = indexChanges;
+
   const changes = compareArraysByName(newIndexes, removedIndexes);
-  logChanges(`Schema ${schema.name} - Indexes`, {
+
+  reportSchemaChanges(`Schema ${schema.name} - Indexes`, {
     toAdd: changes.toAdd.map(v => v.name),
     toRemove: changes.toRemove.map(v => v.name),
     toUpdate: changes.toUpdate.map(v => v.name),
@@ -361,38 +363,26 @@ export function compareSchemaKey(localSchema: any, cloudSchema: any, key: string
     };
   }
 
-  if (
-    Array.isArray(localSchema[key]) ||
-    (!localSchema[key] && Array.isArray(cloudSchema[key]))
-  ) {
-    return compareArraysByName(
-      localSchema[key],
-      cloudSchema[key]
-    );
+  const isLocalPropertyArray = Array.isArray(localSchema[key]);
+  const isCloudPropertyArray = !localSchema[key] && Array.isArray(cloudSchema[key]);
+
+  if (isLocalPropertyArray || isCloudPropertyArray) {
+    return compareArraysByName(localSchema[key], cloudSchema[key]);
   }
-  return compareSchemas(
-    localSchema[key],
-    cloudSchema[key]
-  );
+
+  return compareSchemas(localSchema[key], cloudSchema[key]);
 }
 
 function compareSchemas(localSchema: any, cloudSchema: any) {
-  const toAdd = _.difference(
-    Object.keys(localSchema),
-    Object.keys(cloudSchema)
-  );
+  // Calculate the properties of the schemas that have been added or removed
+  const toAdd = _.difference(Object.keys(localSchema), Object.keys(cloudSchema));
+  const toRemove = _.difference(Object.keys(cloudSchema), Object.keys(localSchema));
 
-  // calculate excess properties
-  const toRemove = _.difference(
-    Object.keys(cloudSchema),
-    Object.keys(localSchema)
-  );
+  const existingLocalProperties = _(localSchema).omit(toAdd).value();
+  const existingCloudProperties = _(cloudSchema).omit(toRemove).value();
+  const schemaDiff = deepDiff(existingLocalProperties, existingCloudProperties);
 
-  // calculate properties which have changed
-  const toUpdate: any = Object.keys(deepDiff(
-    _(localSchema).omit(toAdd).value(),
-    _(cloudSchema).omit(toRemove).value()
-  ));
+  const toUpdate = Object.keys(schemaDiff);
 
   return {
     toAdd,
@@ -402,29 +392,21 @@ function compareSchemas(localSchema: any, cloudSchema: any) {
 }
 
 function compareArraysByName(localSchema: any[], cloudSchema: any[]) {
-  const toAdd: any[] = _.differenceBy(
-    localSchema,
-    cloudSchema,
-    'name'
-  );
+  const toAdd: any[] = _.differenceBy(localSchema, cloudSchema, 'name');
+  const toRemove: any[] = _.differenceBy(cloudSchema, localSchema, 'name');
 
-  // evaluate excess
-  const toRemove: any[] = _.differenceBy(
-    cloudSchema,
-    localSchema,
-    'name'
-  );
-
-  // evaluate incorrect
-  const toUpdate: any = _.differenceWith(
-    // local schema, omit missing
-    _.differenceBy(localSchema, toAdd, 'name'),
-    // cloud schema, omit excess
-    _.differenceBy(cloudSchema, toRemove, 'name'),
-    // compare via helper function
-    (targetTransition, currentTransition) => _.isEqual(
-      _.omit(targetTransition, ['id']),
-      _.omit(currentTransition, ['id'])
+  /*
+    Looks at an array of local schemas and an array of cloud schemas, filters out any schema that doesn't exist in both array,
+    and then compares the remaining schemas in the arrays. A local schema will be compared to the cloud schema with the same name
+  */
+  const existingLocalProperties = _.differenceBy(localSchema, toAdd, 'name');
+  const existingCloudProperties = _.differenceBy(cloudSchema, toRemove, 'name');
+  const toUpdate: any[] = _.differenceWith(
+    existingLocalProperties,
+    existingCloudProperties,
+    (targetSchema, currentSchema) => _.isEqual(
+      _.omit(targetSchema, ['id']),
+      _.omit(currentSchema, ['id'])
     )
   );
 
@@ -453,13 +435,18 @@ function compareIndexes(localSchema: any, cloudSchema: any) {
   const newIndexes: any = [];
   for (const localIndex of localIndexes) {
     let existsInCloud = false;
+
     for (const cloudIndex of indexesManagedByUser) {
-      if (_.isEqual(_.omit(cloudIndex.idx, ['name', 'id', 'system']), _.omit({ options: {}, ...localIndex }, ['name']))) {
+      const cloudIndexContents = _.omit(cloudIndex.idx, ['name', 'id', 'system']);
+      const localIndexContents = _.omit({ options: {}, ...localIndex }, ['name']);
+
+      if (_.isEqual(cloudIndexContents, localIndexContents)) {
         existsInCloud = true;
         cloudIndex.marked = true;
         break;
       }
     }
+
     if (!existsInCloud) {
       newIndexes.push(localIndex);
     }
