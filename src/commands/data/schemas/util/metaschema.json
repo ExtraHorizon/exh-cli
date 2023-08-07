@@ -377,14 +377,11 @@
             "type": "string"
           }
         },
-        "pattern": {
+        "const": {
           "type": "string"
         },
-        "required": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
+        "pattern": {
+          "type": "string"
         },
         "format": {
           "type": "string",
@@ -414,6 +411,9 @@
             "type": "number"
           }
         },
+        "const": {
+          "type": "number"
+        },
         "queryable": {
           "type": "boolean"
         }
@@ -425,6 +425,12 @@
         "type": {
           "type": "string",
           "enum": ["boolean"]
+        },
+        "enum": {
+          "type": "array",
+          "items": {
+            "type": "boolean"
+          }
         },
         "queryable": {
           "type": "boolean"
