@@ -432,6 +432,9 @@
             "type": "boolean"
           }
         },
+        "const": {
+          "type": "boolean"
+        },
         "queryable": {
           "type": "boolean"
         }
