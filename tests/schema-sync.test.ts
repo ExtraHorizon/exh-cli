@@ -1,4 +1,3 @@
-// file.only
 import { compareSchemaKey } from '../src/commands/data/schemas/util/syncSchema';
 import { properties, propertiesModified, transitions, transitionsModified } from './data/dataSchema';
 
