@@ -53,8 +53,8 @@ export async function syncTargetFile(sdk: any, targetFile: string, dry?: boolean
     const targetSchema = await readJsonFile(filePath);
 
     // synchronize with data service
-    const syncSchema = SyncSchema.createSchemaSync(sdk);
-    await syncSchema.sync(targetSchema, dry);
+    const syncSchema = SyncSchema.createSchemaSync(sdk, dry);
+    await syncSchema.sync(targetSchema);
   }
 }
 
