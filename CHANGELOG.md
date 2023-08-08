@@ -1,5 +1,13 @@
 # Extrahorizon CLI changelog
 
+### v1.1.0
+* Added single file sync command for schemas with `exh schema sync --file <path>`
+* Added a dry run argument for schema sync `exh schemas sync --dry`. This will report the properties to be added, removed and updated in the terminal, without persisting schema changes.
+* Added verification and validation for statuses that are defined, but not present in transitions.
+* Added validation to ensure that properties in a creation transition exist in the schema properties.
+* Added verification and validation of transition conditions.
+* Added terminal notifications for if a newer release of the CLI available.
+
 ### v1.0.4
 * Security update
 
