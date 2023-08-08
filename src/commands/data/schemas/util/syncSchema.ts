@@ -38,25 +38,25 @@ export class SyncSchema {
     }
 
     //  root attributes: update
-    await this.#syncRootAttributes(dry);
+    await this.#syncRootAttributes();
 
     //  properties: add, update & remove
-    await this.#syncProperties(dry);
+    await this.#syncProperties();
 
     //  statuses 1/2: add & update
-    await this.#updateStatuses(dry);
+    await this.#updateStatuses();
 
     //  creationTransition: update
-    await this.#syncCreationTransition(dry);
+    await this.#syncCreationTransition();
 
     // transtions: add, update & remove
-    await this.#syncTransitions(dry);
+    await this.#syncTransitions();
 
     //  statuses 2/2 remove
-    await this.#pruneStatuses(dry);
+    await this.#pruneStatuses();
 
     // Indexes: add, update & remove
-    await this.#syncIndexes(dry);
+    await this.#syncIndexes();
   }
 
   /**
