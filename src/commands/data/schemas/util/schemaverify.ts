@@ -1,4 +1,5 @@
 import Ajv from 'ajv';
+import { isEqual } from 'lodash';
 
 export enum TestId {
   META_SCHEMA = 1,
@@ -70,6 +71,7 @@ export class SchemaVerify {
         return { ok: false, errors: transformAjvErrors('', this.ajv.errors) };
       }
     }
+
     return { ok: true, errors: [] };
   }
 
@@ -89,6 +91,14 @@ export class SchemaVerify {
     if (this.schema.creationTransition) {
       statusList = new Set([...statusList.values(), this.schema.creationTransition.toStatus]);
     }
+
+    Object.keys(this.schema.statuses || []).forEach(status => {
+      if (!statusList.has(status)) {
+        errors.push(`Status '${status}' is defined in the schema statuses but not used in any transition`);
+        ok = false;
+      }
+    });
+
     for (const status of statusList) {
       if (this.schema.statuses[status] === undefined) {
         errors.push(`Status '${status}' is not defined in the status list`);
@@ -104,6 +114,29 @@ export class SchemaVerify {
 
     /* check all conditions of the creation transition */
     if (this.schema.creationTransition?.conditions?.length) {
+      const schemaProperties = this.schema.properties || [];
+
+      // Validate that all properties in the conditions are defined in the schema properties
+      const transitionConditions = this.schema.creationTransition.conditions || [];
+      transitionConditions.forEach(condition => {
+        const conditionProperties = condition.configuration?.properties || [];
+
+        Object.keys(conditionProperties).forEach(key => {
+          // Check if the condition property is not defined in the schema properties
+          if (!schemaProperties[key]) {
+            errors.push(`Property '${key}' is defined in the creation transition properties but not in the schema properties`);
+            ok = false;
+            return;
+          }
+
+          // Check if the condition property is incorrectly typed vs the schema properties
+          if (!isEqual(schemaProperties[key], conditionProperties[key])) {
+            errors.push(`Property '${key}' has different type definitions in the creation transition and schema properties`);
+            ok = false;
+          }
+        });
+      });
+
       for (const [index, condition] of this.schema.creationTransition.conditions.entries()) {
         if (condition.type !== 'input') {
           continue;

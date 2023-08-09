@@ -103,6 +103,7 @@
             "type": "string"
           },
           "fromStatuses": {
+            "minLength": 1,
             "items": {
               "type": "string"
             },
@@ -150,7 +151,8 @@
                   "type": "string",
                   "enum": [
                     "asc",
-                    "desc"
+                    "desc",
+                    "text"
                   ]
                 }
               }
@@ -231,24 +233,223 @@
       "type": "array",
       "items": {
         "type": "object",
-        "properties": {
-          "configuration": {
-            "type": "object"
-          },
-          "type": {
-            "enum": [
-              "input",
-              "initiatorHasRelationToUserInData",
-              "initiatorHasRelationToGroupInData",
-              "document"
-            ],
+        "anyOf": [
+          { "$ref": "#/definitions/inputCondition" },
+          { "$ref": "#/definitions/documentCondition" },
+          { "$ref": "#/definitions/initiatorHasRelationToUserInDataCondition" },
+          { "$ref": "#/definitions/initiatorHasRelationToGroupInData" }
+        ]
+      }
+    },
+    "inputCondition": {
+      "type": "object",
+      "properties": {
+        "configuration": { "$ref": "#/definitions/configurations" },
+        "type": {
+          "type": "string",
+          "enum": ["input"]
+        },
+        "required": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "documentCondition": {
+      "type": "object",
+      "properties": {
+        "configuration": { "$ref": "#/definitions/configurations" },
+        "type": {
+          "type": "string",
+          "enum": ["input"]
+        },
+        "required": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "initiatorHasRelationToUserInDataCondition": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "initiatorHasRelationToUserInData"
+          ]
+        },
+        "userIdField": {
+          "type": "string"
+        },
+        "relation": {
+          "type": "string",
+          "enum": ["isStaffOfTargetPatient"]
+        }
+      },
+      "required": [
+        "type"
+      ]
+    },
+    "initiatorHasRelationToGroupInData": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "initiatorHasRelationToGroupInData"
+          ]
+        },
+        "groupIdField": {
+          "type": "string"
+        },
+        "relation": {
+          "type": "string",
+          "enum": ["staff", "patient"]
+        },
+        "requiredPermission": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ]
+    },
+    "objectConfiguration": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["object"]
+        },
+        "required": {
+          "type": "array",
+          "items": {
             "type": "string"
           }
         },
-        "required": [
-          "type"
-        ]
+        "queryable": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": true,
+      "required": ["type"]
+    },
+    "arrayConfiguration": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["array"]
+        },
+        "items": {
+          "type": "object"
+        },
+        "minItems": {
+          "type": "number"
+        },
+        "maxItems": {
+          "type": "number"
+        },
+        "contains": {
+          "type": "object"
+        },
+        "queryable": {
+          "type": "boolean"
+        }
       }
+    },
+    "stringConfigurations": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["string"]
+        },
+        "minLength": {
+          "type": "number"
+        },
+        "maxLength": {
+          "type": "number"
+        },
+        "enum": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "const": {
+          "type": "string"
+        },
+        "pattern": {
+          "type": "string"
+        },
+        "format": {
+          "type": "string",
+          "enum": ["date-time"]
+        },
+        "queryable": {
+          "type": "boolean"
+        }
+      }
+    },
+    "numberConfigurations": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["string"]
+        },
+        "minimum": {
+          "type": "number"
+        },
+        "maximum": {
+          "type": "number"
+        },
+        "enum": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        },
+        "const": {
+          "type": "number"
+        },
+        "queryable": {
+          "type": "boolean"
+        }
+      }
+    },
+    "booleanConfigurations": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["boolean"]
+        },
+        "enum": {
+          "type": "array",
+          "items": {
+            "type": "boolean"
+          }
+        },
+        "const": {
+          "type": "boolean"
+        },
+        "queryable": {
+          "type": "boolean"
+        }
+      },
+      "required": ["type"]
+    },
+    "configurations": {
+      "type": "object",
+      "anyOf": [
+        {"$ref": "#/definitions/objectConfiguration"},
+        {"$ref": "#/definitions/arrayConfiguration"},
+        {"$ref": "#/definitions/stringConfigurations"},
+        {"$ref": "#/definitions/numberConfigurations"},
+        {"$ref": "#/definitions/booleanConfigurations"}
+    ]
     }
   }
 }

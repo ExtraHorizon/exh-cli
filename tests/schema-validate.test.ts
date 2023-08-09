@@ -45,7 +45,8 @@ test('Invalid JSON schema in properties must trigger an error', () => {
 });
 
 test('Invalid JSON schema in creationTransition input condition must trigger an error', () => {
-  const verify = new SchemaVerify(ajv, { name: 'test',
+  const schema = {
+    name: 'test',
     description: 'test',
     statuses: { new: {} },
     creationTransition: { type: 'manual',
@@ -56,18 +57,14 @@ test('Invalid JSON schema in creationTransition input condition must trigger an 
           configuration: {
             type: 'test',
           },
-
         },
       ] },
-    properties: {} }, metaschema);
-  for (const check of verify.RunChecks()) {
-    if (check.id === TestId.INPUT_CONDITIONS) {
-      expect(check.ok).toBe(false);
-    } else {
-      expect(check.ok).toBe(true);
-    }
-  }
+    properties: {},
+  };
+  const verify = ajv.compile(metaschema);
+  expect(verify(schema)).toBe(false);
 });
+
 test('Valid JSON schema in creationTransition input condition must not trigger an error', () => {
   const verify = new SchemaVerify(ajv, { name: 'test',
     description: 'test',
@@ -86,40 +83,9 @@ test('Valid JSON schema in creationTransition input condition must not trigger a
 
         },
       ] },
-    properties: {} }, metaschema);
+    properties: { name: { type: 'string' } } }, metaschema);
   for (const check of verify.RunChecks()) {
     expect(check.ok).toBe(true);
-  }
-});
-
-test('Invalid JSON schema in transition input condition must trigger an error', () => {
-  const verify = new SchemaVerify(ajv, { name: 'test',
-    description: 'test',
-    statuses: { new: {}, processed: {} },
-    creationTransition: { type: 'manual', toStatus: 'new' },
-    transitions: [
-      {
-        name: 'toProcessed',
-        type: 'manual',
-        fromStatuses: ['new'],
-        toStatus: 'processed',
-        conditions: [
-          {
-            type: 'input',
-            configuration: {
-              type: 'test',
-            },
-          },
-        ],
-      },
-    ],
-    properties: {} }, metaschema);
-  for (const check of verify.RunChecks()) {
-    if (check.id === TestId.INPUT_CONDITIONS) {
-      expect(check.ok).toBe(false);
-    } else {
-      expect(check.ok).toBe(true);
-    }
   }
 });
 
@@ -151,6 +117,136 @@ test('Valid JSON schema in transition condition must not trigger an error', () =
     properties: {} }, metaschema);
   for (const check of verify.RunChecks()) {
     expect(check.ok).toBe(true);
+  }
+});
+
+test('Invalid JSON schema in transition input condition must trigger an error', () => {
+  const schema = {
+    name: 'test',
+    description: 'test',
+    statuses: { new: {}, processed: {} },
+    creationTransition: { type: 'manual', toStatus: 'new' },
+    transitions: [
+      {
+        name: 'toProcessed',
+        type: 'manual',
+        fromStatuses: ['new'],
+        toStatus: 'processed',
+        conditions: [
+          {
+            type: 'input',
+            configuration: {
+              type: 'test',
+            },
+          },
+        ],
+      },
+    ],
+    properties: {},
+  };
+  const verify = ajv.compile(metaschema);
+  expect(verify(schema)).toBe(false);
+});
+
+test('Using a status which is not defined in a transition should trigger an error', () => {
+  /* Test for normal transition */
+  const verify = new SchemaVerify(ajv, { name: 'test',
+    description: 'test',
+    statuses: { new: {}, dazed: {}, confused: {} },
+    creationTransition: { type: 'manual', toStatus: 'new' },
+    transitions: [
+      {
+        name: 'toDazed',
+        type: 'automatic',
+        fromStatuses: ['new'],
+        toStatus: 'dazed',
+        conditions: [],
+      },
+    ],
+    properties: {} }, metaschema);
+
+  for (const check of verify.RunChecks()) {
+    if (check.id === TestId.STATUS_CHECK) {
+      expect(check.ok).toBe(false);
+      expect(check.errors).toEqual(["Status 'confused' is defined in the schema statuses but not used in any transition"]);
+    }
+  }
+});
+
+test('Using a property in the creationTransition which is not defined in the schema properties should trigger an error', () => {
+  const verify = new SchemaVerify(ajv, { name: 'test',
+    description: 'test',
+    statuses: { created: {} },
+    creationTransition: { type: 'manual',
+      toStatus: 'created',
+      conditions: [
+        {
+          type: 'input',
+          configuration: {
+            properties: {
+              tags: {
+                type: 'array',
+                items: {
+                  type: 'string',
+                },
+              },
+            },
+          },
+        },
+      ] },
+    properties: {} }, metaschema);
+
+  for (const check of verify.RunChecks()) {
+    if (check.id === TestId.INPUT_CONDITIONS) {
+      if (check.id === TestId.INPUT_CONDITIONS) {
+        expect(check.ok).toBe(false);
+        expect(check.errors).toEqual(["Property 'tags' is defined in the creation transition properties but not in the schema properties"]);
+      } else {
+        expect(check.ok).toBe(true);
+      }
+    }
+  }
+});
+
+test('Using a property in the creationTransition which is differently typed in the schema properties should trigger an error', () => {
+  const verify = new SchemaVerify(ajv, { name: 'test',
+    description: 'test',
+    statuses: { created: {} },
+    creationTransition: { type: 'manual',
+      toStatus: 'created',
+      conditions: [
+        {
+          type: 'input',
+          configuration: {
+            properties: {
+              tags: {
+                type: 'array',
+                items: {
+                  type: 'string',
+                },
+              },
+            },
+          },
+        },
+      ] },
+    properties: {
+      tags: {
+        type: 'array',
+        items: {
+          type: 'number',
+        },
+      },
+    } }, metaschema);
+
+  for (const check of verify.RunChecks()) {
+    if (check.id === TestId.INPUT_CONDITIONS) {
+      if (check.id === TestId.INPUT_CONDITIONS) {
+        expect(check.ok).toBe(false);
+        expect(check.errors).toEqual(["Property 'tags' has different type definitions in the creation transition and schema properties"]);
+      } else {
+        expect(check.ok).toBe(true);
+      }
+    }
   }
 });
 

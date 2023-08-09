@@ -1,6 +1,6 @@
 {
   "name": "@extrahorizon/exh-cli",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "main": "build/index.js",
   "exports": "./build/index.js",
   "license": "MIT",
@@ -47,6 +47,7 @@
     "joi": "^17.6.0",
     "jsonschema": "^1.4.1",
     "lodash": "^4.17.21",
+    "update-notifier": "^5.1.0",
     "uuid": "^8.3.2",
     "yargs": "^17.5.1"
   },

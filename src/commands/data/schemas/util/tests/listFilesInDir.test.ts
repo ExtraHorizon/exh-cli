@@ -1,3 +1,4 @@
+import path = require('path');
 import * as mockFs from 'mock-fs';
 import { flatListFiles } from '../listFilesInDir';
 
@@ -22,17 +23,17 @@ describe('listFilesInDir', () => {
 
   it('Returns a flat array of only json files', () => {
     expect(flatListFiles('path/to/fake/dir', '.json')).toStrictEqual([
-      'path/to/fake/dir/a-directory/second-json-file.json',
-      'path/to/fake/dir/first-json-file.json',
+      path.join('path/to/fake/dir/a-directory/second-json-file.json'),
+      path.join('path/to/fake/dir/first-json-file.json'),
     ]);
   });
 
   it('Returns a flat array of all files', () => {
     expect(flatListFiles('path/to/fake/dir')).toStrictEqual([
-      'path/to/fake/dir/a-directory/second-json-file.json',
-      'path/to/fake/dir/a-directory/some-file.txt',
-      'path/to/fake/dir/first-json-file.json',
-      'path/to/fake/dir/some-file.txt',
+      path.join('path/to/fake/dir/a-directory/second-json-file.json'),
+      path.join('path/to/fake/dir/a-directory/some-file.txt'),
+      path.join('path/to/fake/dir/first-json-file.json'),
+      path.join('path/to/fake/dir/some-file.txt'),
     ]);
   });
 
