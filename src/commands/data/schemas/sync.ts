@@ -32,22 +32,24 @@ export const handler = async ({ sdk, dir, file, dry }) => {
     process.exit(1);
   }
   if (dir) {
-    await syncTargetDir(sdk, path.resolve(dir || '.'), dry);
+    const targetDir = path.resolve(dir || '.');
+    await verifyHandler({ dir: targetDir, file: null });
+    await syncTargetDir(sdk, targetDir, dry);
   }
   if (file) {
-    await syncTargetFile(sdk, path.resolve(file), dry);
+    const targetFile = path.resolve(file);
+    await verifyHandler({ dir: null, file: targetFile });
+    await syncTargetFile(sdk, targetFile, dry);
   }
 };
 
 export async function syncTargetFile(sdk: any, targetFile: string, dry?: boolean) {
-  await verifyHandler({ dir: null, file: targetFile });
-
   const filePath = path.resolve(targetFile);
 
   if (!filePath.endsWith('.json')) {
     console.log(`Ignored ${path.basename(filePath)}, not a JSON file (needs .json extension)`);
   } else {
-    console.log(chalk.bold(`Synchronizing ${path.basename(filePath)}`));
+    console.group(chalk.bold(`Synchronizing ${path.basename(filePath)}`));
 
     // parse to object
     const targetSchema = await readJsonFile(filePath);
@@ -55,6 +57,7 @@ export async function syncTargetFile(sdk: any, targetFile: string, dry?: boolean
     // synchronize with data service
     const syncSchema = SyncSchema.createSchemaSync(sdk, dry);
     await syncSchema.sync(targetSchema);
+    console.groupEnd();
   }
 }
 
@@ -63,9 +66,6 @@ export async function syncTargetFile(sdk: any, targetFile: string, dry?: boolean
  * @param {string} targetDir path to the directory containing all of the target schemas
  */
 export async function syncTargetDir(sdk: any, targetDir: string, dry?: boolean) {
-  /* Do a verification of the schema before syncing it */
-  await verifyHandler({ dir: targetDir, file: null });
-
   // list all the target files inside of the directory
   const targetFiles = flatListFiles(targetDir, '.json');
 

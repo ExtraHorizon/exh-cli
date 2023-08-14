@@ -26,12 +26,11 @@ export class SyncSchema {
       return;
     }
 
-    console.log(`Syncing ${this.localSchema.name}`);
     this.cloudSchema = await this.ds.fetchSchemaByName(this.localSchema.name);
 
     if (!this.cloudSchema) {
       if (this.dry) {
-        console.log(`\t-> Will be created: ${chalk.green(this.localSchema.name)}`);
+        console.log(`-> New schema will be created: ${chalk.green(this.localSchema.name)}`);
         return;
       }
       this.cloudSchema = await this.ds.createSchema(this.localSchema.name, this.localSchema.description);
@@ -312,6 +311,7 @@ function reportRootAttributesChanges(cloudSchema: any, updatedValues: any) {
 
   if (changedKeys.length < 1) {
     console.log('No update required.');
+    console.groupEnd();
     return;
   }
 
@@ -328,8 +328,9 @@ function reportSchemaChanges(group: string, changes: Changes) {
 
   console.group(group);
 
-  if (toAdd.length && toRemove.length && toUpdate.length) {
+  if (!toAdd.length && !toRemove.length && !toUpdate.length) {
     console.log('No update required');
+    console.groupEnd();
     return;
   }
 
