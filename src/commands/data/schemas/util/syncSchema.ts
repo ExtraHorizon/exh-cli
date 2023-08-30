@@ -1,8 +1,8 @@
 /* eslint-disable lines-between-class-members */
 import chalk = require('chalk');
 import * as _ from 'lodash';
+import { compareStatuses, calculateStatusUpdateData } from '../sync/statusHelpers';
 import { DataService } from './dataService';
-import { compareStatuses, calculateStatusProperties } from './helpers/statuses';
 
 export class SyncSchema {
   private ds: DataService;
@@ -154,9 +154,9 @@ export class SyncSchema {
     }
 
     for (const key of toUpdate) {
-      const data = calculateStatusProperties(this.localSchema.statuses[key], this.cloudSchema.statuses[key]);
       console.log(`statuses: updating ${key}`);
-      await this.ds.updateStatus(this.cloudSchema.id, key, { data });
+      const data = calculateStatusUpdateData(this.localSchema.statuses[key], this.cloudSchema.statuses[key]);
+      await this.ds.updateStatus(this.cloudSchema.id, key, data);
     }
 
     // don't delete yet, first some other data needs to be adjusted

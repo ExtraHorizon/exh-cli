@@ -1,5 +1,5 @@
 {
-  "name": "Statuses_Schema_2",
+  "name": "Statuses_Schema",
   "description": "Test data for updating schema statuses",
   "createMode": "permissionRequired",
   "readMode": "allUsers",

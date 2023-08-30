@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { compareStatuses, calculateStatusProperties } from '../../../src/commands/data/schemas/util/helpers/statuses';
+import { compareStatuses, calculateStatusUpdateData } from '../../../src/commands/data/schemas/sync/statusHelpers';
 import { readJsonFile } from '../../../src/commands/data/schemas/util/readJson';
 
 describe('Sync - Statuses', () => {
@@ -26,7 +26,7 @@ describe('Sync - Statuses', () => {
   });
 
   it('Returns a status properties to be added, updated and deleted', () => {
-    const result = calculateStatusProperties(localSchema.statuses.Two, cloudSchema.statuses.Two);
+    const result = calculateStatusUpdateData(localSchema.statuses.Two, cloudSchema.statuses.Two);
     expect(result).toStrictEqual({
       kappa: 'Kappa',
       delta: 'Delta',

@@ -102,7 +102,7 @@ export class DataService {
  * @param {*} data  a status object
  */
   async updateStatus(id: string, name: string, data: object) {
-    return await this.sdk.raw.put(`/data/v1/${id}/statuses/${name}`, data);
+    return await this.sdk.raw.put(`/data/v1/${id}/statuses/${name}`, { data });
   }
 
   /**

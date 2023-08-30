@@ -1,5 +1,5 @@
 import { isEqual } from 'lodash';
-import { Changes } from '../syncSchema';
+import { Changes } from '../util/syncSchema';
 
 export function compareStatuses(localSchema: any, cloudSchema: any) {
   const changes: Changes = {
@@ -12,57 +12,53 @@ export function compareStatuses(localSchema: any, cloudSchema: any) {
   const localStatuses = localSchema.statuses;
 
   // Check local schema for statuses to be created or updated
-  const localStatusKeys = Object.keys(localStatuses);
-  localStatusKeys.forEach(key => {
-    const cloudStatus = cloudStatuses[key];
-    const localStatus = localStatuses[key];
+  for (const statusName of Object.keys(localStatuses)) {
+    const cloudStatus = cloudStatuses[statusName];
+    const localStatus = localStatuses[statusName];
 
     // Status is to be created
     const isNewStatus = localStatus && !cloudStatus;
     if (isNewStatus) {
-      changes.toAdd.push(key);
+      changes.toAdd.push(statusName);
     }
 
     // Status is to be updated
     const isUpdatedStatus = localStatus && cloudStatus && !isEqual(localStatus, cloudStatus);
     if (isUpdatedStatus) {
-      changes.toUpdate.push(key);
+      changes.toUpdate.push(statusName);
     }
-  });
+  }
 
   // Check cloud schema for statuses to be removed
-  const cloudStatusKeys = Object.keys(cloudStatuses);
-  cloudStatusKeys.forEach(key => {
-    const cloudStatus = cloudStatuses[key];
-    const localStatus = localStatuses[key];
+  for (const statusName of Object.keys(cloudStatuses)) {
+    const cloudStatus = cloudStatuses[statusName];
+    const localStatus = localStatuses[statusName];
 
     // Status is to be deleted
     const isExcessStatus = !localStatus && cloudStatus;
     if (isExcessStatus) {
-      changes.toRemove.push(key);
+      changes.toRemove.push(statusName);
     }
-  });
+  }
 
   return changes;
 }
 
-export function calculateStatusProperties(localStatus: any, cloudStatus: any) {
+export function calculateStatusUpdateData(localStatus: any, cloudStatus: any) {
   const result: Record<string, string> = {};
 
   // Add and update properties
-  const localStatusKeys = Object.keys(localStatus);
-  localStatusKeys.forEach(key => {
+  for (const key of Object.keys(localStatus)) {
     result[key] = localStatus[key];
-  });
+  }
 
   // Remove excess properties by providing a null value
-  const cloudStatusKeys = Object.keys(cloudStatus);
-  cloudStatusKeys.forEach(key => {
+  for (const key of Object.keys(cloudStatus)) {
     const isExcessProperty = !localStatus[key];
     if (isExcessProperty) {
       result[key] = null;
     }
-  });
+  }
 
   return result;
 }
