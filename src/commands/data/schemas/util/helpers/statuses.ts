@@ -13,7 +13,7 @@ export function compareStatuses(localSchema: any, cloudSchema: any) {
 
   // Check local schema for statuses to be created or updated
   const localStatusKeys = Object.keys(localStatuses);
-  for (const key of localStatusKeys) {
+  localStatusKeys.forEach(key => {
     const cloudStatus = cloudStatuses[key];
     const localStatus = localStatuses[key];
 
@@ -28,11 +28,11 @@ export function compareStatuses(localSchema: any, cloudSchema: any) {
     if (isUpdatedStatus) {
       changes.toUpdate.push(key);
     }
-  }
+  });
 
   // Check cloud schema for statuses to be removed
   const cloudStatusKeys = Object.keys(cloudStatuses);
-  for (const key of cloudStatusKeys) {
+  cloudStatusKeys.forEach(key => {
     const cloudStatus = cloudStatuses[key];
     const localStatus = localStatuses[key];
 
@@ -41,7 +41,7 @@ export function compareStatuses(localSchema: any, cloudSchema: any) {
     if (isExcessStatus) {
       changes.toRemove.push(key);
     }
-  }
+  });
 
   return changes;
 }

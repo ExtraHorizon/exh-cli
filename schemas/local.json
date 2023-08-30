@@ -1,0 +1,84 @@
+{
+  "name": "Statuses_Schema_2",
+  "description": "Test data for updating schema statuses",
+  "createMode": "permissionRequired",
+  "readMode": "allUsers",
+  "updateMode": "default",
+  "deleteMode": "permissionRequired",
+  "statuses": {
+    "created": {},
+    "One" : {
+      "alpha": "Alpha",
+      "beta": "Lambda",
+      "sigma": "Sigma",
+      "phi": "Phi"
+    },
+    "Two" : {
+      "kappa": "Kappa",
+      "delta": "Delta",
+      "omicron": "Omicron",
+      "upsilon": "Upsilon"
+    },
+    "Three" : {
+      "chi": "Chi",
+      "eta": "Eta",
+      "zeta": "Zeta"
+    },
+    "Four" : {
+      "alpha": "Alpha",
+      "beta": "Beta"
+    }
+  },
+  "creationTransition": {
+    "type": "manual",
+    "toStatus": "created",
+    "conditions": [
+      {
+        "type": "input",
+        "configuration": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    ]
+  },
+  "properties": {
+
+  },
+  "transitions": [
+    {
+      "name": "transition_One",
+      "type": "automatic",
+      "fromStatuses": [
+        "created"
+      ],
+      "toStatus": "One"
+    },
+    {
+      "name": "transition_Two",
+      "type": "automatic",
+      "fromStatuses": [
+        "One"
+      ],
+      "toStatus": "Two"
+    },
+    {
+      "name": "transition_Three",
+      "type": "automatic",
+      "fromStatuses": [
+        "Two"
+      ],
+      "toStatus": "Three"
+    },
+    {
+      "name": "transition_Four",
+      "type": "automatic",
+      "fromStatuses": [
+        "Three"
+      ],
+      "toStatus": "Four"
+    }
+  ]
+}

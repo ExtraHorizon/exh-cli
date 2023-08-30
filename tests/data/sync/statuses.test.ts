@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { compareStatuses, calculateStatusProperties } from '../../../src/commands/data/schemas/util/helpers/properties';
+import { compareStatuses, calculateStatusProperties } from '../../../src/commands/data/schemas/util/helpers/statuses';
 import { readJsonFile } from '../../../src/commands/data/schemas/util/readJson';
 
 describe('Sync - Statuses', () => {

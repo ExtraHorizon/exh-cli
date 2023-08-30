@@ -2,7 +2,7 @@
 import chalk = require('chalk');
 import * as _ from 'lodash';
 import { DataService } from './dataService';
-import { compareStatuses, calculateStatusProperties } from './helpers/properties';
+import { compareStatuses, calculateStatusProperties } from './helpers/statuses';
 
 export class SyncSchema {
   private ds: DataService;
