@@ -1,0 +1,46 @@
+{
+  "name": "Statuses_Schema",
+  "description": "Test data for updating schema statuses",
+  "createMode": "permissionRequired",
+  "readMode": "allUsers",
+  "updateMode": "default",
+  "deleteMode": "permissionRequired",
+  "statuses": {
+    "One" : {
+      "alpha": "Alpha",
+      "beta": "Lambda",
+      "sigma": "Sigma",
+      "phi": "Phi"
+    },
+    "Two" : {
+      "kappa": "Kappa",
+      "delta": "Delta",
+      "omicron": "Omicron",
+      "upsilon": "Upsilon"
+    },
+    "Three" : {
+      "chi": "Chi",
+      "eta": "Eta",
+      "zeta": "Zeta"
+    },
+    "Four" : {
+      "alpha": "Alpha",
+      "beta": "Beta"
+    }
+  },
+  "creationTransition": {
+    "type": "manual",
+    "toStatus": "created",
+    "conditions": [
+      {
+        "type": "input",
+        "configuration": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    ]
+  }
+}

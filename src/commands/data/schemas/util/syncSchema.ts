@@ -2,6 +2,7 @@
 import chalk = require('chalk');
 import * as _ from 'lodash';
 import { DataService } from './dataService';
+import { compareStatuses, calculateStatusProperties } from './helpers/properties';
 
 export class SyncSchema {
   private ds: DataService;
@@ -138,14 +139,14 @@ export class SyncSchema {
  * @param {object} targetSchema.statuses
  */
   async #updateStatuses() {
-    const statusDiff = compareSchemaKey(this.localSchema, this.cloudSchema, 'statuses');
+    const changes = compareStatuses(this.localSchema, this.cloudSchema);
 
     if (this.dry) {
-      reportSchemaChanges(`Schema ${this.cloudSchema.name} - Statuses`, statusDiff);
+      reportSchemaChanges(`Schema ${this.cloudSchema.name} - Statuses`, changes);
       return;
     }
 
-    const { toAdd, toUpdate } = statusDiff;
+    const { toAdd, toUpdate } = changes;
 
     for (const key of toAdd) {
       console.log(`statuses: adding ${key}`);
@@ -153,8 +154,9 @@ export class SyncSchema {
     }
 
     for (const key of toUpdate) {
+      const data = calculateStatusProperties(this.localSchema.statuses[key], this.cloudSchema.statuses[key]);
       console.log(`statuses: updating ${key}`);
-      await this.ds.updateStatus(this.cloudSchema.id, key, this.localSchema.statuses[key]);
+      await this.ds.updateStatus(this.cloudSchema.id, key, { data });
     }
 
     // don't delete yet, first some other data needs to be adjusted
@@ -322,13 +324,13 @@ function reportRootAttributesChanges(cloudSchema: any, updatedValues: any) {
   console.groupEnd();
 }
 
-type Changes = {toAdd: string[]; toRemove: string[]; toUpdate: string[];}
+export type Changes = {toAdd: string[]; toRemove: string[]; toUpdate: string[];}
 function reportSchemaChanges(group: string, changes: Changes) {
   const { toAdd, toRemove, toUpdate } = changes;
 
   console.group(group);
 
-  if (toAdd.length && toRemove.length && toUpdate.length) {
+  if (!toAdd.length && !toRemove.length && !toUpdate.length) {
     console.log('No update required');
     return;
   }
