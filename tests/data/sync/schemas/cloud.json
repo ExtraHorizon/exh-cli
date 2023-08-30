@@ -1,11 +1,12 @@
 {
-  "name": "Statuses_Schema",
+  "name": "Statuses_Schema_2",
   "description": "Test data for updating schema statuses",
   "createMode": "permissionRequired",
   "readMode": "allUsers",
   "updateMode": "default",
   "deleteMode": "permissionRequired",
   "statuses": {
+    "created": {},
     "One" : {
       "alpha": "Alpha",
       "beta": "Lambda",
@@ -43,5 +44,42 @@
         }
       }
     ]
-  }
+  },
+  "properties": {
+
+  },
+  "transitions": [
+    {
+      "name": "transition_One",
+      "type": "automatic",
+      "fromStatuses": [
+        "created"
+      ],
+      "toStatus": "One"
+    },
+    {
+      "name": "transition_Two",
+      "type": "automatic",
+      "fromStatuses": [
+        "One"
+      ],
+      "toStatus": "Two"
+    },
+    {
+      "name": "transition_Three",
+      "type": "automatic",
+      "fromStatuses": [
+        "Two"
+      ],
+      "toStatus": "Three"
+    },
+    {
+      "name": "transition_Four",
+      "type": "automatic",
+      "fromStatuses": [
+        "Three"
+      ],
+      "toStatus": "Six"
+    }
+  ]
 }
