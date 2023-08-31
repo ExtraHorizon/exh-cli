@@ -1,0 +1,7 @@
+{
+  "name": "invalid-runtime",
+  "description": "Invalid runtime task",
+  "path": "build",
+  "entryPoint": "index.handler",
+  "runtime": "nodejs12.x"
+}
