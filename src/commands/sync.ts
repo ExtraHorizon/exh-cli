@@ -35,6 +35,12 @@ If not, the local directory is assumed with a default configuration which assume
       type: 'boolean',
       default: false,
     },
+    ignoreSchemaVerificationErrors: {
+      demandOption: false,
+      describe: 'Allow schema synchronization to proceed with validation errors.',
+      type: 'boolean',
+      default: false,
+    },
 
   }).check(async ({ path }) => {
     if (path !== undefined) {
@@ -50,7 +56,7 @@ If not, the local directory is assumed with a default configuration which assume
     return true;
   });
 
-export const handler = async ({ sdk, path, schemas, tasks, templates }) => {
+export const handler = async ({ sdk, path, schemas, tasks, templates, ignoreSchemaVerificationErrors }) => {
   const targetPath = ospath.join(process.cwd(), path || '.');
   const cfg = await getRepoConfig(targetPath, true);
 
@@ -60,7 +66,7 @@ export const handler = async ({ sdk, path, schemas, tasks, templates }) => {
   if ((syncAll || schemas) && cfg.schemas) {
     console.log(chalk.green('\n ⚙️  Syncing schemas ...'));
     for (const schema of cfg.schemas) {
-      await syncSchemas(sdk, ospath.join(targetPath, schema));
+      await syncSchemas(sdk, ospath.join(targetPath, schema), undefined, ignoreSchemaVerificationErrors);
     }
   }
 
