@@ -15,7 +15,7 @@ describe('Tasks - Sync - Runtimes', () => {
   });
 
   it('Throws an invalid runtime error when provided an invalid runtime argument', async () => {
-    const error = await handler({ sdk: null, name: 'test', entryPoint: 'index.js', runtime: 'nodejs12.x' })
+    const error = await handler({ sdk: null, name: 'test', entryPoint: 'index.js', runtime: 'nodejs8.x' })
       .catch(e => e);
 
     expect(error.message).toBe(`"runtime" must be one of [${runtimes}]`);

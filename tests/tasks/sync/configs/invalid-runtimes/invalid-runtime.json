@@ -3,5 +3,5 @@
   "description": "Invalid runtime task",
   "path": "build",
   "entryPoint": "index.handler",
-  "runtime": "nodejs12.x"
+  "runtime": "nodejs8.x"
 }
