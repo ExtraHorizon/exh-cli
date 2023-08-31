@@ -31,7 +31,7 @@ export const builder = (yargs: any) => epilogue(yargs).options({
   return true;
 });
 
-export const handler = async ({ file, dir }) => {
+export const handler = async ({ file, dir, ignoreVerificationErrors }) => {
   let files: string[] = [];
 
   if (dir) {
@@ -72,7 +72,9 @@ export const handler = async ({ file, dir }) => {
             console.log('\t', chalk.red(error));
           }
         }
-        throw new CommandError(`Schema ${schemaPath} contains error, please fix`);
+        if (!ignoreVerificationErrors) {
+          throw new CommandError(`Schema ${schemaPath} contains error, please fix`);
+        }
       }
     }
     console.log();
