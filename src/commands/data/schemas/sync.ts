@@ -79,7 +79,7 @@ export async function syncTargetDir(sdk: any, targetDir: string, dry?: boolean, 
 
   // iterate through array of target files
   for (const filePath of targetFiles) {
-    await syncTargetFile(sdk, filePath, dry);
+    await syncTargetFile(sdk, filePath, dry, ignoreVerificationErrors);
     process.stdout.write('\n');
   }
 }
