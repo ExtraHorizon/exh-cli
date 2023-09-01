@@ -40,6 +40,7 @@ yargs(hideBin(process.argv)).middleware(async argv => {
   const sdk = await sdkAuth();
   return { sdk, isTTY };
 }).commandDir('commands')
+  .scriptName('exh')
   .strict()
   .demandCommand(1)
   .completion('generate_completion', false)
