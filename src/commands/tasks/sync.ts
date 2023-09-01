@@ -144,6 +144,12 @@ async function syncSingleTask(sdk:any, config: TaskConfig) {
     await createTask(sdk, request);
     console.log(chalk.green('Successfully created task', config.name));
   } else {
+    // TODO: Check all fields and only update if they are different
+    const { data: existingFunction } = await sdk.raw.get(`/tasks/v1/functions/${myFunction.name}`);
+    if (request.runtime === existingFunction.runtime) {
+      delete request.runtime;
+    }
+
     await updateTask(sdk, request);
     console.log(chalk.green('Successfully updated task', config.name));
   }
