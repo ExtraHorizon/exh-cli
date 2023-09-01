@@ -1,8 +1,15 @@
 # Extrahorizon CLI changelog
 
+### v1.2.0
+* Added a sync argument `exh sync ... --ignoreSchemaVerificationErrors` to bypass schema verification errors, this allows schemas to be synced even if errors are reported
+* Added a schema sync argument `exh data schemas sync ... --ignoreVerificationErrors` to bypass schema verification errors, this allows schemas to be synced even if errors are reported
+* Fixed an issue synchronizing statuses with an existing schema, excess properties should now be correctly removed from statuses
+* Updated the supported runtimes for tasks
+* The `--help` information now correctly displays `exh` rather than `index.js` as the command.
+
 ### v1.1.0
-* Added single file sync command for schemas with `exh schema sync --file <path>`
-* Added a dry run argument for schema sync `exh schemas sync --dry`. This will report the properties to be added, removed and updated in the terminal, without persisting schema changes.
+* Added single file sync command for schemas with `exh data schemas sync --file=<path>`
+* Added a dry run argument for schema sync `exh data schemas sync --file=<path> --dry`. This will report the properties to be added, removed and updated in the terminal, without persisting schema changes.
 * Added verification and validation for statuses that are defined, but not present in transitions.
 * Added validation to ensure that properties in a creation transition exist in the schema properties.
 * Added verification and validation of transition conditions.
