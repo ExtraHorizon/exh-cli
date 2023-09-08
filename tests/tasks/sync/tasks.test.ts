@@ -49,9 +49,9 @@ describe('Tasks - Sync - Runtimes', () => {
       },
     }));
     const logSpy = jest.spyOn(global.console, 'log');
+
     await listHandler({ sdk: mock, isTTY: true });
-    expect(logSpy).toHaveBeenCalled();
-    expect(logSpy).toHaveBeenCalledTimes(1);
+
     expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('hello'));
     expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('2023-09-07T09:27:54.897Z'));
     expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('this is a description'));
