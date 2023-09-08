@@ -39,7 +39,9 @@ yargs(hideBin(process.argv)).middleware(async argv => {
 
   const sdk = await sdkAuth();
   return { sdk, isTTY };
-}).commandDir('commands')
+}).commandDir('commands', {
+  extensions: ['js', 'ts'],
+})
   .scriptName('exh')
   .strict()
   .demandCommand(1)
