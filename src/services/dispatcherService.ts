@@ -1,8 +1,8 @@
 import { readFile } from 'fs/promises';
-import { FieldFormatError, OAuth1Client, OAuth2Client } from '@extrahorizon/javascript-sdk';
+import { OAuth1Client, OAuth2Client } from '@extrahorizon/javascript-sdk';
 import { Dispatcher } from '../models/dispatcher';
 
-export async function sync(_sdk: OAuth1Client | OAuth2Client, file: any) {
+export async function sync(_sdk: OAuth1Client | OAuth2Client, file: string) {
   // TODO: Add permission check for current user?
   console.log(`Synchronizing Dispatchers from ${file}`);
   const dispatchers = await extractDispatchersFromFile(file);
@@ -26,13 +26,13 @@ async function extractDispatchersFromFile(file: string) {
 function assertRequiredFields(dispatcher: Dispatcher) {
   // Ensure all dispatchers have names
   if (!dispatcher.name) {
-    throw new FieldFormatError('Dispatcher name is a required field');
+    throw new Error('Dispatcher name is a required field');
   }
 
   // Ensure all actions have names
   for (const action of dispatcher.actions) {
     if (!action.name) {
-      throw new FieldFormatError('Action name is a required field');
+      throw new Error('Action name is a required field');
     }
   }
 }
