@@ -1,29 +1,55 @@
 import { readFile } from 'fs/promises';
-import { OAuth1Client, OAuth2Client } from '@extrahorizon/javascript-sdk';
-import { Dispatcher } from '../models/dispatcher';
+import { Dispatcher, DispatcherCreation, OAuth1Client } from '@extrahorizon/javascript-sdk';
+import { green, yellow, blue } from 'chalk';
+import * as dispatcherRepository from '../repositories/dispatchers';
 
-export async function sync(_sdk: OAuth1Client | OAuth2Client, file: string) {
+export async function sync(sdk: OAuth1Client, file: string) {
   // TODO: Add permission check for current user?
-  console.log(`Synchronizing Dispatchers from ${file}`);
-  const dispatchers = await extractDispatchersFromFile(file);
+  console.log(yellow(`Synchronizing Dispatchers from ${file}`));
 
-  for (const dispatcher of dispatchers) {
-    console.log(`Validating Dispatcher: ${dispatcher.name}`);
-    assertRequiredFields(dispatcher);
+  const localDispatchers = await extractDispatchersFromFile(file);
+  const exhDispatchers = await dispatcherRepository.getByCliManagedTag(sdk);
 
-    console.log(`Synchronizing Dispatcher: ${dispatcher.name}`);
-    // TODO: Synchronize dispatcher
+  for (const localDispatcher of localDispatchers) {
+    console.group(blue(`Dispatcher: ${localDispatcher.name}`));
+    assertRequiredFields(localDispatcher);
+
+    // TODO: This does not account for dispatchers that exist in Extra Horizon with an existing name, but not a EXH_CLI_MANAGED tag
+    const exhDispatcher = exhDispatchers.find(({ name }) => name === localDispatcher.name);
+    await synchronizeDispatcher(sdk, localDispatcher, exhDispatcher);
+  }
+}
+
+async function synchronizeDispatcher(sdk: OAuth1Client, localDispatcher: DispatcherCreation, exhDispatcher: Dispatcher | undefined) {
+  // Ensure all Dispatchers have the EXH_CLI_MANAGED tag
+  const hasCliManagedTag = localDispatcher.tags.includes('EXH_CLI_MANAGED');
+  if (!hasCliManagedTag) {
+    localDispatcher.tags.push('EXH_CLI_MANAGED');
+  }
+
+  if (!exhDispatcher) {
+    // Create a new Dispatcher
+    console.log(yellow('🔄  Creating...'));
+    await dispatcherRepository.create(sdk, localDispatcher);
+    console.log(green('✅  Created'));
+  } else {
+    // Update an existing Dispatcher
+    console.log(yellow('🔄  Updating...'));
+    await dispatcherRepository.update(sdk, exhDispatcher.id, localDispatcher);
+    console.log(green('✅  Updated'));
   }
 }
 
 async function extractDispatchersFromFile(file: string) {
   const data = await readFile(file);
-  const dispatchers: Dispatcher[] = JSON.parse(data.toString());
+  const dispatchers: DispatcherCreation[] = JSON.parse(data.toString());
 
   return dispatchers;
 }
 
-function assertRequiredFields(dispatcher: Dispatcher) {
+function assertRequiredFields(dispatcher: DispatcherCreation) {
+  console.log(yellow('🔄  Validating...'));
+
   // Ensure all dispatchers have names
   if (!dispatcher.name) {
     throw new Error('Dispatcher name is a required field');
@@ -35,4 +61,6 @@ function assertRequiredFields(dispatcher: Dispatcher) {
       throw new Error('Action name is a required field');
     }
   }
+
+  console.log(green('✅  Validated'));
 }
