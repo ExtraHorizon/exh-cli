@@ -5,13 +5,18 @@ import { generateTaskAction } from '../__helpers__/actions';
 import { generateDispatcher } from '../__helpers__/dispatchers';
 
 describe('Dispatchers - Sync', () => {
-  // TODO: Move to before all
-  const logSpy = jest.spyOn(global.console, 'log');
+  let logSpy;
   const existingDispatcher = generateDispatcher();
 
-  beforeAll(() => {
+  beforeEach(() => {
+    // TODO: Move to global before each
+    logSpy = jest.spyOn(global.console, 'log');
     jest.spyOn(dispatcherRepository, 'getByCliManagedTag')
       .mockImplementation(() => Promise.resolve([existingDispatcher, generateDispatcher()]));
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   it('Throws for a Dispatcher without a name', async () => {
@@ -57,8 +62,8 @@ describe('Dispatchers - Sync', () => {
     expect(dispatcherRepository.create).toHaveBeenCalledTimes(1);
     expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('🔄  Validating...'));
     expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('✅  Validated'));
-    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('🔄  Creating...'));
-    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('✅  Created'));
+    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('🔄  Synchronizing...'));
+    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('✅  Synchronized'));
   });
 
   it('Updates an existing Dispatcher', async () => {
@@ -68,13 +73,16 @@ describe('Dispatchers - Sync', () => {
     jest.spyOn(dispatcherRepository, 'update')
       .mockImplementationOnce(() => Promise.resolve({ affectedRecords: 1 }));
 
+    jest.spyOn(dispatcherRepository, 'updateAction')
+      .mockImplementation(() => Promise.resolve({ affectedRecords: 1 }));
+
     await handler({ sdk: undefined, file: '' });
 
     expect(dispatcherRepository.update).toHaveBeenCalledTimes(1);
     expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('🔄  Validating...'));
     expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('✅  Validated'));
-    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('🔄  Updating...'));
-    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('✅  Updated'));
+    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('🔄  Synchronizing...'));
+    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('✅  Synchronized'));
   });
 
   it('Adds a EXH_CLI_MANAGED tag to Dispatchers', async () => {
