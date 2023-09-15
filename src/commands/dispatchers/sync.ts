@@ -1,7 +1,7 @@
 import { OAuth1Client } from '@extrahorizon/javascript-sdk';
 import { Argv } from 'yargs';
 import { epilogue } from '../../helpers/util';
-import * as dispatchersService from '../../services/dispatcherService';
+import * as dispatchersService from '../../services/dispatchers';
 
 export const command = 'sync';
 export const desc = 'Synchronize Dispatchers, if a declared Dispatcher does not exist, it will be created';

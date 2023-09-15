@@ -1,6 +1,6 @@
 import { readFile } from 'fs/promises';
 import { Dispatcher, DispatcherCreation, OAuth1Client } from '@extrahorizon/javascript-sdk';
-import { green, yellow, blue } from 'chalk';
+import { blue, green, yellow } from 'chalk';
 import * as dispatcherRepository from '../repositories/dispatchers';
 
 export async function sync(sdk: OAuth1Client, file: string) {
@@ -17,6 +17,7 @@ export async function sync(sdk: OAuth1Client, file: string) {
     // TODO: This does not account for dispatchers that exist in Extra Horizon with an existing name, but not a EXH_CLI_MANAGED tag
     const exhDispatcher = exhDispatchers.find(({ name }) => name === localDispatcher.name);
     await synchronizeDispatcher(sdk, localDispatcher, exhDispatcher);
+    console.groupEnd();
   }
 }
 
@@ -27,16 +28,43 @@ async function synchronizeDispatcher(sdk: OAuth1Client, localDispatcher: Dispatc
     localDispatcher.tags.push('EXH_CLI_MANAGED');
   }
 
+  console.log(yellow('🔄  Synchronizing...'));
   if (!exhDispatcher) {
-    // Create a new Dispatcher
-    console.log(yellow('🔄  Creating...'));
     await dispatcherRepository.create(sdk, localDispatcher);
-    console.log(green('✅  Created'));
   } else {
-    // Update an existing Dispatcher
-    console.log(yellow('🔄  Updating...'));
     await dispatcherRepository.update(sdk, exhDispatcher.id, localDispatcher);
-    console.log(green('✅  Updated'));
+    await synchronizeActions(sdk, localDispatcher, exhDispatcher);
+  }
+  console.log(green('✅  Synchronized'));
+}
+
+async function synchronizeActions(sdk: OAuth1Client, localDispatcher: DispatcherCreation, exhDispatcher: Dispatcher) {
+  for (const localAction of localDispatcher.actions) {
+    console.group(blue(`Action: ${localAction.name}`));
+    const exhAction = exhDispatcher.actions.find(({ name }) => name === localAction.name);
+
+    // Create or update Dispatcher actions that exist locally
+    console.log(yellow('🔄  Synchronizing...'));
+    if (!exhAction) {
+      await dispatcherRepository.createAction(sdk, exhDispatcher.id, localAction);
+    } else {
+      await dispatcherRepository.updateAction(sdk, exhDispatcher.id, exhAction.id, localAction);
+    }
+    console.log(green('✅  Synchronized'));
+    console.groupEnd();
+  }
+
+  // Find and delete Dispatcher actions that no longer exist locally
+  for (const exhAction of exhDispatcher.actions) {
+    const actionExistsLocally = localDispatcher.actions.some(({ name }) => name === exhAction.name);
+
+    if (!actionExistsLocally) {
+      console.group(blue(`Action: ${exhAction.name}`));
+      console.log(yellow('🔄  Synchronizing...'));
+      await dispatcherRepository.deleteAction(sdk, exhDispatcher.id, exhAction.id);
+      console.log(green('✅  Synchronized'));
+      console.groupEnd();
+    }
   }
 }
 
@@ -56,10 +84,9 @@ function assertRequiredFields(dispatcher: DispatcherCreation) {
   }
 
   // Ensure all actions have names
-  for (const action of dispatcher.actions) {
-    if (!action.name) {
-      throw new Error('Action name is a required field');
-    }
+  const hasInvalidAction = dispatcher.actions.some(action => !action.name);
+  if (hasInvalidAction) {
+    throw new Error('Action name is a required field');
   }
 
   console.log(green('✅  Validated'));
