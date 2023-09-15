@@ -1,18 +1,32 @@
 import * as fs from 'fs/promises';
 import { handler } from '../../src/commands/dispatchers/sync';
 import * as dispatcherRepository from '../../src/repositories/dispatchers';
-import { generateTaskAction } from '../__helpers__/actions';
+import { generateMailAction, generateTaskAction } from '../__helpers__/actions';
 import { generateDispatcher } from '../__helpers__/dispatchers';
 
 describe('Dispatchers - Sync', () => {
   let logSpy;
+  let updateDispatcherSpy;
+  let updateActionSpy;
+  let deleteActionSpy;
+
   const existingDispatcher = generateDispatcher();
 
-  beforeEach(() => {
-    // TODO: Move to global before each
+  beforeAll(() => {
+    // TODO: Move these somewhere else?
     logSpy = jest.spyOn(global.console, 'log');
+
     jest.spyOn(dispatcherRepository, 'getByCliManagedTag')
       .mockImplementation(() => Promise.resolve([existingDispatcher, generateDispatcher()]));
+
+    updateDispatcherSpy = jest.spyOn(dispatcherRepository, 'update')
+      .mockImplementation(() => Promise.resolve({ affectedRecords: 1 }));
+
+    updateActionSpy = jest.spyOn(dispatcherRepository, 'updateAction')
+      .mockImplementation(() => Promise.resolve({ affectedRecords: 1 }));
+
+    deleteActionSpy = jest.spyOn(dispatcherRepository, 'deleteAction')
+      .mockImplementationOnce(() => Promise.resolve({ affectedRecords: 1 }));
   });
 
   afterEach(() => {
@@ -53,32 +67,21 @@ describe('Dispatchers - Sync', () => {
     jest.spyOn(fs, 'readFile')
       .mockImplementationOnce(() => Promise.resolve(JSON.stringify([dispatcher])));
 
-    jest.spyOn(dispatcherRepository, 'create')
+    const createDispatcherSpy = jest.spyOn(dispatcherRepository, 'create')
       .mockImplementationOnce(() => Promise.resolve(dispatcher));
 
-    const file = './tests/dispatchers/data/create-dispatcher.json';
-    await handler({ sdk: undefined, file });
+    await handler({ sdk: undefined, file: '' });
 
-    expect(dispatcherRepository.create).toHaveBeenCalledTimes(1);
-    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('🔄  Validating...'));
-    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('✅  Validated'));
-    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('🔄  Synchronizing...'));
-    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('✅  Synchronized'));
+    expect(createDispatcherSpy).toHaveBeenCalledTimes(1);
   });
 
   it('Updates an existing Dispatcher', async () => {
     jest.spyOn(fs, 'readFile')
       .mockImplementationOnce(() => Promise.resolve(JSON.stringify([existingDispatcher])));
 
-    jest.spyOn(dispatcherRepository, 'update')
-      .mockImplementationOnce(() => Promise.resolve({ affectedRecords: 1 }));
-
-    jest.spyOn(dispatcherRepository, 'updateAction')
-      .mockImplementation(() => Promise.resolve({ affectedRecords: 1 }));
-
     await handler({ sdk: undefined, file: '' });
 
-    expect(dispatcherRepository.update).toHaveBeenCalledTimes(1);
+    expect(updateDispatcherSpy).toHaveBeenCalledTimes(1);
     expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('🔄  Validating...'));
     expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('✅  Validated'));
     expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('🔄  Synchronizing...'));
@@ -103,5 +106,33 @@ describe('Dispatchers - Sync', () => {
         tags: expect.arrayContaining(['EXH_CLI_MANAGED']),
       })
     );
+  });
+
+  it('Updates an Action of an existing Dispatcher', async () => {
+    jest.spyOn(fs, 'readFile')
+      .mockImplementationOnce(() => Promise.resolve(JSON.stringify([existingDispatcher])));
+
+    await handler({ sdk: undefined, file: '' });
+    expect(updateActionSpy).toHaveBeenCalledTimes(2);
+  });
+
+  it('Removes an Action from an existing Dispatcher', async () => {
+    const existingActions = [generateTaskAction(), generateMailAction()];
+    const excessAction = generateTaskAction();
+
+    const localDispatcher = generateDispatcher({ actions: existingActions });
+    const dispatcherWithExcessAction = {
+      ...localDispatcher,
+      actions: [...existingActions, excessAction],
+    };
+
+    jest.spyOn(dispatcherRepository, 'getByCliManagedTag')
+      .mockImplementationOnce(() => Promise.resolve([dispatcherWithExcessAction]));
+
+    jest.spyOn(fs, 'readFile')
+      .mockImplementationOnce(() => Promise.resolve(JSON.stringify([localDispatcher])));
+
+    await handler({ sdk: undefined, file: '' });
+    expect(deleteActionSpy).toHaveBeenCalledTimes(1);
   });
 });
