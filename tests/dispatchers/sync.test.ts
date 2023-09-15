@@ -5,7 +5,6 @@ import { generateMailAction, generateTaskAction } from '../__helpers__/actions';
 import { generateDispatcher } from '../__helpers__/dispatchers';
 
 describe('Dispatchers - Sync', () => {
-  let logSpy;
   let updateDispatcherSpy;
   let updateActionSpy;
   let deleteActionSpy;
@@ -14,8 +13,6 @@ describe('Dispatchers - Sync', () => {
 
   beforeAll(() => {
     // TODO: Move these somewhere else?
-    logSpy = jest.spyOn(global.console, 'log');
-
     jest.spyOn(dispatcherRepository, 'getByCliManagedTag')
       .mockImplementation(() => Promise.resolve([existingDispatcher, generateDispatcher()]));
 
@@ -73,6 +70,12 @@ describe('Dispatchers - Sync', () => {
     await handler({ sdk: undefined, file: '' });
 
     expect(createDispatcherSpy).toHaveBeenCalledTimes(1);
+    expect(createDispatcherSpy).toHaveBeenCalledWith(
+      undefined,
+      expect.objectContaining({
+        name: dispatcher.name,
+      })
+    );
   });
 
   it('Updates an existing Dispatcher', async () => {
@@ -82,14 +85,18 @@ describe('Dispatchers - Sync', () => {
     await handler({ sdk: undefined, file: '' });
 
     expect(updateDispatcherSpy).toHaveBeenCalledTimes(1);
-    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('🔄  Validating...'));
-    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('✅  Validated'));
-    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('🔄  Synchronizing...'));
-    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('✅  Synchronized'));
+    expect(updateDispatcherSpy).toHaveBeenCalledWith(
+      undefined,
+      existingDispatcher.id,
+      expect.objectContaining({
+        name: existingDispatcher.name,
+      })
+    );
   });
 
   it('Adds a EXH_CLI_MANAGED tag to Dispatchers', async () => {
     const dispatcher = generateDispatcher({ tags: [] });
+    expect(dispatcher.tags).not.toContain('EXH_CLI_MANAGED');
 
     jest.spyOn(fs, 'readFile')
       .mockImplementationOnce(() => Promise.resolve(JSON.stringify([dispatcher])));
@@ -99,10 +106,10 @@ describe('Dispatchers - Sync', () => {
 
     await handler({ sdk: undefined, file: '' });
 
-    expect(dispatcher.tags).not.toContain('EXH_CLI_MANAGED');
     expect(dispatcherRepository.create).toHaveBeenCalledWith(
       undefined,
       expect.objectContaining({
+        name: dispatcher.name,
         tags: expect.arrayContaining(['EXH_CLI_MANAGED']),
       })
     );
@@ -134,5 +141,10 @@ describe('Dispatchers - Sync', () => {
 
     await handler({ sdk: undefined, file: '' });
     expect(deleteActionSpy).toHaveBeenCalledTimes(1);
+    expect(deleteActionSpy).toHaveBeenCalledWith(
+      undefined,
+      dispatcherWithExcessAction.id,
+      excessAction.id
+    );
   });
 });
