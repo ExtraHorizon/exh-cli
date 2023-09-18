@@ -5,17 +5,15 @@ export async function create(sdk: OAuth1Client, data: DispatcherCreation) {
 }
 
 export async function getByCliManagedTag(sdk: OAuth1Client) {
-  const rql = rqlBuilder()
-    .eq('tags', 'EXH_CLI_MANAGED')
-    .build();
+  const rql = rqlBuilder().eq('tags', 'EXH_CLI_MANAGED').build();
 
+  // TODO: Replace with a find all request?
   const { data } = await sdk.dispatchers.find({ rql });
-
   return data;
 }
 
-export async function update(sdk: OAuth1Client, id: string, data: DispatcherUpdate) {
-  return await sdk.dispatchers.update(id, data);
+export async function update(sdk: OAuth1Client, dispatcherId: ObjectId, data: DispatcherUpdate) {
+  return await sdk.dispatchers.update(dispatcherId, data);
 }
 
 export async function createAction(sdk: OAuth1Client, dispatcherId: ObjectId, data: ActionCreation) {
