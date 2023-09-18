@@ -1,4 +1,4 @@
-# Hello world Task
+# Hello world (JS)
 
 ### Index.js
 
@@ -34,7 +34,7 @@ To create a function we need to provide:
 
 ![](<../../.gitbook/assets/Schermafbeelding 2021-12-16 om 15.30.57.png>)
 
-You can see a hello-world function has been created in the task service. Visit the [Task service documentation](https://app.gitbook.com/o/-MkCjSW-Ht0-VBM7yuP9/s/-Mi5veV04lYlkS769Dcp/) on how to create a task and run it.
+You can see a hello-world function has been created in the task service. Visit the [Task service documentation](http://127.0.0.1:5000/o/-MkCjSW-Ht0-VBM7yuP9/s/-Mi5veV04lYlkS769Dcp/) on how to create a task and run it.
 
 ### Tips
 
