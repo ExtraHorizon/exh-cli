@@ -6,9 +6,7 @@ export async function create(sdk: OAuth1Client, data: DispatcherCreation) {
 }
 
 export async function findAll(sdk: OAuth1Client, rql?: RQLString) {
-  // TODO: Replace with a find all request?
-  const { data } = await sdk.dispatchers.find({ rql });
-  return data;
+  return await sdk.dispatchers.findAll({ rql });
 }
 
 export async function update(sdk: OAuth1Client, dispatcherId: ObjectId, data: DispatcherUpdate) {

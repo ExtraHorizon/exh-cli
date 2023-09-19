@@ -15,7 +15,7 @@ export async function sync(sdk: OAuth1Client, file: string) {
   const exhDispatchers = await dispatcherRepository.findAll(sdk, rql);
 
   for (const localDispatcher of localDispatchers) {
-    console.group(blue(`Dispatcher: ${localDispatcher.name}`));
+    console.group(blue(`Synchronizing Dispatcher: ${localDispatcher.name}`));
 
     // Ensure all Dispatchers and actions have name fields
     assertRequiredFields(localDispatcher);
@@ -28,8 +28,6 @@ export async function sync(sdk: OAuth1Client, file: string) {
 }
 
 async function synchronizeDispatcher(sdk: OAuth1Client, localDispatcher: DispatcherCreation, exhDispatcher: Dispatcher | undefined) {
-  console.log(yellow('🔄  Synchronizing...'));
-
   // Ensure all Dispatchers have the EXH_CLI_MANAGED tag
   // eslint-disable-next-line no-param-reassign
   localDispatcher.tags = localDispatcher.tags || [];
@@ -48,25 +46,24 @@ async function synchronizeDispatcher(sdk: OAuth1Client, localDispatcher: Dispatc
     await synchronizeActions(sdk, localDispatcher, exhDispatcher);
   }
 
-  console.log(green('✅  Synchronized'));
+  console.log(green(`✅  Synchronized Dispatcher: ${localDispatcher.name}`));
 }
 
 async function synchronizeActions(sdk: OAuth1Client, localDispatcher: DispatcherCreation, exhDispatcher: Dispatcher) {
   for (const localAction of localDispatcher.actions) {
-    console.group(blue(`Action: ${localAction.name}`));
+    console.group(blue(`Synchronizing Action: ${localAction.name}`));
 
     // Find the corresponding Dispatcher Action in Extra Horizon
     const exhAction = exhDispatcher.actions.find(({ name }) => name === localAction.name);
 
     // Create or update Dispatcher Actions that exist locally
-    console.log(yellow('🔄  Synchronizing...'));
     if (!exhAction) {
       await dispatcherRepository.createAction(sdk, exhDispatcher.id, localAction);
     } else {
       await dispatcherRepository.updateAction(sdk, exhDispatcher.id, exhAction.id, localAction);
     }
 
-    console.log(green('✅  Synchronized'));
+    console.log(green(`✅  Synchronized Action: ${localAction.name}`));
     console.groupEnd();
   }
 
@@ -76,12 +73,11 @@ async function synchronizeActions(sdk: OAuth1Client, localDispatcher: Dispatcher
 
     // Delete Dispatcher Actions that do not exist locally, but exist in Extra Horizon
     if (!actionExistsLocally) {
-      console.group(blue(`Action: ${exhAction.name}`));
-      console.log(yellow('🔄  Synchronizing...'));
+      console.group(blue(`Deleting Action: ${exhAction.name}`));
 
       await dispatcherRepository.deleteAction(sdk, exhDispatcher.id, exhAction.id);
 
-      console.log(green('✅  Synchronized'));
+      console.log(green(`✅  Synchronized Action: ${exhAction.name}`));
       console.groupEnd();
     }
   }
@@ -95,8 +91,6 @@ async function extractDispatchersFromFile(file: string) {
 }
 
 function assertRequiredFields(dispatcher: DispatcherCreation) {
-  console.log(yellow('🔄  Validating...'));
-
   // Ensure all dispatchers have names
   if (!dispatcher.name) {
     throw new Error('Dispatcher name is a required field');
@@ -113,5 +107,5 @@ function assertRequiredFields(dispatcher: DispatcherCreation) {
     throw new Error('Action name is a required field');
   }
 
-  console.log(green('✅  Validated'));
+  console.log(green(`✅  Validated Dispatcher: ${dispatcher.name}`));
 }
