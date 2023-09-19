@@ -2,7 +2,7 @@ import * as fs from 'fs/promises';
 import { handler } from '../../src/commands/dispatchers/sync';
 import * as dispatcherRepository from '../../src/repositories/dispatchers';
 import { generateMailAction, generateTaskAction } from '../__helpers__/actions';
-import { generateDispatcher } from '../__helpers__/dispatchers';
+import { generateDispatcher, generateMinimalDispatcher } from '../__helpers__/dispatchers';
 
 describe('Dispatchers - Sync', () => {
   let updateDispatcherSpy;
@@ -13,7 +13,7 @@ describe('Dispatchers - Sync', () => {
 
   beforeAll(() => {
     // TODO: Move these somewhere else?
-    jest.spyOn(dispatcherRepository, 'getByCliManagedTag')
+    jest.spyOn(dispatcherRepository, 'findAll')
       .mockImplementation(() => Promise.resolve([existingDispatcher, generateDispatcher()]));
 
     updateDispatcherSpy = jest.spyOn(dispatcherRepository, 'update')
@@ -58,7 +58,7 @@ describe('Dispatchers - Sync', () => {
     expect(error.message).toBe('Action name is a required field');
   });
 
-  it('Creates a new Dispatcher', async () => {
+  it('Creates a Dispatcher with all fields set', async () => {
     const dispatcher = generateDispatcher();
 
     jest.spyOn(fs, 'readFile')
@@ -74,22 +74,51 @@ describe('Dispatchers - Sync', () => {
       undefined,
       expect.objectContaining({
         name: dispatcher.name,
+        tags: [dispatcher.tags[0], dispatcher.tags[1], 'EXH_CLI_MANAGED'],
+      })
+    );
+  });
+
+  it('Creates a Dispatcher with minimal fields set', async () => {
+    const minimalDispatcher = generateMinimalDispatcher();
+
+    jest.spyOn(fs, 'readFile')
+      .mockImplementationOnce(() => Promise.resolve(JSON.stringify([minimalDispatcher])));
+
+    const createDispatcherSpy = jest.spyOn(dispatcherRepository, 'create')
+      // @ts-expect-error The minimal dispatcher does not satisfy the Dispatcher type, but is not relevant for the test case
+      .mockImplementationOnce(() => Promise.resolve(minimalDispatcher));
+
+    await handler({ sdk: undefined, file: '' });
+
+    expect(createDispatcherSpy).toHaveBeenCalledTimes(1);
+    expect(createDispatcherSpy).toHaveBeenCalledWith(
+      undefined,
+      expect.objectContaining({
+        name: minimalDispatcher.name,
+        tags: ['EXH_CLI_MANAGED'],
       })
     );
   });
 
   it('Updates an existing Dispatcher', async () => {
+    const dispatcher = generateDispatcher({ tags: ['EXH_CLI_MANAGED', 'Tag1', 'Tag2'] });
+
     jest.spyOn(fs, 'readFile')
-      .mockImplementationOnce(() => Promise.resolve(JSON.stringify([existingDispatcher])));
+      .mockImplementationOnce(() => Promise.resolve(JSON.stringify([dispatcher])));
+
+    jest.spyOn(dispatcherRepository, 'findAll')
+      .mockImplementationOnce(() => Promise.resolve([dispatcher, generateDispatcher()]));
 
     await handler({ sdk: undefined, file: '' });
 
     expect(updateDispatcherSpy).toHaveBeenCalledTimes(1);
     expect(updateDispatcherSpy).toHaveBeenCalledWith(
       undefined,
-      existingDispatcher.id,
+      dispatcher.id,
       expect.objectContaining({
-        name: existingDispatcher.name,
+        name: dispatcher.name,
+        tags: dispatcher.tags,
       })
     );
   });
@@ -133,7 +162,7 @@ describe('Dispatchers - Sync', () => {
       actions: [...existingActions, excessAction],
     };
 
-    jest.spyOn(dispatcherRepository, 'getByCliManagedTag')
+    jest.spyOn(dispatcherRepository, 'findAll')
       .mockImplementationOnce(() => Promise.resolve([dispatcherWithExcessAction]));
 
     jest.spyOn(fs, 'readFile')

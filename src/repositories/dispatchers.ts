@@ -1,12 +1,11 @@
-import { ActionCreation, ActionUpdate, DispatcherCreation, DispatcherUpdate, OAuth1Client, ObjectId, rqlBuilder } from '@extrahorizon/javascript-sdk';
+import { ActionCreation, ActionUpdate, DispatcherCreation, DispatcherUpdate, OAuth1Client, ObjectId } from '@extrahorizon/javascript-sdk';
+import { RQLString } from '@extrahorizon/javascript-sdk/build/types/rql';
 
 export async function create(sdk: OAuth1Client, data: DispatcherCreation) {
   return await sdk.dispatchers.create(data);
 }
 
-export async function getByCliManagedTag(sdk: OAuth1Client) {
-  const rql = rqlBuilder().eq('tags', 'EXH_CLI_MANAGED').build();
-
+export async function findAll(sdk: OAuth1Client, rql?: RQLString) {
   // TODO: Replace with a find all request?
   const { data } = await sdk.dispatchers.find({ rql });
   return data;

@@ -1,14 +1,18 @@
 import { readFile } from 'fs/promises';
-import { Dispatcher, DispatcherCreation, OAuth1Client } from '@extrahorizon/javascript-sdk';
+import { Dispatcher, DispatcherCreation, OAuth1Client, rqlBuilder } from '@extrahorizon/javascript-sdk';
 import { blue, green, yellow } from 'chalk';
 import * as dispatcherRepository from '../repositories/dispatchers';
+
+const cliManagedTag = 'EXH_CLI_MANAGED';
 
 export async function sync(sdk: OAuth1Client, file: string) {
   // TODO: Add permission check for current user?
   console.log(yellow(`Synchronizing Dispatchers from ${file}`));
 
   const localDispatchers = await extractDispatchersFromFile(file);
-  const exhDispatchers = await dispatcherRepository.getByCliManagedTag(sdk);
+
+  const rql = rqlBuilder().eq('tags', cliManagedTag).build();
+  const exhDispatchers = await dispatcherRepository.findAll(sdk, rql);
 
   for (const localDispatcher of localDispatchers) {
     console.group(blue(`Dispatcher: ${localDispatcher.name}`));
@@ -27,9 +31,12 @@ async function synchronizeDispatcher(sdk: OAuth1Client, localDispatcher: Dispatc
   console.log(yellow('🔄  Synchronizing...'));
 
   // Ensure all Dispatchers have the EXH_CLI_MANAGED tag
-  const hasCliManagedTag = localDispatcher.tags.includes('EXH_CLI_MANAGED');
+  // eslint-disable-next-line no-param-reassign
+  localDispatcher.tags = localDispatcher.tags || [];
+  const hasCliManagedTag = localDispatcher.tags.includes(cliManagedTag);
+
   if (!hasCliManagedTag) {
-    localDispatcher.tags.push('EXH_CLI_MANAGED');
+    localDispatcher.tags.push(cliManagedTag);
   }
 
   if (!exhDispatcher) {
@@ -65,7 +72,7 @@ async function synchronizeActions(sdk: OAuth1Client, localDispatcher: Dispatcher
 
   for (const exhAction of exhDispatcher.actions) {
     // Find the corresponding Dispatcher Action in the local file
-    const actionExistsLocally = localDispatcher.actions.some(({ name }) => name === exhAction.name);
+    const actionExistsLocally = localDispatcher.actions.find(({ name }) => name === exhAction.name);
 
     // Delete Dispatcher Actions that do not exist locally, but exist in Extra Horizon
     if (!actionExistsLocally) {
@@ -95,9 +102,14 @@ function assertRequiredFields(dispatcher: DispatcherCreation) {
     throw new Error('Dispatcher name is a required field');
   }
 
+  const hasActions = Array.isArray(dispatcher.actions) && dispatcher.actions.length > 0;
+  if (!hasActions) {
+    throw new Error('A Dispatcher must have at least one action');
+  }
+
   // Ensure all actions have names
-  const hasInvalidAction = dispatcher.actions.some(action => !action.name);
-  if (hasInvalidAction) {
+  const hasValidActions = dispatcher.actions.every(action => action.name);
+  if (!hasValidActions) {
     throw new Error('Action name is a required field');
   }
 
