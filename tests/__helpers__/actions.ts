@@ -1,8 +1,7 @@
-import { ActionType, MailAction, MailActionCreation, TaskAction, TaskActionCreation } from '@extrahorizon/javascript-sdk';
 import { randomHexString } from './utils';
 
-export const generateTaskActionCreation = (): TaskActionCreation => ({
-  type: ActionType.TASK,
+export const generateTaskActionCreation = () => ({
+  type: 'task',
   name: `unique-${randomHexString()}-name`,
   description: 'A task action created for testing purposes',
   functionName: `function-${randomHexString()}-name`,
@@ -11,8 +10,8 @@ export const generateTaskActionCreation = (): TaskActionCreation => ({
   startTimestamp: new Date(),
 });
 
-export const generateMailActionCreation = (): MailActionCreation => ({
-  type: ActionType.MAIL,
+export const generateMailActionCreation = () => ({
+  type: 'mail',
   name: `unique-${randomHexString()}-name`,
   description: 'A mail action created for testing purposes',
   recipients: {
@@ -21,14 +20,14 @@ export const generateMailActionCreation = (): MailActionCreation => ({
   templateId: `${randomHexString(12)}`,
 });
 
-export const generateTaskAction = (overrides?: Partial<TaskAction>): TaskAction => ({
+export const generateTaskAction = (overrides?: any) => ({
   ...generateTaskActionCreation(),
   id: randomHexString(12),
   startTimestamp: new Date(),
   ...overrides,
 });
 
-export const generateMailAction = (overrides?: Partial<MailAction>): MailAction => ({
+export const generateMailAction = (overrides?: any) => ({
   ...generateMailActionCreation(),
   id: randomHexString(12),
   ...overrides,
