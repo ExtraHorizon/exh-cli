@@ -1,29 +1,15 @@
 import * as fs from 'fs/promises';
 import { handler } from '../../src/commands/dispatchers/sync';
 import * as dispatcherRepository from '../../src/repositories/dispatchers';
+import { cliManagedTag } from '../../src/services/dispatchers';
 import { generateMailAction, generateTaskAction } from '../__helpers__/actions';
+import { dispatcherRepositoryMock } from '../__helpers__/dispatcherRepositoryMock';
 import { generateDispatcher, generateMinimalDispatcher } from '../__helpers__/dispatchers';
 
 describe('Dispatchers - Sync', () => {
-  let updateDispatcherSpy;
-  let updateActionSpy;
-  let deleteActionSpy;
-
-  const existingDispatcher = generateDispatcher();
-
+  let repositoryMock;
   beforeAll(() => {
-    // TODO: Move these somewhere else?
-    jest.spyOn(dispatcherRepository, 'findAll')
-      .mockImplementation(() => Promise.resolve([existingDispatcher, generateDispatcher()]));
-
-    updateDispatcherSpy = jest.spyOn(dispatcherRepository, 'update')
-      .mockImplementation(() => Promise.resolve({ affectedRecords: 1 }));
-
-    updateActionSpy = jest.spyOn(dispatcherRepository, 'updateAction')
-      .mockImplementation(() => Promise.resolve({ affectedRecords: 1 }));
-
-    deleteActionSpy = jest.spyOn(dispatcherRepository, 'deleteAction')
-      .mockImplementationOnce(() => Promise.resolve({ affectedRecords: 1 }));
+    repositoryMock = dispatcherRepositoryMock();
   });
 
   afterEach(() => {
@@ -38,10 +24,8 @@ describe('Dispatchers - Sync', () => {
     jest.spyOn(fs, 'readFile')
       .mockImplementationOnce(() => Promise.resolve(JSON.stringify([dispatcher])));
 
-    const error = await handler({ sdk: undefined, file: '' })
-      .catch(e => e);
-
-    expect(error.message).toBe('Dispatcher name is a required field');
+    await expect(handler({ sdk: undefined, file: '' }))
+      .rejects.toThrow('Dispatcher name is a required field');
   });
 
   it('Throws for an Action without a name', async () => {
@@ -52,10 +36,8 @@ describe('Dispatchers - Sync', () => {
     jest.spyOn(fs, 'readFile')
       .mockImplementationOnce(() => Promise.resolve(JSON.stringify([dispatcher])));
 
-    const error = await handler({ sdk: undefined, file: '' })
-      .catch(e => e);
-
-    expect(error.message).toBe('Action name is a required field');
+    await expect(handler({ sdk: undefined, file: '' }))
+      .rejects.toThrow('Action name is a required field');
   });
 
   it('Creates a Dispatcher with all fields set', async () => {
@@ -102,7 +84,7 @@ describe('Dispatchers - Sync', () => {
   });
 
   it('Updates an existing Dispatcher', async () => {
-    const dispatcher = generateDispatcher({ tags: ['EXH_CLI_MANAGED', 'Tag1', 'Tag2'] });
+    const dispatcher = generateDispatcher({ tags: [cliManagedTag, 'Tag1', 'Tag2'] });
 
     jest.spyOn(fs, 'readFile')
       .mockImplementationOnce(() => Promise.resolve(JSON.stringify([dispatcher])));
@@ -112,8 +94,8 @@ describe('Dispatchers - Sync', () => {
 
     await handler({ sdk: undefined, file: '' });
 
-    expect(updateDispatcherSpy).toHaveBeenCalledTimes(1);
-    expect(updateDispatcherSpy).toHaveBeenCalledWith(
+    expect(repositoryMock.updateDispatcherSpy).toHaveBeenCalledTimes(1);
+    expect(repositoryMock.updateDispatcherSpy).toHaveBeenCalledWith(
       undefined,
       dispatcher.id,
       expect.objectContaining({
@@ -144,12 +126,12 @@ describe('Dispatchers - Sync', () => {
     );
   });
 
-  it('Updates an Action of an existing Dispatcher', async () => {
+  it('Updates the Actions of an existing Dispatcher', async () => {
     jest.spyOn(fs, 'readFile')
-      .mockImplementationOnce(() => Promise.resolve(JSON.stringify([existingDispatcher])));
+      .mockImplementationOnce(() => Promise.resolve(JSON.stringify([repositoryMock.existingDispatcher])));
 
     await handler({ sdk: undefined, file: '' });
-    expect(updateActionSpy).toHaveBeenCalledTimes(2);
+    expect(repositoryMock.updateActionSpy).toHaveBeenCalledTimes(2);
   });
 
   it('Removes an Action from an existing Dispatcher', async () => {
@@ -169,8 +151,8 @@ describe('Dispatchers - Sync', () => {
       .mockImplementationOnce(() => Promise.resolve(JSON.stringify([localDispatcher])));
 
     await handler({ sdk: undefined, file: '' });
-    expect(deleteActionSpy).toHaveBeenCalledTimes(1);
-    expect(deleteActionSpy).toHaveBeenCalledWith(
+    expect(repositoryMock.deleteActionSpy).toHaveBeenCalledTimes(1);
+    expect(repositoryMock.deleteActionSpy).toHaveBeenCalledWith(
       undefined,
       dispatcherWithExcessAction.id,
       excessAction.id

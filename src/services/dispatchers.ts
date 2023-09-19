@@ -3,13 +3,12 @@ import { Dispatcher, DispatcherCreation, OAuth1Client, rqlBuilder } from '@extra
 import { blue, green, yellow } from 'chalk';
 import * as dispatcherRepository from '../repositories/dispatchers';
 
-const cliManagedTag = 'EXH_CLI_MANAGED';
+export const cliManagedTag = 'EXH_CLI_MANAGED';
 
-export async function sync(sdk: OAuth1Client, file: string) {
-  // TODO: Add permission check for current user?
-  console.log(yellow(`Synchronizing Dispatchers from ${file}`));
+export async function sync(sdk: OAuth1Client, path: string) {
+  console.log(yellow(`Synchronizing Dispatchers from ${path}`));
 
-  const localDispatchers = await extractDispatchersFromFile(file);
+  const localDispatchers = await extractDispatchersFromFile(path);
 
   const rql = rqlBuilder().eq('tags', cliManagedTag).build();
   const exhDispatchers = await dispatcherRepository.findAll(sdk, rql);
@@ -27,7 +26,7 @@ export async function sync(sdk: OAuth1Client, file: string) {
   }
 }
 
-async function synchronizeDispatcher(sdk: OAuth1Client, localDispatcher: DispatcherCreation, exhDispatcher: Dispatcher | undefined) {
+async function synchronizeDispatcher(sdk: OAuth1Client, localDispatcher: DispatcherCreation, exhDispatcher?: Dispatcher) {
   // Ensure all Dispatchers have the EXH_CLI_MANAGED tag
   // eslint-disable-next-line no-param-reassign
   localDispatcher.tags = localDispatcher.tags || [];
@@ -83,11 +82,13 @@ async function synchronizeActions(sdk: OAuth1Client, localDispatcher: Dispatcher
   }
 }
 
-async function extractDispatchersFromFile(file: string) {
-  const data = await readFile(file);
-  const dispatchers: DispatcherCreation[] = JSON.parse(data.toString());
-
-  return dispatchers;
+async function extractDispatchersFromFile(path: string): Promise<DispatcherCreation[]> {
+  try {
+    const data = await readFile(path);
+    return JSON.parse(data.toString());
+  } catch (error) {
+    throw new Error(`Failed to read Dispatchers from ${path}: ${error.message}`);
+  }
 }
 
 function assertRequiredFields(dispatcher: DispatcherCreation) {
