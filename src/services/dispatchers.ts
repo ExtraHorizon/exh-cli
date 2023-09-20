@@ -14,20 +14,19 @@ export async function sync(sdk: OAuth1Client, path: string) {
   const exhDispatchers = await dispatcherRepository.findAll(sdk, rql);
 
   // Ensure all Dispatchers and actions have name fields
+  console.group(blue('Validating Dispatchers:'));
   for (const localDispatcher of localDispatchers) {
     assertRequiredFields(localDispatcher);
   }
+  console.groupEnd();
 
+  console.group(blue('Synchronizing Dispatchers:'));
   for (const localDispatcher of localDispatchers) {
-    console.group(blue(`Synchronizing Dispatcher: ${localDispatcher.name}`));
-
     // TODO: This does not account for dispatchers that exist in Extra Horizon with an existing name, but not a EXH_CLI_MANAGED tag
     const exhDispatcher = exhDispatchers.find(({ name }) => name === localDispatcher.name);
     await synchronizeDispatcher(sdk, localDispatcher, exhDispatcher);
-
-    console.log(green(`Synchronized Dispatcher: ${localDispatcher.name} ✓`));
-    console.groupEnd();
   }
+  console.groupEnd();
 }
 
 async function synchronizeDispatcher(sdk: OAuth1Client, localDispatcher: DispatcherCreation, exhDispatcher?: Dispatcher) {
@@ -41,31 +40,50 @@ async function synchronizeDispatcher(sdk: OAuth1Client, localDispatcher: Dispatc
   }
 
   if (!exhDispatcher) {
-    // A create Dispatcher request will also create actions
-    await dispatcherRepository.create(sdk, localDispatcher);
+    await createDispatcher(sdk, localDispatcher);
   } else {
     // Updating a Dispatcher will not update the actions, thus they must be synchronized separately
+    console.group(blue(`Updating Dispatcher: ${localDispatcher.name}`));
+
     await dispatcherRepository.update(sdk, exhDispatcher.id, localDispatcher);
     await synchronizeActions(sdk, localDispatcher, exhDispatcher);
+
+    console.groupEnd();
+    console.log(green(`Updated Dispatcher: ${localDispatcher.name} ✓`));
   }
+}
+
+async function createDispatcher(sdk: OAuth1Client, dispatcher: DispatcherCreation) {
+  // A create Dispatcher request will also create actions
+  console.group(blue(`Creating Dispatcher: ${dispatcher.name}`));
+  await dispatcherRepository.create(sdk, dispatcher);
+
+  // Aligns the logs for creating a new Dispatcher with Updating a Dispatcher
+  for (const action of dispatcher.actions) {
+    console.log(green(`Action: ${action.name} ✓`));
+  }
+
+  console.groupEnd();
+  console.log(green(`Created Dispatcher: ${dispatcher.name} ✓`));
 }
 
 async function synchronizeActions(sdk: OAuth1Client, localDispatcher: DispatcherCreation, exhDispatcher: Dispatcher) {
   for (const localAction of localDispatcher.actions) {
-    console.group(blue(`Synchronizing Action: ${localAction.name}`));
-
     // Find the corresponding Dispatcher Action in Extra Horizon
     const exhAction = exhDispatcher.actions.find(({ name }) => name === localAction.name);
 
     // Create or update Dispatcher Actions that exist locally
     if (!exhAction) {
-      await dispatcherRepository.createAction(sdk, exhDispatcher.id, localAction);
-    } else {
-      await dispatcherRepository.updateAction(sdk, exhDispatcher.id, exhAction.id, localAction);
-    }
+      console.log(yellow(`Creating Action: ${localAction.name}`));
 
-    console.log(green(`Synchronized Action: ${localAction.name} ✓`));
-    console.groupEnd();
+      await dispatcherRepository.createAction(sdk, exhDispatcher.id, localAction);
+
+      console.log(green(`Created Action: ${localAction.name} ✓`));
+    } else {
+      console.log(yellow(`Updating Action: ${localAction.name}`));
+      await dispatcherRepository.updateAction(sdk, exhDispatcher.id, exhAction.id, localAction);
+      console.log(green(`Updated Action: ${localAction.name} ✓`));
+    }
   }
 
   for (const exhAction of exhDispatcher.actions) {
@@ -75,9 +93,7 @@ async function synchronizeActions(sdk: OAuth1Client, localDispatcher: Dispatcher
     // Delete Dispatcher Actions that do not exist locally, but exist in Extra Horizon
     if (!actionExistsLocally) {
       console.group(blue(`Deleting Action: ${exhAction.name}`));
-
       await dispatcherRepository.deleteAction(sdk, exhDispatcher.id, exhAction.id);
-
       console.log(green(`Deleted Action: ${exhAction.name} ✓`));
       console.groupEnd();
     }
