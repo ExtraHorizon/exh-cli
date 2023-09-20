@@ -131,6 +131,8 @@ describe('Dispatchers - Sync', () => {
       .mockImplementationOnce(() => Promise.resolve(JSON.stringify([repositoryMock.existingDispatcher])));
 
     await handler({ sdk: undefined, file: '' });
+
+    // The existing dispatcher has 2 actions, thus we expect the updateActionSpy to be called twice
     expect(repositoryMock.updateActionSpy).toHaveBeenCalledTimes(2);
   });
 

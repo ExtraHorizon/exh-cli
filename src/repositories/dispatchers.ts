@@ -1,5 +1,4 @@
-import { ActionCreation, ActionUpdate, DispatcherCreation, DispatcherUpdate, OAuth1Client, ObjectId } from '@extrahorizon/javascript-sdk';
-import { RQLString } from '@extrahorizon/javascript-sdk/build/types/rql';
+import { ActionCreation, ActionUpdate, DispatcherCreation, DispatcherUpdate, OAuth1Client, ObjectId, RQLString } from '@extrahorizon/javascript-sdk';
 
 export async function create(sdk: OAuth1Client, data: DispatcherCreation) {
   return await sdk.dispatchers.create(data);
