@@ -299,10 +299,10 @@
     minimatch "^3.1.2"
     strip-json-comments "^3.1.1"
 
-"@extrahorizon/javascript-sdk@7.5.1-dev.270":
-  version "7.5.1-dev.270"
-  resolved "https://npm.pkg.github.com/download/@ExtraHorizon/javascript-sdk/7.5.1-dev.270/a5018bb065bea28837f8068d6397a4c80d14def4#a5018bb065bea28837f8068d6397a4c80d14def4"
-  integrity sha512-LuNyWRziQRWMd4aln9twxd5oygKHET7aVm1/t+68KdeZZ5DkAHD33ST0c4VuldaYeB8TjbInVvtvGhPhYxyW/Q==
+"@extrahorizon/javascript-sdk@7.5.1-dev.271":
+  version "7.5.1-dev.271"
+  resolved "https://npm.pkg.github.com/download/@ExtraHorizon/javascript-sdk/7.5.1-dev.271/a877bde9eb0bcd6242f396c4643e37852db8c969#a877bde9eb0bcd6242f396c4643e37852db8c969"
+  integrity sha512-UqWRGrG9+XVg8TTIB7WEejA/WCu3J56c5A2yfen3CFNyHvaijy5blzeYd2gMyZ6WRN1UFL1Nd8Qi/+a+aTyTSw==
   dependencies:
     axios "^0.27.2"
     buffer "^6.0.3"
