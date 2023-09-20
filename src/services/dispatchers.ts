@@ -45,7 +45,7 @@ async function synchronizeDispatcher(sdk: OAuth1Client, localDispatcher: Dispatc
     await synchronizeActions(sdk, localDispatcher, exhDispatcher);
   }
 
-  console.log(green(`✅  Synchronized Dispatcher: ${localDispatcher.name}`));
+  console.log(green(`Synchronized Dispatcher: ${localDispatcher.name} ✓`));
 }
 
 async function synchronizeActions(sdk: OAuth1Client, localDispatcher: DispatcherCreation, exhDispatcher: Dispatcher) {
@@ -62,7 +62,7 @@ async function synchronizeActions(sdk: OAuth1Client, localDispatcher: Dispatcher
       await dispatcherRepository.updateAction(sdk, exhDispatcher.id, exhAction.id, localAction);
     }
 
-    console.log(green(`✅  Synchronized Action: ${localAction.name}`));
+    console.log(green(`Synchronized Action: ${localAction.name} ✓`));
     console.groupEnd();
   }
 
@@ -76,7 +76,7 @@ async function synchronizeActions(sdk: OAuth1Client, localDispatcher: Dispatcher
 
       await dispatcherRepository.deleteAction(sdk, exhDispatcher.id, exhAction.id);
 
-      console.log(green(`✅  Synchronized Action: ${exhAction.name}`));
+      console.log(green(`Synchronized Action: ${exhAction.name} ✓`));
       console.groupEnd();
     }
   }
@@ -108,5 +108,5 @@ function assertRequiredFields(dispatcher: DispatcherCreation) {
     throw new Error('Action name is a required field');
   }
 
-  console.log(green(`✅  Validated Dispatcher: ${dispatcher.name}`));
+  console.log(green(`Validated Dispatcher: ${dispatcher.name} ✓`));
 }
