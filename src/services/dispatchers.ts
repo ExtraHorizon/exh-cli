@@ -75,9 +75,7 @@ async function synchronizeActions(sdk: OAuth1Client, localDispatcher: Dispatcher
     // Create or update Dispatcher Actions that exist locally
     if (!exhAction) {
       console.log(yellow(`Creating Action: ${localAction.name}`));
-
       await dispatcherRepository.createAction(sdk, exhDispatcher.id, localAction);
-
       console.log(green(`Created Action: ${localAction.name} ✓`));
     } else {
       console.log(yellow(`Updating Action: ${localAction.name}`));
@@ -112,18 +110,18 @@ async function extractDispatchersFromFile(path: string): Promise<DispatcherCreat
 function assertRequiredFields(dispatcher: DispatcherCreation) {
   // Ensure all dispatchers have names
   if (!dispatcher.name) {
-    throw new Error('Invalid Dispatcher: Dispatcher without a name');
+    throw new Error('Invalid Dispatcher: Dispatcher without a name 𝖷');
   }
 
   const hasActions = Array.isArray(dispatcher.actions) && dispatcher.actions.length > 0;
   if (!hasActions) {
-    throw new Error(`Invalid Dispatcher: ${dispatcher.name} needs at least one action`);
+    throw new Error(`Invalid Dispatcher: ${dispatcher.name} needs at least one action 𝖷`);
   }
 
   // Ensure all actions have names
   const hasValidActions = dispatcher.actions.every(action => action.name);
   if (!hasValidActions) {
-    throw new Error(`Invalid Dispatcher: ${dispatcher.name} has actions without a name`);
+    throw new Error(`Invalid Dispatcher: ${dispatcher.name} has actions without a name 𝖷`);
   }
 
   console.log(green(`Validated Dispatcher: ${dispatcher.name} ✓`));
