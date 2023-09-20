@@ -1,5 +1,10 @@
 # Extrahorizon CLI changelog
 
+### v1.3.0
+* Added a command to synchronize Dispatchers `exh dispatchers sync --file=<path>` the file argument must point to a JSON file containing an array of Dispatchers to be synchronized.
+* Added Dispatchers to the general `exh sync` command, this will synchronize all Dispatchers within a file named `dispatchers.json` in the working directory or within the provided path.
+* Added an argument `exh sync --dispatchers` to synchronize only Dispatchers.
+
 ### v1.2.0
 * Added a sync argument `exh sync ... --ignoreSchemaVerificationErrors` to bypass schema verification errors, this allows schemas to be synced even if errors are reported
 * Added a schema sync argument `exh data schemas sync ... --ignoreVerificationErrors` to bypass schema verification errors, this allows schemas to be synced even if errors are reported
