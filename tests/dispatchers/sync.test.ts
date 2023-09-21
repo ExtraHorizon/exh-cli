@@ -25,7 +25,7 @@ describe('Dispatchers - Sync', () => {
       .mockImplementationOnce(() => Promise.resolve(JSON.stringify([dispatcher])));
 
     await expect(handler({ sdk: undefined, file: '' }))
-      .rejects.toThrow('Dispatcher name is a required field');
+      .rejects.toThrow('The dispatchers file is invalid');
   });
 
   it('Throws for an Action without a name', async () => {
@@ -37,7 +37,7 @@ describe('Dispatchers - Sync', () => {
       .mockImplementationOnce(() => Promise.resolve(JSON.stringify([dispatcher])));
 
     await expect(handler({ sdk: undefined, file: '' }))
-      .rejects.toThrow('Action name is a required field');
+      .rejects.toThrow('The dispatchers file is invalid');
   });
 
   it('Creates a Dispatcher with all fields set', async () => {
