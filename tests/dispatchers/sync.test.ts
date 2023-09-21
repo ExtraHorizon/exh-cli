@@ -1,4 +1,5 @@
 import * as fs from 'fs/promises';
+import { red } from 'chalk';
 import { handler } from '../../src/commands/dispatchers/sync';
 import * as dispatcherRepository from '../../src/repositories/dispatchers';
 import { cliManagedTag } from '../../src/services/dispatchers';
@@ -24,8 +25,12 @@ describe('Dispatchers - Sync', () => {
     jest.spyOn(fs, 'readFile')
       .mockImplementationOnce(() => Promise.resolve(JSON.stringify([dispatcher])));
 
-    await expect(handler({ sdk: undefined, file: '', clean: false }))
-      .rejects.toThrow('Invalid Dispatcher: Dispatcher without a name 𝖷');
+    const logSpy = jest.spyOn(global.console, 'log');
+
+    await expect(handler({ sdk: undefined, file: '' }))
+      .rejects.toThrow('The dispatchers file is invalid');
+
+    expect(logSpy).toHaveBeenCalledWith(red('- No name'));
   });
 
   it('Throws for an Action without a name', async () => {
@@ -36,8 +41,12 @@ describe('Dispatchers - Sync', () => {
     jest.spyOn(fs, 'readFile')
       .mockImplementationOnce(() => Promise.resolve(JSON.stringify([dispatcher])));
 
-    await expect(handler({ sdk: undefined, file: '', clean: false }))
-      .rejects.toThrow(`Invalid Dispatcher: ${dispatcher.name} has actions without a name 𝖷`);
+    const logSpy = jest.spyOn(global.console, 'log');
+
+    await expect(handler({ sdk: undefined, file: '' }))
+      .rejects.toThrow('The dispatchers file is invalid');
+
+    expect(logSpy).toHaveBeenCalledWith(red('- Action [0] does not have a name'));
   });
 
   it('Creates a Dispatcher with all fields set', async () => {

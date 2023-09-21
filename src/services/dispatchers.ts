@@ -1,6 +1,6 @@
 import { readFile } from 'fs/promises';
 import { Dispatcher, DispatcherCreation, OAuth1Client, rqlBuilder } from '@extrahorizon/javascript-sdk';
-import { blue, green, yellow } from 'chalk';
+import { blue, green, red, yellow } from 'chalk';
 import * as dispatcherRepository from '../repositories/dispatchers';
 
 export const cliManagedTag = 'EXH_CLI_MANAGED';
@@ -13,12 +13,7 @@ export async function sync(sdk: OAuth1Client, path: string, clean = false) {
   const rql = rqlBuilder().eq('tags', cliManagedTag).build();
   const exhDispatchers = await dispatcherRepository.findAll(sdk, rql);
 
-  // Ensure all Dispatchers and actions have name fields
-  console.group(blue('Validating Dispatchers:'));
-  for (const localDispatcher of localDispatchers) {
-    assertRequiredFields(localDispatcher);
-  }
-  console.groupEnd();
+  validateDispatchers(localDispatchers);
 
   console.group(blue('Synchronizing Dispatchers:'));
   for (const localDispatcher of localDispatchers) {
@@ -130,22 +125,42 @@ async function extractDispatchersFromFile(path: string): Promise<DispatcherCreat
   }
 }
 
-function assertRequiredFields(dispatcher: DispatcherCreation) {
-  // Ensure all dispatchers have names
-  if (!dispatcher.name) {
-    throw new Error('Invalid Dispatcher: Dispatcher without a name 𝖷');
-  }
+function validateDispatchers(dispatchers: DispatcherCreation[]) {
+  let hasErrors = false;
 
-  const hasActions = Array.isArray(dispatcher.actions) && dispatcher.actions.length > 0;
-  if (!hasActions) {
-    throw new Error(`Invalid Dispatcher: ${dispatcher.name} needs at least one action 𝖷`);
-  }
+  console.group(blue('Validating Dispatchers:'));
+  dispatchers.forEach((dispatcher, index) => {
+    const displayName = dispatcher.name ? `[${index}]: ${dispatcher.name}` : `[${index}]: NO_NAME`;
+    const errors = [];
 
-  // Ensure all actions have names
-  const hasValidActions = dispatcher.actions.every(action => action.name);
-  if (!hasValidActions) {
-    throw new Error(`Invalid Dispatcher: ${dispatcher.name} has actions without a name 𝖷`);
-  }
+    // Ensure all dispatchers have names
+    if (!dispatcher.name) {
+      errors.push('No name');
+    }
 
-  console.log(green(`Validated Dispatcher: ${dispatcher.name} ✓`));
+    const hasActions = Array.isArray(dispatcher.actions) && dispatcher.actions.length > 0;
+    if (!hasActions) {
+      errors.push('The actions value need to be an array with at least one object in it');
+    } else {
+      dispatcher.actions.forEach((action, actionIndex) => {
+        if (!action.name) {
+          errors.push(`Action [${actionIndex}] does not have a name`);
+        }
+      });
+    }
+
+    if (errors.length === 0) {
+      console.log(green(`✓ Valid Dispatcher: ${displayName}`));
+    } else {
+      hasErrors = true;
+      console.group(red(`𝖷 Invalid Dispatcher: ${displayName}`));
+      errors.forEach(error => console.log(red(`- ${error}`)));
+      console.groupEnd();
+    }
+  });
+  console.groupEnd();
+
+  if (hasErrors) {
+    throw new Error('\nThe dispatchers file is invalid');
+  }
 }
