@@ -1,6 +1,6 @@
 {
   "name": "@extrahorizon/exh-cli",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "main": "build/index.js",
   "exports": "./build/index.js",
   "license": "MIT",
@@ -38,7 +38,7 @@
     "typescript": "^4.7.4"
   },
   "dependencies": {
-    "@extrahorizon/javascript-sdk": "^7.0.0",
+    "@extrahorizon/javascript-sdk": "^7.6.0",
     "ajv": "^8.11.0",
     "archiver": "^5.3.1",
     "axios": "^0.27.2",

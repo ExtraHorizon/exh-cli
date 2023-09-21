@@ -1,8 +1,10 @@
+import { existsSync } from 'fs';
 import * as fs from 'fs/promises';
 import * as ospath from 'path';
 import * as chalk from 'chalk';
 import { getRepoConfig, REPO_CONFIG_FILE } from '../helpers/repoConfig';
 import { epilogue } from '../helpers/util';
+import { sync as syncDispatchers } from '../services/dispatchers';
 import { syncTargetDir as syncSchemas } from './data/schemas/sync';
 import { handler as syncTask } from './tasks/sync';
 import { handler as syncTemplates } from './templates/sync';
@@ -35,6 +37,17 @@ If not, the local directory is assumed with a default configuration which assume
       type: 'boolean',
       default: false,
     },
+    dispatchers: {
+      demandOption: false,
+      describe: 'Sync Dispatchers only',
+      type: 'boolean',
+      default: false,
+    },
+    cleanDispatchers: {
+      demandOption: false,
+      describe: 'Delete Dispatchers created using the CLI, that are no longer present in the local Dispatcher file',
+      type: 'boolean',
+    },
     ignoreSchemaVerificationErrors: {
       demandOption: false,
       describe: 'Allow schema synchronization to proceed with validation errors.',
@@ -56,11 +69,11 @@ If not, the local directory is assumed with a default configuration which assume
     return true;
   });
 
-export const handler = async ({ sdk, path, schemas, tasks, templates, ignoreSchemaVerificationErrors }) => {
+export const handler = async ({ sdk, path, schemas, tasks, templates, dispatchers, cleanDispatchers, ignoreSchemaVerificationErrors }) => {
   const targetPath = ospath.join(process.cwd(), path || '.');
   const cfg = await getRepoConfig(targetPath, true);
 
-  const syncAll = !(schemas || tasks || templates);
+  const syncAll = !(schemas || tasks || templates || dispatchers);
 
   /* Sync all schemas */
   if ((syncAll || schemas) && cfg.schemas) {
@@ -83,6 +96,19 @@ export const handler = async ({ sdk, path, schemas, tasks, templates, ignoreSche
     console.log(chalk.green('\n ⚙️  Syncing tasks...'));
     for (const task of cfg.tasks) {
       await syncTask({ sdk, path: ospath.join(targetPath, task) });
+    }
+  }
+
+  /* Sync all dispatchers */
+  if ((syncAll || dispatchers)) {
+    // The dispatchers.json file is expected to be always in the root folder of the execution directory or of the provided path
+    const dispatchersPath = ospath.join(targetPath, 'dispatchers.json');
+    const isValidPath = existsSync(dispatchersPath);
+
+    if (isValidPath) {
+      await syncDispatchers(sdk, dispatchersPath, cleanDispatchers);
+    } else {
+      console.log(chalk.yellow('Warning: dispatchers.json not found'));
     }
   }
 };
