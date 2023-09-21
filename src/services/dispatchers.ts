@@ -53,11 +53,11 @@ async function createDispatcher(sdk: OAuth1Client, dispatcher: DispatcherCreatio
 
   // Aligns the logs for creating a new Dispatcher with Updating a Dispatcher
   for (const action of dispatcher.actions) {
-    console.log(green(`Action: ${action.name} ✓`));
+    console.log(green(`✓ Action: ${action.name}`));
   }
 
   console.groupEnd();
-  console.log(green(`Created Dispatcher: ${dispatcher.name} ✓`));
+  console.log(green(`✓ Created Dispatcher: ${dispatcher.name}`));
 }
 
 async function updateDispatcher(sdk: OAuth1Client, localDispatcher: DispatcherCreation, exhDispatcher: Dispatcher) {
@@ -68,7 +68,7 @@ async function updateDispatcher(sdk: OAuth1Client, localDispatcher: DispatcherCr
   await synchronizeActions(sdk, localDispatcher, exhDispatcher);
 
   console.groupEnd();
-  console.log(green(`Updated Dispatcher: ${localDispatcher.name} ✓`));
+  console.log(green(`✓ Updated Dispatcher: ${localDispatcher.name}`));
 }
 
 async function removeDispatchers(sdk: OAuth1Client, localDispatchers: DispatcherCreation[], exhDispatchers: Dispatcher[]) {
@@ -80,7 +80,7 @@ async function removeDispatchers(sdk: OAuth1Client, localDispatchers: Dispatcher
     if (!localDispatcher) {
       console.log(blue(`Deleting Dispatcher: ${exhDispatcher.name}`));
       await dispatcherRepository.remove(sdk, exhDispatcher.id);
-      console.log(green(`Deleted Dispatcher: ${exhDispatcher.name} ✓`));
+      console.log(green(`✓ Deleted Dispatcher: ${exhDispatcher.name}`));
     }
   }
 }
@@ -94,11 +94,11 @@ async function synchronizeActions(sdk: OAuth1Client, localDispatcher: Dispatcher
     if (!exhAction) {
       console.log(yellow(`Creating Action: ${localAction.name}`));
       await dispatcherRepository.createAction(sdk, exhDispatcher.id, localAction);
-      console.log(green(`Created Action: ${localAction.name} ✓`));
+      console.log(green(`✓ Created Action: ${localAction.name}`));
     } else {
       console.log(yellow(`Updating Action: ${localAction.name}`));
       await dispatcherRepository.updateAction(sdk, exhDispatcher.id, exhAction.id, localAction);
-      console.log(green(`Updated Action: ${localAction.name} ✓`));
+      console.log(green(`✓ Updated Action: ${localAction.name}`));
     }
   }
 
@@ -110,7 +110,7 @@ async function synchronizeActions(sdk: OAuth1Client, localDispatcher: Dispatcher
     if (!actionExistsLocally) {
       console.group(blue(`Deleting Action: ${exhAction.name}`));
       await dispatcherRepository.removeAction(sdk, exhDispatcher.id, exhAction.id);
-      console.log(green(`Deleted Action: ${exhAction.name} ✓`));
+      console.log(green(`✓ Deleted Action: ${exhAction.name}`));
       console.groupEnd();
     }
   }
