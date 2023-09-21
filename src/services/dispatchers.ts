@@ -5,7 +5,7 @@ import * as dispatcherRepository from '../repositories/dispatchers';
 
 export const cliManagedTag = 'EXH_CLI_MANAGED';
 
-export async function sync(sdk: OAuth1Client, path: string) {
+export async function sync(sdk: OAuth1Client, path: string, clean = false) {
   console.log(yellow(`Synchronizing Dispatchers from ${path}`));
 
   const localDispatchers = await extractDispatchersFromFile(path);
@@ -26,6 +26,11 @@ export async function sync(sdk: OAuth1Client, path: string) {
     const exhDispatcher = exhDispatchers.find(({ name }) => name === localDispatcher.name);
     await synchronizeDispatcher(sdk, localDispatcher, exhDispatcher);
   }
+
+  // Remove Dispatchers that exist on Extra Horizon with the EXH_CLI_MANAGED tag, but do not exist locally
+  if (clean) {
+    await removeDispatchers(sdk, localDispatchers, exhDispatchers);
+  }
   console.groupEnd();
 }
 
@@ -42,14 +47,7 @@ async function synchronizeDispatcher(sdk: OAuth1Client, localDispatcher: Dispatc
   if (!exhDispatcher) {
     await createDispatcher(sdk, localDispatcher);
   } else {
-    // Updating a Dispatcher will not update the actions, thus they must be synchronized separately
-    console.group(blue(`Updating Dispatcher: ${localDispatcher.name}`));
-
-    await dispatcherRepository.update(sdk, exhDispatcher.id, localDispatcher);
-    await synchronizeActions(sdk, localDispatcher, exhDispatcher);
-
-    console.groupEnd();
-    console.log(green(`Updated Dispatcher: ${localDispatcher.name} ✓`));
+    await updateDispatcher(sdk, localDispatcher, exhDispatcher);
   }
 }
 
@@ -65,6 +63,31 @@ async function createDispatcher(sdk: OAuth1Client, dispatcher: DispatcherCreatio
 
   console.groupEnd();
   console.log(green(`Created Dispatcher: ${dispatcher.name} ✓`));
+}
+
+async function updateDispatcher(sdk: OAuth1Client, localDispatcher: DispatcherCreation, exhDispatcher: Dispatcher) {
+  console.group(blue(`Updating Dispatcher: ${localDispatcher.name}`));
+  await dispatcherRepository.update(sdk, exhDispatcher.id, localDispatcher);
+
+  // Updating a Dispatcher will not update the actions, thus they must be synchronized separately
+  await synchronizeActions(sdk, localDispatcher, exhDispatcher);
+
+  console.groupEnd();
+  console.log(green(`Updated Dispatcher: ${localDispatcher.name} ✓`));
+}
+
+async function removeDispatchers(sdk: OAuth1Client, localDispatchers: DispatcherCreation[], exhDispatchers: Dispatcher[]) {
+  for (const exhDispatcher of exhDispatchers) {
+    // Find the corresponding Dispatcher in the local file
+    const localDispatcher = localDispatchers.find(({ name }) => name === exhDispatcher.name);
+
+    // Delete Dispatchers that do not exist locally, but exist in Extra Horizon
+    if (!localDispatcher) {
+      console.log(blue(`Deleting Dispatcher: ${exhDispatcher.name}`));
+      await dispatcherRepository.remove(sdk, exhDispatcher.id);
+      console.log(green(`Deleted Dispatcher: ${exhDispatcher.name} ✓`));
+    }
+  }
 }
 
 async function synchronizeActions(sdk: OAuth1Client, localDispatcher: DispatcherCreation, exhDispatcher: Dispatcher) {
@@ -91,7 +114,7 @@ async function synchronizeActions(sdk: OAuth1Client, localDispatcher: Dispatcher
     // Delete Dispatcher Actions that do not exist locally, but exist in Extra Horizon
     if (!actionExistsLocally) {
       console.group(blue(`Deleting Action: ${exhAction.name}`));
-      await dispatcherRepository.deleteAction(sdk, exhDispatcher.id, exhAction.id);
+      await dispatcherRepository.removeAction(sdk, exhDispatcher.id, exhAction.id);
       console.log(green(`Deleted Action: ${exhAction.name} ✓`));
       console.groupEnd();
     }
