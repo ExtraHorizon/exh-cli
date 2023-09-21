@@ -12,6 +12,10 @@ export async function update(sdk: OAuth1Client, dispatcherId: ObjectId, data: Di
   return await sdk.dispatchers.update(dispatcherId, data);
 }
 
+export async function remove(sdk: OAuth1Client, dispatcherId: ObjectId) {
+  return await sdk.dispatchers.remove(dispatcherId);
+}
+
 export async function createAction(sdk: OAuth1Client, dispatcherId: ObjectId, data: ActionCreation) {
   return await sdk.dispatchers.actions.create(dispatcherId, data);
 }
@@ -20,6 +24,6 @@ export async function updateAction(sdk: OAuth1Client, dispatcherId: ObjectId, ac
   return await sdk.dispatchers.actions.update(dispatcherId, actionId, data);
 }
 
-export async function deleteAction(sdk: OAuth1Client, dispatcherId: ObjectId, actionId: ObjectId) {
+export async function removeAction(sdk: OAuth1Client, dispatcherId: ObjectId, actionId: ObjectId) {
   return await sdk.dispatchers.actions.remove(dispatcherId, actionId);
 }
