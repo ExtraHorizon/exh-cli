@@ -27,7 +27,7 @@ describe('Dispatchers - Sync', () => {
 
     const logSpy = jest.spyOn(global.console, 'log');
 
-    await expect(handler({ sdk: undefined, file: '' }))
+    await expect(handler({ sdk: undefined, file: '', clean: false }))
       .rejects.toThrow('The dispatchers file is invalid');
 
     expect(logSpy).toHaveBeenCalledWith(red('- No name'));
@@ -43,7 +43,7 @@ describe('Dispatchers - Sync', () => {
 
     const logSpy = jest.spyOn(global.console, 'log');
 
-    await expect(handler({ sdk: undefined, file: '' }))
+    await expect(handler({ sdk: undefined, file: '', clean: false }))
       .rejects.toThrow('The dispatchers file is invalid');
 
     expect(logSpy).toHaveBeenCalledWith(red('- Action [0] does not have a name'));
