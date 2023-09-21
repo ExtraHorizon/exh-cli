@@ -43,6 +43,11 @@ If not, the local directory is assumed with a default configuration which assume
       type: 'boolean',
       default: false,
     },
+    cleanDispatchers: {
+      demandOption: false,
+      describe: 'Delete Dispatchers created using the CLI, that are no longer present in the local Dispatcher file',
+      type: 'boolean',
+    },
     ignoreSchemaVerificationErrors: {
       demandOption: false,
       describe: 'Allow schema synchronization to proceed with validation errors.',
@@ -64,7 +69,7 @@ If not, the local directory is assumed with a default configuration which assume
     return true;
   });
 
-export const handler = async ({ sdk, path, schemas, tasks, templates, dispatchers, ignoreSchemaVerificationErrors }) => {
+export const handler = async ({ sdk, path, schemas, tasks, templates, dispatchers, cleanDispatchers, ignoreSchemaVerificationErrors }) => {
   const targetPath = ospath.join(process.cwd(), path || '.');
   const cfg = await getRepoConfig(targetPath, true);
 
@@ -101,7 +106,7 @@ export const handler = async ({ sdk, path, schemas, tasks, templates, dispatcher
     const isValidPath = existsSync(dispatchersPath);
 
     if (isValidPath) {
-      await syncDispatchers(sdk, dispatchersPath);
+      await syncDispatchers(sdk, dispatchersPath, cleanDispatchers);
     } else {
       console.log(chalk.yellow('Warning: dispatchers.json not found'));
     }
