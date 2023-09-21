@@ -107,7 +107,7 @@ function validateDispatchers(dispatchers: DispatcherCreation[]) {
 
   console.group(blue('Validating Dispatchers:'));
   dispatchers.forEach((dispatcher, index) => {
-    const displayName = dispatcher?.name ? `[${index}]: ${dispatcher.name}` : `[${index}]: NO_NAME`;
+    const displayName = dispatcher.name ? `[${index}]: ${dispatcher.name}` : `[${index}]: NO_NAME`;
     const errors = [];
 
     // Ensure all dispatchers have names
@@ -117,13 +117,13 @@ function validateDispatchers(dispatchers: DispatcherCreation[]) {
 
     const hasActions = Array.isArray(dispatcher.actions) && dispatcher.actions.length > 0;
     if (!hasActions) {
-      errors.push('Needs at least one action');
+      errors.push('The actions value need to be an array with at least one object in it');
     } else {
-      // Ensure all actions have names
-      const hasValidActions = dispatcher.actions.every(action => action.name);
-      if (!hasValidActions) {
-        errors.push('Has actions without a name');
-      }
+      dispatcher.actions.forEach((action, actionIndex) => {
+        if (!action.name) {
+          errors.push(`Action [${actionIndex}] does not have a name`);
+        }
+      });
     }
 
     if (errors.length === 0) {
