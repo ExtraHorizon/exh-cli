@@ -11,8 +11,13 @@ export const builder = (yargs: Argv) => epilogue(yargs).options({
     describe: 'Path to the file containing the Dispatcher(s) configuration',
     type: 'string',
   },
+  clean: {
+    demandOption: false,
+    describe: 'Delete Dispatchers created using the CLI, that are no longer present in the local Dispatcher file',
+    type: 'boolean',
+  },
 });
 
-export const handler = async ({ sdk, file }: {sdk: OAuth1Client; file: string;}) => {
-  await dispatchersService.sync(sdk, file);
+export const handler = async ({ sdk, file, clean }: {sdk: OAuth1Client; file: string; clean: boolean;}) => {
+  await dispatchersService.sync(sdk, file, clean);
 };
