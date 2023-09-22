@@ -9,6 +9,7 @@
 
 ## features
 
+* [Dispatchers](features/dispatchers.md)
 * [Data](commands/commands.md)
 * [Tasks](commands/tasks/README.md)
   * [API interaction (Python)](features/tasks/api-interaction-python.md)

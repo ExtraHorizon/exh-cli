@@ -4,7 +4,7 @@ description: Organising your Extra Horizon configuration
 
 # Repository configuration
 
-The `exh` client has a global sync command for synchronizing your schema, tasks & template using a single command. Doing
+The `exh` client has a global sync command for synchronizing your Schema, Tasks, Templates and Dispatchers using a single command.
 
 ```
 exh sync
@@ -18,9 +18,9 @@ exh sync --path /your/path/here
 
 will allow you to specify exactly which directory you want to sync
 
-By default, `exh` will try to sync all schemas in a `schemas` subdirectory, templates in a `templates` subdirectory and tasks in a `tasks` subdirectory.
+By default, `exh` will try to sync all schemas in a `schemas` subdirectory, templates in a `templates` subdirectory, tasks in a `tasks` subdirectory and Dispatchers in a `dispatchers.json` file.
 
-In case this is not the directory layout you prefer, these locations can be customised by creating a `repo-config.json` in the top directory. Example:
+In case this is not the directory layout you prefer, these locations can be customized by creating a `repo-config.json` in the top directory. Example:
 
 ```
 {
@@ -38,3 +38,6 @@ In case this is not the directory layout you prefer, these locations can be cust
 }
 ```
 
+{% hint style="info" %}
+Dispatchers are expected to always exist within a root file named `dispatchers.json`
+{% endhint %}

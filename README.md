@@ -12,9 +12,9 @@ To get started with the ExtraHorizon CLI (exh-cli) you'll need to install it and
 
 ### Command Overview
 
-* ****[**Data**](commands/commands.md) **->**commands related to data service management
-* ****[**Tasks**](commands/tasks/) **->**command related to task service management
-* ****[**Templates**](features/templates.md) **->**command related to (mail) template management
+* [**Data**](commands/commands.md) **->**commands related to data service management
+* [**Tasks**](commands/tasks/) **->**command related to task service management
+* [**Templates**](features/templates.md) **->**command related to (mail) template management
 
 You can always use the `--help` option in order to get help on a certain command. For example
 
