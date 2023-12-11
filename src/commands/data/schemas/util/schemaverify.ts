@@ -1,5 +1,4 @@
 import Ajv from 'ajv';
-import { isEqual } from 'lodash';
 
 export enum TestId {
   META_SCHEMA = 1,
@@ -114,28 +113,10 @@ export class SchemaVerify {
 
     /* check all conditions of the creation transition */
     if (this.schema.creationTransition?.conditions?.length) {
-      const schemaProperties = this.schema.properties || [];
-
       // Validate that all properties in the conditions are defined in the schema properties
-      const transitionConditions = this.schema.creationTransition.conditions || [];
-      transitionConditions.forEach(condition => {
-        const conditionProperties = condition.configuration?.properties || [];
-
-        Object.keys(conditionProperties).forEach(key => {
-          // Check if the condition property is not defined in the schema properties
-          if (!schemaProperties[key]) {
-            errors.push(`Property '${key}' is defined in the creation transition properties but not in the schema properties`);
-            ok = false;
-            return;
-          }
-
-          // Check if the condition property is incorrectly typed vs the schema properties
-          if (!isEqual(schemaProperties[key], conditionProperties[key])) {
-            errors.push(`Property '${key}' has different type definitions in the creation transition and schema properties`);
-            ok = false;
-          }
-        });
-      });
+      const result = this.validateTransition(this.schema.creationTransition);
+      errors.push(...result.errors);
+      ok = result.ok;
 
       for (const [index, condition] of this.schema.creationTransition.conditions.entries()) {
         if (condition.type !== 'input') {
@@ -166,6 +147,56 @@ export class SchemaVerify {
         }
       }
     }
+    return { ok, errors };
+  }
+
+  validateTransition(transition: any) {
+    const conditions = transition.conditions || [];
+    for (const condition of conditions) {
+      if (condition.type === 'input') {
+        // TODO: This could not be an object - maybe?
+        return this.recursivelyValidateProperties(condition.configuration, '');
+      }
+    }
+
+    return { ok: true, errors: [] };
+  }
+
+  recursivelyValidateProperties(object: any, path: string) {
+    let ok = true;
+    const errors = [];
+
+    // The provided path will always be an object or an array
+    const properties = object.properties || {};
+    for (const key of Object.keys(properties)) {
+      const { type } = properties[key];
+
+      /**
+       * Check the given property exists in the properties section of the schema
+       * The path value is only supplied for nested properties e.g `diagnosis.severity`, else the property is at the root `schema.properties`
+       * The reduce function is used to traverse the properties object using the path to ensure all nodes of the path exist in `schema.properties`
+       */
+      const propertyPath = path ? `${path}.${key}` : key;
+      const value = propertyPath.split('.').reduce((property, a) => property[a], this.schema.properties);
+      console.log(key, value);
+
+      if (!value) {
+        // TODO: Also check the property type matches
+        errors.push(`Property '${propertyPath}' something here about the property at this path not being correct`);
+        ok = false;
+      }
+
+      if (type === 'object') {
+        const nestedPath = path ? `${path}.${key}.properties` : `${key}.properties`;
+        this.recursivelyValidateProperties(properties[key], nestedPath);
+      }
+
+      if (type === 'array') {
+        const nestedPath = path ? `${path}.${key}.items.properties` : `${key}.items.properties`;
+        this.recursivelyValidateProperties(properties[key].items, nestedPath);
+      }
+    }
+
     return { ok, errors };
   }
 
