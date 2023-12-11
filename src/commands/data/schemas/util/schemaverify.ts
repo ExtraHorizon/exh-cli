@@ -70,6 +70,10 @@ export class SchemaVerify {
       if (!this.ajv.validateSchema(tmpSchema)) {
         return { ok: false, errors: transformAjvErrors('', this.ajv.errors) };
       }
+      const errors = getIdInObjectArrayErrors(this.schema.properties);
+      if (errors.length > 0) {
+        return { ok: false, errors: errors.map(path => `Following id property is not allowed: ${path}`) };
+      }
     }
 
     return { ok: true, errors: [] };
@@ -188,4 +192,29 @@ export class SchemaVerify {
     }
     return { ok, errors };
   }
+}
+
+// The data service automatically assigns an id to all objects in an array
+// This function checks if the schema has an array of objects with an id property conflicting the one from the data service
+function getIdInObjectArrayErrors(properties: any, path = []) {
+  const pathsWithIdInArray = [];
+  for (const [name, value] of Object.entries<any>(properties)) {
+    // For all properties with type array of objects, check if they have an id property
+    if (value.type === 'array' && value.items.type === 'object') {
+      // Check if the array has an id property, if so add it to the list of paths
+      if ('id' in value.items.properties) {
+        pathsWithIdInArray.push([...path, name, 'id'].join('.'));
+      }
+
+      // Continue to check if the object in the items array has an array with an object with an id property
+      pathsWithIdInArray.push(...getIdInObjectArrayErrors(value.items.properties, [...path, name]));
+    }
+
+    // Continue to check if the object has an array with an object with an id property
+    if (value.type === 'object') {
+      pathsWithIdInArray.push(...getIdInObjectArrayErrors(value.properties, [...path, name]));
+    }
+  }
+
+  return pathsWithIdInArray;
 }

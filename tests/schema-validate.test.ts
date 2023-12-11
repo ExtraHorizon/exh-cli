@@ -89,6 +89,139 @@ test('Valid JSON schema in creationTransition input condition must not trigger a
   }
 });
 
+test('An item of an array with an id should error', () => {
+  const verify = new SchemaVerify(ajv, { name: 'test',
+    description: 'test',
+    statuses: { new: {} },
+    creationTransition: { },
+    properties: { name: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          id: {
+            type: 'string',
+          },
+        },
+      },
+    } } }, metaschema);
+
+  for (const check of verify.RunChecks()) {
+    if (check.id === TestId.PROPERTY_VERIFY) {
+      expect(check.ok).toBe(false);
+      expect(check.errors).toStrictEqual(['Following id property is not allowed: name.id']);
+    }
+  }
+
+  expect.assertions(2);
+});
+
+test('An item of an array in a sub property with an id should error', () => {
+  const verify = new SchemaVerify(ajv, { name: 'test',
+    description: 'test',
+    statuses: { new: {} },
+    creationTransition: { },
+    properties: { name: {
+      type: 'object',
+      properties: { subname: { type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            id: {
+              type: 'string',
+            },
+          },
+        } } },
+    } } }, metaschema);
+
+  for (const check of verify.RunChecks()) {
+    if (check.id === TestId.PROPERTY_VERIFY) {
+      expect(check.ok).toBe(false);
+      expect(check.errors).toStrictEqual(['Following id property is not allowed: name.subname.id']);
+    }
+  }
+
+  expect.assertions(2);
+});
+
+test('A deeply nested item in array property with an id should error', () => {
+  const verify = new SchemaVerify(ajv, { name: 'test',
+    description: 'test',
+    statuses: { new: {} },
+    creationTransition: { },
+    properties: { name: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: { subname: { type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              id: {
+                type: 'string',
+              },
+            },
+          } } },
+      },
+    } } }, metaschema);
+
+  for (const check of verify.RunChecks()) {
+    if (check.id === TestId.PROPERTY_VERIFY) {
+      expect(check.ok).toBe(false);
+      expect(check.errors).toStrictEqual(['Following id property is not allowed: name.subname.id']);
+    }
+  }
+
+  expect.assertions(2);
+});
+
+test('An item of an array with an id should error for all properties', () => {
+  const verify = new SchemaVerify(ajv, { name: 'test',
+    description: 'test',
+    statuses: { new: {} },
+    creationTransition: { },
+    properties: { firstProperty: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          id: {
+            type: 'string',
+          },
+        },
+      },
+    },
+
+    secondProperty: {
+      type: 'string',
+    },
+
+    thirdProperty: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          id: {
+            type: 'string',
+          },
+        },
+      },
+
+    } } }, metaschema);
+
+  for (const check of verify.RunChecks()) {
+    if (check.id === TestId.PROPERTY_VERIFY) {
+      expect(check.ok).toBe(false);
+      expect(check.errors).toStrictEqual([
+        'Following id property is not allowed: firstProperty.id',
+        'Following id property is not allowed: thirdProperty.id',
+      ]);
+    }
+  }
+
+  expect.assertions(2);
+});
+
 test('Valid JSON schema in transition condition must not trigger an error', () => {
   const verify = new SchemaVerify(ajv, { name: 'test',
     description: 'test',
