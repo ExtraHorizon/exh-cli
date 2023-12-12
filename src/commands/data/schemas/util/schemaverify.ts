@@ -1,4 +1,5 @@
 import Ajv from 'ajv';
+import { isEmpty } from 'lodash';
 
 export enum TestId {
   META_SCHEMA = 1,
@@ -156,7 +157,7 @@ export class SchemaVerify {
 
   recursivelyValidateProperties(object: any, path: string) {
     const properties = object.properties || {};
-    const invalidPaths = [];
+    const invalidPaths = new Set([]);
 
     for (const key of Object.keys(properties)) {
       const { type } = properties[key];
@@ -167,23 +168,28 @@ export class SchemaVerify {
        * The reduce function is used to traverse the properties object using the path to ensure all nodes of the path exist in `schema.properties`
        */
       const propertyPath = path ? `${path}.${key}` : key;
-      const value = propertyPath.split('.').reduce((property, a) => property[a], this.schema.properties);
+      propertyPath.split('.').reduce((property, a, index, array) => {
+        // TODO: Also check the property type matches?
+        const value = property[a] || {};
 
-      if (!value) {
-        // TODO: Also check the property type matches
-        invalidPaths.push(propertyPath);
-      }
+        if (isEmpty(value)) {
+          const invalidPath = array.slice(0, index + 1).join('.');
+          invalidPaths.add(invalidPath);
+        }
+
+        return value;
+      }, this.schema.properties);
 
       if (type === 'object') {
         const nestedPath = path ? `${path}.${key}.properties` : `${key}.properties`;
         const result = this.recursivelyValidateProperties(properties[key], nestedPath);
-        invalidPaths.push(...result);
+        result.forEach(invalidPath => invalidPaths.add(invalidPath));
       }
 
       if (type === 'array') {
         const nestedPath = path ? `${path}.${key}.items.properties` : `${key}.items.properties`;
         const result = this.recursivelyValidateProperties(properties[key].items, nestedPath);
-        invalidPaths.push(...result);
+        result.forEach(invalidPath => invalidPaths.add(invalidPath));
       }
     }
 

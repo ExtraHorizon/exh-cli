@@ -46,6 +46,9 @@ export const schema = {
                         staffId: {
                           type: 'string',
                         },
+                        lastName: {
+                          type: 'string',
+                        },
                       },
                     },
                   },
@@ -111,7 +114,11 @@ export const schema = {
               properties: {
                 staffId: {
                   type: 'string',
-                  description: 'A noted existing condition',
+                  description: 'An assigned staff member',
+                },
+                lastName: {
+                  type: 'string',
+                  description: 'An assigned staff members last name',
                 },
               },
             },
