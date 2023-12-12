@@ -111,60 +111,20 @@ export class SchemaVerify {
     let ok = true;
     const errors: any[] = [];
 
-    /* check all conditions of the creation transition */
+    /* Validate conditions of the creation transition */
     if (this.schema.creationTransition?.conditions?.length) {
-      // Validate that all properties in the conditions are defined in the schema properties
       const result = this.validateTransition(this.schema.creationTransition, 'creationTransition');
-      errors.push(...result.errors);
-      ok = result.ok;
-
-      for (const [index, condition] of this.schema.creationTransition.conditions.entries()) {
-        if (condition.type !== 'input') {
-          continue;
-        }
-        condition.configuration.$schema = 'http://json-schema.org/draft-07/schema#';
-        if (!this.ajv.validateSchema(condition.configuration)) {
-          ok = false;
-          errors.push(...transformAjvErrors(`/creationTransition/conditions[${index}]/configuration`, this.ajv.errors));
-        }
-      }
+      errors.push(...result);
     }
 
-    /* check all conditions of the other transitions */
+    /* Validate conditions of the other transitions */
     if (this.schema.transitions?.length) {
-      for (const [tIndex, transition] of this.schema.transitions.entries()) {
-        if (!transition.conditions) {
-          continue;
-        }
-        for (const [cIndex, condition] of transition.conditions?.entries()) {
-          if (condition.type !== 'input') {
-            continue;
-          }
-          if (!this.ajv.validateSchema(condition.configuration)) {
-            ok = false;
-            errors.push(...transformAjvErrors(`/transitions[${tIndex}]/conditions[${cIndex}]/configuration`, this.ajv.errors));
-          }
-        }
-      }
-    }
-    return { ok, errors };
-  }
-
-  validateTransition(transition: any, name: string) {
-    let ok = true;
-    const invalidProperties = [];
-
-    const conditions = transition.conditions || [];
-
-    for (const condition of conditions) {
-      if (condition.type === 'input') {
-        // TODO: This could not be an object - maybe?
-        const result = this.recursivelyValidateProperties(condition.configuration, '');
-        invalidProperties.push(...result);
+      for (const [transition] of this.schema.transitions.entries()) {
+        const result = this.validateTransition(transition, transition.name);
+        errors.push(...result);
       }
     }
 
-    const errors = invalidProperties.map((path: string) => `Transition - ${name} : property '${path}' is defined in conditions, but not defined in the schema properties`);
     if (errors.length) {
       ok = false;
     }
@@ -172,9 +132,31 @@ export class SchemaVerify {
     return { ok, errors };
   }
 
+  validateTransition(transition: any, name: string) {
+    const errors = [];
+    const conditions = transition.conditions || [];
+
+    for (const [index, condition] of Object.entries<any>(conditions)) {
+      if (condition.type === 'input') {
+        condition.configuration.$schema = 'http://json-schema.org/draft-07/schema#';
+
+        const isValidConfiguration = this.ajv.validateSchema(condition.configuration);
+        if (!isValidConfiguration) {
+          errors.push(...transformAjvErrors(`/creationTransition/conditions[${index}]/configuration`, this.ajv.errors));
+        }
+
+        // TODO: This could not be an object - maybe?
+        const result = this.recursivelyValidateProperties(condition.configuration, '');
+        result.forEach((path: string) => errors.push(`Transition - ${name} : property '${path}' is defined in conditions, but not defined in the schema properties`));
+      }
+    }
+
+    return errors;
+  }
+
   recursivelyValidateProperties(object: any, path: string) {
     const properties = object.properties || {};
-    const invalidProperties = [];
+    const invalidPaths = [];
 
     for (const key of Object.keys(properties)) {
       const { type } = properties[key];
@@ -189,23 +171,23 @@ export class SchemaVerify {
 
       if (!value) {
         // TODO: Also check the property type matches
-        invalidProperties.push(propertyPath);
+        invalidPaths.push(propertyPath);
       }
 
       if (type === 'object') {
         const nestedPath = path ? `${path}.${key}.properties` : `${key}.properties`;
         const result = this.recursivelyValidateProperties(properties[key], nestedPath);
-        invalidProperties.push(...result);
+        invalidPaths.push(...result);
       }
 
       if (type === 'array') {
         const nestedPath = path ? `${path}.${key}.items.properties` : `${key}.items.properties`;
         const result = this.recursivelyValidateProperties(properties[key].items, nestedPath);
-        invalidProperties.push(...result);
+        invalidPaths.push(...result);
       }
     }
 
-    return invalidProperties;
+    return invalidPaths;
   }
 
   #verifyConditionTypes(): InternalTestResult {
