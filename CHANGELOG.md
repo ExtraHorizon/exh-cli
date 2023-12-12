@@ -1,6 +1,6 @@
 # Extrahorizon CLI changelog
 
-### vx.x.x
+### v1.4.0
 * Added a validation check for `id` properties in objects within arrays in data schemas, this will now be reported as an error if present.
 
 ### v1.3.0
