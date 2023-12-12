@@ -1,5 +1,5 @@
 {
-  "extends": ["@qompium/eslint-config-q-node"],
+  "extends": ["@extrahorizon/eslint-config-node"],
   "parserOptions": {
     "project": "./tsconfig.eslint.json"
   },

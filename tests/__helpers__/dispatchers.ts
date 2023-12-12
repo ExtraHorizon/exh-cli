@@ -1,4 +1,5 @@
 import { Dispatcher } from '@extrahorizon/javascript-sdk';
+// eslint-disable-next-line no-restricted-imports
 import { DispatcherCreation } from '@extrahorizon/javascript-sdk/build/types/services/dispatchers/dispatchers/types';
 import { generateMailAction, generateTaskAction } from './actions';
 import { randomHexString } from './utils';

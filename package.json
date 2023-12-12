@@ -9,7 +9,8 @@
     "start": "yarn test",
     "clean": "rimraf build",
     "build": "yarn clean && tsc",
-    "test": "jest"
+    "test": "jest",
+    "lint": "eslint src tests --ext .ts"
   },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/"
@@ -22,7 +23,7 @@
   ],
   "preferGlobal": true,
   "devDependencies": {
-    "@qompium/eslint-config-q-node": "^1.5.0",
+    "@extrahorizon/eslint-config-node": "1.6.0",
     "@types/dotenv-safe": "^8.1.2",
     "@types/jest": "^28.1.3",
     "@types/jsonschema": "^1.1.1",
@@ -35,7 +36,7 @@
     "mock-fs": "^5.1.2",
     "rimraf": "^3.0.2",
     "ts-jest": "^28.0.5",
-    "typescript": "^4.7.4"
+    "typescript": "4.5.5"
   },
   "dependencies": {
     "@extrahorizon/javascript-sdk": "^7.6.0",
