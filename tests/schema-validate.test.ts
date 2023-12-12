@@ -109,7 +109,36 @@ test('An item of an array with an id should error', () => {
   for (const check of verify.RunChecks()) {
     if (check.id === TestId.PROPERTY_VERIFY) {
       expect(check.ok).toBe(false);
-      expect(check.errors).toStrictEqual(['Following id property is not allowed: name.id']);
+      expect(check.errors).toStrictEqual(['The following id property is not allowed: name.items.properties.id']);
+    }
+  }
+
+  expect.assertions(2);
+});
+
+test('An item of a nested array with an id should error', () => {
+  const verify = new SchemaVerify(ajv, { name: 'test',
+    description: 'test',
+    statuses: { new: {} },
+    creationTransition: { },
+    properties: { name: {
+      type: 'array',
+      items: { type: 'array',
+        items: { type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              id: {
+                type: 'string',
+              },
+            },
+          } } },
+    } } }, metaschema);
+
+  for (const check of verify.RunChecks()) {
+    if (check.id === TestId.PROPERTY_VERIFY) {
+      expect(check.ok).toBe(false);
+      expect(check.errors).toStrictEqual(['The following id property is not allowed: name.items.items.items.properties.id']);
     }
   }
 
@@ -137,7 +166,7 @@ test('An item of an array in a sub property with an id should error', () => {
   for (const check of verify.RunChecks()) {
     if (check.id === TestId.PROPERTY_VERIFY) {
       expect(check.ok).toBe(false);
-      expect(check.errors).toStrictEqual(['Following id property is not allowed: name.subname.id']);
+      expect(check.errors).toStrictEqual(['The following id property is not allowed: name.properties.subname.items.properties.id']);
     }
   }
 
@@ -168,7 +197,7 @@ test('A deeply nested item in array property with an id should error', () => {
   for (const check of verify.RunChecks()) {
     if (check.id === TestId.PROPERTY_VERIFY) {
       expect(check.ok).toBe(false);
-      expect(check.errors).toStrictEqual(['Following id property is not allowed: name.subname.id']);
+      expect(check.errors).toStrictEqual(['The following id property is not allowed: name.items.properties.subname.items.properties.id']);
     }
   }
 
@@ -213,8 +242,8 @@ test('An item of an array with an id should error for all properties', () => {
     if (check.id === TestId.PROPERTY_VERIFY) {
       expect(check.ok).toBe(false);
       expect(check.errors).toStrictEqual([
-        'Following id property is not allowed: firstProperty.id',
-        'Following id property is not allowed: thirdProperty.id',
+        'The following id property is not allowed: firstProperty.items.properties.id',
+        'The following id property is not allowed: thirdProperty.items.properties.id',
       ]);
     }
   }

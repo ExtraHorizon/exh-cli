@@ -72,7 +72,7 @@ export class SchemaVerify {
       }
       const errors = getIdInObjectArrayErrors(this.schema.properties);
       if (errors.length > 0) {
-        return { ok: false, errors: errors.map(path => `Following id property is not allowed: ${path}`) };
+        return { ok: false, errors: errors.map(path => `The following id property is not allowed: ${path}`) };
       }
     }
 
@@ -198,21 +198,30 @@ export class SchemaVerify {
 // This function checks if the schema has an array of objects with an id property conflicting the one from the data service
 function getIdInObjectArrayErrors(properties: any, path = []) {
   const pathsWithIdInArray = [];
-  for (const [name, value] of Object.entries<any>(properties)) {
+  let name;
+  let value;
+
+  for ([name, value] of Object.entries<any>(properties)) {
+    // Keep going deeper into the schema until the next value is no longer an array
+    while (value.type === 'array' && value.items.type === 'array') {
+      value = value.items;
+      name = `${name}.items`;
+    }
+
     // For all properties with type array of objects, check if they have an id property
     if (value.type === 'array' && value.items.type === 'object') {
       // Check if the array has an id property, if so add it to the list of paths
       if ('id' in value.items.properties) {
-        pathsWithIdInArray.push([...path, name, 'id'].join('.'));
+        pathsWithIdInArray.push([...path, `${name}.items.properties`, 'id'].join('.'));
       }
 
       // Continue to check if the object in the items array has an array with an object with an id property
-      pathsWithIdInArray.push(...getIdInObjectArrayErrors(value.items.properties, [...path, name]));
+      pathsWithIdInArray.push(...getIdInObjectArrayErrors(value.items.properties, [...path, `${name}.items.properties`]));
     }
 
     // Continue to check if the object has an array with an object with an id property
     if (value.type === 'object') {
-      pathsWithIdInArray.push(...getIdInObjectArrayErrors(value.properties, [...path, name]));
+      pathsWithIdInArray.push(...getIdInObjectArrayErrors(value.properties, [...path, `${name}.properties`]));
     }
   }
 
