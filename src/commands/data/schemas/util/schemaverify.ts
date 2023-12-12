@@ -7,6 +7,7 @@ export enum TestId {
   INPUT_CONDITIONS= 3,
   STATUS_CHECK = 4,
   CONDITION_TYPES = 5,
+  TRANSITION_NAMES = 6,
 }
 
 interface InternalTestResult {
@@ -50,6 +51,7 @@ export class SchemaVerify {
     yield { id: TestId.INPUT_CONDITIONS, test: 'Check if all input conditions of transitions are valid JSON schema', ...this.#verifyInputConditions() };
     yield { id: TestId.STATUS_CHECK, test: 'Check if all statuses are accounted for', ...this.#verifyStatuses() };
     yield { id: TestId.CONDITION_TYPES, test: 'Check if all condition types are used in the correct transitions', ...this.#verifyConditionTypes() };
+    yield { id: TestId.TRANSITION_NAMES, test: 'Check if all transition names are unique', ...this.#verifyTransitionNames() };
   }
 
   #verifyMetaSchema(): InternalTestResult {
@@ -58,6 +60,23 @@ export class SchemaVerify {
       return { ok: false, errors: transformAjvErrors('', validate.errors) };
     }
     return { ok: true, errors: [] };
+  }
+
+  #verifyTransitionNames(): InternalTestResult {
+    const transitionNames = new Set();
+    const nonUniqueNames = new Set();
+
+    for (const transition of (this.schema.transitions || [])) {
+      const { name } = transition;
+
+      if (transitionNames.has(name)) {
+        nonUniqueNames.add(name);
+      } else {
+        transitionNames.add(name);
+      }
+    }
+
+    return { ok: nonUniqueNames.size === 0, errors: [...nonUniqueNames].map(name => `Transition name '${name}' is not unique`) };
   }
 
   #verifyProperties(): InternalTestResult {

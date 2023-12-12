@@ -460,6 +460,54 @@ test('Using a status which is not defined should trigger an error', () => {
   }
 });
 
+test('Using two or more transitions with the same name should throw an error', () => {
+  /* Test for normal transition */
+  const verify = new SchemaVerify(ajv, { name: 'test',
+    description: 'test',
+    statuses: { new: {}, manual: {}, processed: {} },
+    creationTransition: { type: 'manual', toStatus: 'new' },
+    transitions: [
+      {
+        name: 'toProcessed',
+        type: 'manual',
+        fromStatuses: ['new'],
+        toStatus: 'processed',
+        conditions: [],
+      },
+      {
+        name: 'toProcessed',
+        type: 'manual',
+        fromStatuses: ['manual'],
+        toStatus: 'processed',
+        conditions: [],
+      },
+      {
+        name: 'toProcessed',
+        type: 'manual',
+        fromStatuses: ['processed'],
+        toStatus: 'processed',
+        conditions: [],
+      },
+      {
+        name: 'revert',
+        type: 'manual',
+        fromStatuses: ['processed'],
+        toStatus: 'new',
+        conditions: [],
+      },
+    ],
+    properties: {} }, metaschema);
+
+  for (const check of verify.RunChecks()) {
+    if (check.id === TestId.TRANSITION_NAMES) {
+      expect(check.ok).toBe(false);
+      expect(check.errors).toStrictEqual(["Transition name 'toProcessed' is not unique"]);
+    }
+  }
+
+  expect.assertions(2);
+});
+
 test('Using input conditions in non-manual transitions must give an error', () => {
   const verify = new SchemaVerify(ajv, { name: 'test',
     description: 'test',
