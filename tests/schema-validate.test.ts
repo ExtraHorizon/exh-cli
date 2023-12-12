@@ -168,7 +168,7 @@ test('Using a status which is not defined in a transition should trigger an erro
   for (const check of verify.RunChecks()) {
     if (check.id === TestId.STATUS_CHECK) {
       expect(check.ok).toBe(false);
-      expect(check.errors).toEqual(["Status 'confused' is defined in the schema statuses but not used in any transition"]);
+      expect(check.errors).toStrictEqual(["Status 'confused' is defined in the schema statuses but not used in any transition"]);
     }
   }
 });
@@ -200,7 +200,7 @@ test('Using a property in the creationTransition which is not defined in the sch
     if (check.id === TestId.INPUT_CONDITIONS) {
       if (check.id === TestId.INPUT_CONDITIONS) {
         expect(check.ok).toBe(false);
-        expect(check.errors).toEqual(["Property 'tags' is defined in the creation transition properties but not in the schema properties"]);
+        expect(check.errors).toStrictEqual(["Property 'tags' is defined in the creation transition properties but not in the schema properties"]);
       } else {
         expect(check.ok).toBe(true);
       }
@@ -242,7 +242,7 @@ test('Using a property in the creationTransition which is differently typed in t
     if (check.id === TestId.INPUT_CONDITIONS) {
       if (check.id === TestId.INPUT_CONDITIONS) {
         expect(check.ok).toBe(false);
-        expect(check.errors).toEqual(["Property 'tags' has different type definitions in the creation transition and schema properties"]);
+        expect(check.errors).toStrictEqual(["Property 'tags' has different type definitions in the creation transition and schema properties"]);
       } else {
         expect(check.ok).toBe(true);
       }
