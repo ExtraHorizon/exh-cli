@@ -114,7 +114,7 @@ export class SchemaVerify {
     /* check all conditions of the creation transition */
     if (this.schema.creationTransition?.conditions?.length) {
       // Validate that all properties in the conditions are defined in the schema properties
-      const result = this.validateTransition(this.schema.creationTransition);
+      const result = this.validateTransition(this.schema.creationTransition, 'creationTransition');
       errors.push(...result.errors);
       ok = result.ok;
 
@@ -150,24 +150,32 @@ export class SchemaVerify {
     return { ok, errors };
   }
 
-  validateTransition(transition: any) {
+  validateTransition(transition: any, name: string) {
+    let ok = true;
+    const invalidProperties = [];
+
     const conditions = transition.conditions || [];
+
     for (const condition of conditions) {
       if (condition.type === 'input') {
         // TODO: This could not be an object - maybe?
-        return this.recursivelyValidateProperties(condition.configuration, '');
+        const result = this.recursivelyValidateProperties(condition.configuration, '');
+        invalidProperties.push(...result);
       }
     }
 
-    return { ok: true, errors: [] };
+    const errors = invalidProperties.map((path: string) => `Transition - ${name} : property '${path}' is defined in conditions, but not defined in the schema properties`);
+    if (errors.length) {
+      ok = false;
+    }
+
+    return { ok, errors };
   }
 
   recursivelyValidateProperties(object: any, path: string) {
-    let ok = true;
-    const errors = [];
-
-    // The provided path will always be an object or an array
     const properties = object.properties || {};
+    const invalidProperties = [];
+
     for (const key of Object.keys(properties)) {
       const { type } = properties[key];
 
@@ -178,26 +186,26 @@ export class SchemaVerify {
        */
       const propertyPath = path ? `${path}.${key}` : key;
       const value = propertyPath.split('.').reduce((property, a) => property[a], this.schema.properties);
-      console.log(key, value);
 
       if (!value) {
         // TODO: Also check the property type matches
-        errors.push(`Property '${propertyPath}' something here about the property at this path not being correct`);
-        ok = false;
+        invalidProperties.push(propertyPath);
       }
 
       if (type === 'object') {
         const nestedPath = path ? `${path}.${key}.properties` : `${key}.properties`;
-        this.recursivelyValidateProperties(properties[key], nestedPath);
+        const result = this.recursivelyValidateProperties(properties[key], nestedPath);
+        invalidProperties.push(...result);
       }
 
       if (type === 'array') {
         const nestedPath = path ? `${path}.${key}.items.properties` : `${key}.items.properties`;
-        this.recursivelyValidateProperties(properties[key].items, nestedPath);
+        const result = this.recursivelyValidateProperties(properties[key].items, nestedPath);
+        invalidProperties.push(...result);
       }
     }
 
-    return { ok, errors };
+    return invalidProperties;
   }
 
   #verifyConditionTypes(): InternalTestResult {

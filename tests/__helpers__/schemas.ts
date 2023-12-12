@@ -38,6 +38,17 @@ export const schema = {
                   urgency: {
                     type: 'string',
                   },
+                  staff: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        staffId: {
+                          type: 'string',
+                        },
+                      },
+                    },
+                  },
                   comment: {
                     type: 'string',
                   },
@@ -92,6 +103,18 @@ export const schema = {
             type: 'string',
             enum: ['low', 'medium', 'high'],
             description: 'Urgency of the measurement',
+          },
+          staff: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                staffId: {
+                  type: 'string',
+                  description: 'A noted existing condition',
+                },
+              },
+            },
           },
           comment: {
             type: 'string',
