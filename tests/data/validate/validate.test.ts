@@ -45,4 +45,22 @@ describe('Data - Schema - Validate', () => {
       }
     }
   });
+
+  it('Is not a valid metaschema', async () => {
+    const yes = schema.creationTransition.conditions[0].configuration;
+    console.log(yes);
+    delete schema.creationTransition.conditions[0].configuration;
+    const validate = new SchemaVerify(ajv, schema, metaschema);
+    const checks = validate.RunChecks();
+    for (const check of checks) {
+      if (check.id === TestId.INPUT_CONDITIONS) {
+        expect(check.ok).toBe(false);
+        expect(check.errors).toStrictEqual([
+          "Transition - creationTransition : property 'notes.items.properties.staff.items.properties' is defined in conditions, but not defined in the schema properties",
+          "Transition - creationTransition : property 'notes.items.properties.staff.items.properties.staffId' is defined in conditions, but not defined in the schema properties",
+          "Transition - creationTransition : property 'notes.items.properties.staff.items.properties.lastName' is defined in conditions, but not defined in the schema properties",
+        ]);
+      }
+    }
+  });
 });
