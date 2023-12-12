@@ -1,7 +1,7 @@
 # Extrahorizon CLI changelog
 
 ### vx.x.x
-* Added a validation check for `id` properties in arrays in data schemas, this will now be reported as an error if present.
+* Added a validation check for `id` properties in objects within arrays in data schemas, this will now be reported as an error if present.
 
 ### v1.3.0
 * Added a command to synchronize Dispatchers `exh dispatchers sync --file=<path>` the file argument must point to a JSON file containing an array of Dispatchers to be synchronized.
