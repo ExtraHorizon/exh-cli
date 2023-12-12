@@ -22,8 +22,8 @@ jobs:
           registry-url: https://npm.pkg.github.com/
           scope: '@extrahorizon'
       - run: yarn
-      - run: yarn build
       - run: yarn lint
+      - run: yarn build
       - run: yarn test
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
