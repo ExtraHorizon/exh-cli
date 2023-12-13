@@ -1,8 +1,11 @@
-export const schema = {
-  name: 'chads-blood-pressure-measurement',
+export const validSchema: any = {
+  name: 'blood-pressure-measurement',
   description: 'Blood pressure measurement',
   statuses: {
     created: {},
+    analyzing: {},
+    analyzed: {},
+    'report-available': {},
   },
   creationTransition: {
     type: 'manual',
@@ -15,125 +18,100 @@ export const schema = {
           properties: {
             systolic: {
               type: 'number',
+              const: 200,
             },
             diastolic: {
               type: 'number',
-            },
-            diagnosis: {
-              type: 'object',
-              properties: {
-                severity: {
-                  type: 'string',
-                },
-                timestamp: {
-                  type: 'string',
-                },
-              },
-            },
-            notes: {
-              type: 'array',
-              items: {
-                type: 'object',
-                properties: {
-                  urgency: {
-                    type: 'string',
-                  },
-                  staff: {
-                    type: 'array',
-                    items: {
-                      type: 'object',
-                      properties: {
-                        staffId: {
-                          type: 'string',
-                        },
-                        lastName: {
-                          type: 'string',
-                        },
-                      },
-                    },
-                  },
-                  comment: {
-                    type: 'string',
-                  },
-                  timestamp: {
-                    type: 'string',
-                    format: 'date-time',
-                  },
-                },
-              },
             },
           },
         },
       },
     ],
-    actions: [],
+    actions: [
+      {
+        type: 'linkCreator',
+      },
+      {
+        type: 'linkEnlistedGroups',
+      },
+    ],
   },
+  transitions: [
+    {
+      name: 'start-analysis',
+      type: 'automatic',
+      toStatus: 'analyzing',
+      fromStatuses: ['created'],
+      actions: [
+        {
+          type: 'task',
+          functionName: 'analyze-blood-pressure',
+        },
+      ],
+    },
+    {
+      name: 'mark-as-analyzed',
+      type: 'manual',
+      toStatus: 'analyzed',
+      fromStatuses: ['analyzing'],
+      conditions: [
+        {
+          type: 'input',
+          configuration: {
+            type: 'object',
+            properties: {
+              category: {
+                type: 'string',
+                enum: ['normal', 'elevated', 'hypertension-stage-1', 'hypertension-stage-2', 'hypertensive-crisis'],
+              },
+            },
+            required: ['category'],
+          },
+        },
+      ],
+    },
+    {
+      name: 'add-report',
+      type: 'manual',
+      toStatus: 'report-available',
+      fromStatuses: ['analyzed'],
+      conditions: [
+        {
+          type: 'input',
+          configuration: {
+            type: 'object',
+            properties: {
+              report: {
+                type: 'string',
+              },
+            },
+            required: ['report'],
+          },
+        },
+      ],
+    },
+  ],
   properties: {
     systolic: {
       type: 'number',
       description: 'Systolic pressure in mmHg',
-      minimum: 50,
-      maximum: 200,
     },
     diastolic: {
       type: 'number',
       description: 'Diastolic pressure in mmHg',
-      minimum: 50,
-      maximum: 200,
     },
-    diagnosis: {
-      type: 'object',
-      description: 'The diagnosis of the patient',
-      properties: {
-        severity: {
-          type: 'string',
-          enum: ['low', 'medium', 'high'],
-          description: 'The class of the diagnosis',
-        },
-        timestamp: {
-          type: 'string',
-          format: 'date-time',
-          description: 'The time of the diagnosis',
-        },
-      },
+    timestamp: {
+      type: 'string',
+      format: 'date-time',
+      description: 'Timestamp when the measurement was taken',
     },
-    notes: {
-      type: 'array',
-      items: {
-        type: 'object',
-        properties: {
-          urgency: {
-            type: 'string',
-            enum: ['low', 'medium', 'high'],
-            description: 'Urgency of the measurement',
-          },
-          staff: {
-            type: 'array',
-            items: {
-              type: 'object',
-              properties: {
-                staffId: {
-                  type: 'string',
-                  description: 'An assigned staff member',
-                },
-                lastName: {
-                  type: 'string',
-                  description: 'An assigned staff members last name',
-                },
-              },
-            },
-          },
-          comment: {
-            type: 'string',
-            description: 'A comment about the measurement',
-          },
-          timestamp: {
-            type: 'string',
-            format: 'date-time',
-            description: 'The time of the note',
-          },
-        },
-      },
+    category: {
+      type: 'string',
+      description: 'Category of the result',
+    },
+    report: {
+      type: 'string',
+      description: 'File-token of the report',
     },
   },
 };

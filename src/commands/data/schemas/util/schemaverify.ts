@@ -1,5 +1,4 @@
 import Ajv from 'ajv';
-import { isEmpty } from 'lodash';
 
 export enum TestId {
   META_SCHEMA = 1,
@@ -120,8 +119,8 @@ export class SchemaVerify {
 
     /* Validate conditions of the other transitions */
     if (this.schema.transitions?.length) {
-      for (const [transition] of this.schema.transitions.entries()) {
-        const result = this.validateTransition(transition, transition.name);
+      for (const [_, transition] of Object.entries<any>(this.schema.transitions)) {
+        const result = this.validateTransition(transition, `transitions.${transition.name}`);
         errors.push(...result);
       }
     }
@@ -146,51 +145,39 @@ export class SchemaVerify {
           errors.push(...transformAjvErrors(`/creationTransition/conditions[${index}]/configuration`, this.ajv.errors));
         }
 
-        // TODO: This could not be an object - maybe?
-        const result = this.recursivelyValidateProperties(condition.configuration, '');
-        result.forEach((path: string) => errors.push(`Transition - ${name} : property '${path}' is defined in conditions, but not defined in the schema properties`));
+        const result = this.validateAgainst(condition.configuration.properties, this.schema.properties, '');
+        result.forEach((error: string) => errors.push(`Transition - ${name} : property ${error}`));
       }
     }
 
     return errors;
   }
 
-  recursivelyValidateProperties(object: any, path: string) {
-    const properties = object.properties || {};
+  validateAgainst(source: any, target: any, path: string) {
     const invalidPaths = new Set([]);
 
-    for (const key of Object.keys(properties)) {
-      const { type } = properties[key];
+    // If the provided source object is not an object the property tree has been exhausted, thus return
+    if (typeof source !== 'object') {
+      return invalidPaths;
+    }
 
-      /**
-       * Check the given property exists in the properties section of the schema
-       * The path value is only supplied for nested properties e.g `diagnosis.severity`, else the property is at the root `schema.properties`
-       * The reduce function is used to traverse the properties object using the path to ensure all nodes of the path exist in `schema.properties`
-       */
-      const propertyPath = path ? `${path}.${key}` : key;
-      propertyPath.split('.').reduce((property, a, index, array) => {
-        // TODO: Also check the property type matches?
-        const value = property[a] || {};
+    for (const key of Object.keys(source)) {
+      const sourceProperty = source[key];
+      const targetProperty = target?.[key];
 
-        if (isEmpty(value)) {
-          const invalidPath = array.slice(0, index + 1).join('.');
-          invalidPaths.add(invalidPath);
+      if (key === 'type' && typeof sourceProperty === 'string') {
+        if (targetProperty && sourceProperty !== targetProperty) {
+          invalidPaths.add(`'${path}.type' is defined in both conditions and properties but is of the incorrect type`);
         }
 
-        return value;
-      }, this.schema.properties);
-
-      if (type === 'object') {
-        const nestedPath = path ? `${path}.${key}.properties` : `${key}.properties`;
-        const result = this.recursivelyValidateProperties(properties[key], nestedPath);
-        result.forEach(invalidPath => invalidPaths.add(invalidPath));
+        if (!targetProperty) {
+          invalidPaths.add(`'${path}' is defined in conditions, but not defined in the schema properties`);
+        }
       }
 
-      if (type === 'array') {
-        const nestedPath = path ? `${path}.${key}.items.properties` : `${key}.items.properties`;
-        const result = this.recursivelyValidateProperties(properties[key].items, nestedPath);
-        result.forEach(invalidPath => invalidPaths.add(invalidPath));
-      }
+      const currentPath = path ? `${path}.${key}` : key;
+      const result = this.validateAgainst(sourceProperty, targetProperty, currentPath);
+      result.forEach(error => invalidPaths.add(error));
     }
 
     return invalidPaths;
