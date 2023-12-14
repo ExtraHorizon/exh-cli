@@ -165,11 +165,17 @@ export class SchemaVerify {
       const sourceProperty = source[key];
       const targetProperty = target?.[key];
 
+      /**
+       * If the source key is type and the value is a string we have reached a type definition
+       * If the property is not a string most likely the user has defined a property with the name of type
+       */
       if (key === 'type' && typeof sourceProperty === 'string') {
+        // If the type property exists at the given path in the target, check if the types match
         if (targetProperty && sourceProperty !== targetProperty) {
           invalidPaths.add(`'${path}.type' is defined in both conditions and properties but is of the incorrect type`);
         }
 
+        // If the type property does not exist at the target path, throw an error
         if (!targetProperty) {
           invalidPaths.add(`'${path}' is defined in conditions, but not defined in the schema properties`);
         }
