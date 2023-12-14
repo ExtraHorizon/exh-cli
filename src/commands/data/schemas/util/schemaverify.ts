@@ -168,7 +168,7 @@ export class SchemaVerify {
           errors.push(...transformAjvErrors(`/creationTransition/conditions[${index}]/configuration`, this.ajv.errors));
         }
 
-        const result = this.validateAgainst(condition.configuration.properties, this.schema.properties, '');
+        const result = this.validateConditionPropertiesAgainstSchemaProperties(condition.configuration.properties, this.schema.properties, '');
         result.forEach((error: string) => errors.push(`Transition - ${name} : property ${error}`));
       }
     }
@@ -176,36 +176,36 @@ export class SchemaVerify {
     return errors;
   }
 
-  validateAgainst(source: any, target: any, path: string) {
+  validateConditionPropertiesAgainstSchemaProperties(conditionProperties: any, schemaProperties: any, path: string) {
     const invalidPaths = new Set([]);
 
     // If the provided source object is not an object the property tree has been exhausted, thus return
-    if (typeof source !== 'object') {
+    if (typeof conditionProperties !== 'object') {
       return invalidPaths;
     }
 
-    for (const key of Object.keys(source)) {
-      const sourceProperty = source[key];
-      const targetProperty = target?.[key];
+    for (const key of Object.keys(conditionProperties)) {
+      const conditionProperty = conditionProperties[key];
+      const schemaProperty = schemaProperties?.[key];
 
       /**
        * If the source key is type and the value is a string we have reached a type definition
        * If the property is not a string most likely the user has defined a property with the name of type
        */
-      if (key === 'type' && typeof sourceProperty === 'string') {
+      if (key === 'type' && typeof conditionProperty === 'string') {
         // If the type property exists at the given path in the target, check if the types match
-        if (targetProperty && sourceProperty !== targetProperty) {
-          invalidPaths.add(`'${path}.type' is defined in both conditions and properties but is of the incorrect type`);
+        if (schemaProperty && conditionProperty !== schemaProperty) {
+          invalidPaths.add(`'${path}.type' does not match the value found in the schema properties`);
         }
 
         // If the type property does not exist at the target path, throw an error
-        if (!targetProperty) {
-          invalidPaths.add(`'${path}' is defined in conditions, but not defined in the schema properties`);
+        if (!schemaProperty) {
+          invalidPaths.add(`'${path}' is defined in the condition properties, but not defined in the schema properties`);
         }
       }
 
       const currentPath = path ? `${path}.${key}` : key;
-      const result = this.validateAgainst(sourceProperty, targetProperty, currentPath);
+      const result = this.validateConditionPropertiesAgainstSchemaProperties(conditionProperty, schemaProperty, currentPath);
       result.forEach(error => invalidPaths.add(error));
     }
 

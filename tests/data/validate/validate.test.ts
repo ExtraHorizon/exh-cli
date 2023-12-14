@@ -34,7 +34,7 @@ describe('Data - Schema - Validate', () => {
       if (check.id === TestId.INPUT_CONDITIONS) {
         expect(check.ok).toBe(false);
         expect(check.errors).toStrictEqual([
-          "Transition - mark-as-analyzed : property 'category' is defined in conditions, but not defined in the schema properties",
+          "Transition - mark-as-analyzed : property 'category' is defined in the condition properties, but not defined in the schema properties",
         ]);
       }
     }
@@ -52,7 +52,7 @@ describe('Data - Schema - Validate', () => {
       if (check.id === TestId.INPUT_CONDITIONS) {
         expect(check.ok).toBe(false);
         expect(check.errors).toStrictEqual([
-          "Transition - creationTransition : property 'systolic.type' is defined in both conditions and properties but is of the incorrect type",
+          "Transition - creationTransition : property 'systolic.type' does not match the value found in the schema properties",
         ]);
       }
     }
@@ -70,8 +70,8 @@ describe('Data - Schema - Validate', () => {
       if (check.id === TestId.INPUT_CONDITIONS) {
         expect(check.ok).toBe(false);
         expect(check.errors).toStrictEqual([
-          "Transition - creationTransition : property 'comments.items.properties.staffIds' is defined in conditions, but not defined in the schema properties",
-          "Transition - creationTransition : property 'comments.items.properties.staffIds.items' is defined in conditions, but not defined in the schema properties",
+          "Transition - creationTransition : property 'comments.items.properties.staffIds' is defined in the condition properties, but not defined in the schema properties",
+          "Transition - creationTransition : property 'comments.items.properties.staffIds.items' is defined in the condition properties, but not defined in the schema properties",
         ]);
       }
     }
@@ -89,7 +89,7 @@ describe('Data - Schema - Validate', () => {
       if (check.id === TestId.INPUT_CONDITIONS) {
         expect(check.ok).toBe(false);
         expect(check.errors).toStrictEqual([
-          "Transition - creationTransition : property 'comments.items.properties.staffIds.items.type' is defined in both conditions and properties but is of the incorrect type",
+          "Transition - creationTransition : property 'comments.items.properties.staffIds.items.type' does not match the value found in the schema properties",
         ]);
       }
     }
