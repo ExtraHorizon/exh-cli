@@ -47,7 +47,6 @@ export class SchemaVerify {
   * RunChecks(): Generator<TestResult> {
     yield { id: TestId.META_SCHEMA, test: 'Check if the schema is in the correct form', ...this.#verifyMetaSchema() };
     yield { id: TestId.PROPERTY_VERIFY, test: 'Check if the properties object is valid JSON schema', ...this.#verifyProperties() };
-    yield { id: TestId.INPUT_CONDITIONS, test: 'Check if all input conditions of transitions are valid JSON schema', ...this.#verifyInputConditions() };
     yield { id: TestId.STATUS_CHECK, test: 'Check if all statuses are accounted for', ...this.#verifyStatuses() };
     yield { id: TestId.CONDITION_TYPES, test: 'Check if all condition types are used in the correct transitions', ...this.#verifyConditionTypes() };
     yield { id: TestId.TRANSITION_NAMES, test: 'Check if all transition names are unique', ...this.#verifyTransitionNames() };
@@ -128,52 +127,6 @@ export class SchemaVerify {
       }
     }
     return { ok, errors };
-  }
-
-  #verifyInputConditions(): InternalTestResult {
-    let ok = true;
-    const errors: any[] = [];
-
-    /* Validate conditions of the creation transition */
-    if (this.schema.creationTransition?.conditions?.length) {
-      const result = this.validateTransition(this.schema.creationTransition, 'creationTransition');
-      errors.push(...result);
-    }
-
-    /* Validate conditions of the other transitions */
-    if (this.schema.transitions?.length) {
-      for (const [_, transition] of Object.entries<any>(this.schema.transitions)) {
-        const result = this.validateTransition(transition, `${transition.name}`);
-        errors.push(...result);
-      }
-    }
-
-    if (errors.length) {
-      ok = false;
-    }
-
-    return { ok, errors };
-  }
-
-  validateTransition(transition: any, name: string) {
-    const errors = [];
-    const conditions = transition.conditions || [];
-
-    for (const [index, condition] of Object.entries<any>(conditions)) {
-      if (condition.type === 'input') {
-        condition.configuration.$schema = 'http://json-schema.org/draft-07/schema#';
-
-        const isValidConfiguration = this.ajv.validateSchema(condition.configuration);
-        if (!isValidConfiguration) {
-          errors.push(...transformAjvErrors(`/creationTransition/conditions[${index}]/configuration`, this.ajv.errors));
-        }
-
-        const result = this.validateAgainst(condition.configuration.properties, this.schema.properties, '');
-        result.forEach((error: string) => errors.push(`Transition - ${name} : property ${error}`));
-      }
-    }
-
-    return errors;
   }
 
   validateAgainst(source: any, target: any, path: string) {
