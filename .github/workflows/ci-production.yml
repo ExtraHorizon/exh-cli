@@ -5,7 +5,7 @@ on:
     branches:
       - master
       - dev
-      - feature/SVCS-2041-Publish-dev-builds-for-beta-testing'
+      - feature/SVCS-2041-Publish-dev-builds-for-beta-testing
 
 jobs:
   publish-gpr:
