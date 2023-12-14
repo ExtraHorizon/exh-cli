@@ -35,6 +35,7 @@ jobs:
           if [ "${{github.ref}}" == "refs/heads/master" ]
           then
             version_tag=v${{steps.extract_version.outputs.version}}
+            branch_tag="latest"
           else
             if [ "$${{github.ref}}" == "refs/heads/dev" ]
             then
@@ -52,6 +53,6 @@ jobs:
           # Tag the commit with the correct version
           git tag -a $version_tag -m "Tagging $version_tag"
           git push origin $version_tag
-          yarn publish --registry https://npm.pkg.github.com/ --new-version $version_tag
+          yarn publish --registry https://npm.pkg.github.com/ --new-version $version_tag --tag=$branch_tag
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
