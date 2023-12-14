@@ -76,6 +76,16 @@ Or check an entire directory of schemas at once
 exh data schemas verify --dir=<directory-path> 
 ```
 
+#### Arguments
+
+`--file`
+
+This argument is used to specify the path to the JSON file that contains the schema to be verified.
+
+`--dir`&#x20;
+
+This argument is used to specify the directory that contains all the schema files to be verified.
+
 ### Schema sync
 
 When you've created your schemas & verified that they are correct, you can upload them to the ExtraHorizon cloud & start working with them! This upload can be done using the `sync` command.&#x20;
@@ -84,12 +94,30 @@ When you've created your schemas & verified that they are correct, you can uploa
 exh data schemas sync --dir=<pathToSchemaDir> 
 ```
 
-This is will upload the entire directory at once. The cli will:
+This will upload the entire directory at once. The cli will:
 
 * Check whether the schema already exists and create a new one if it doesn't&#x20;
 * Look for differences between the schema in the cloud and your local schema and make sure that these differences are synchronized.
 
 Therefore, if you make any subsequent changes to the schemas, you can just run the sync again and the cli will make sure that the changes are properly synced.
+
+#### Arguments
+
+`--file`
+
+This argument is used to specify the path to the JSON file that contains the schema to be synchronized.
+
+`--dir`&#x20;
+
+This argument is used to specify the directory that contains all the schema files to be synchronized.
+
+`--dry`
+
+When this argument is set, a dry-run will be performed. During a dry-run, only output will be printed, but no changes will be applied to the back-end. This option is useful for previewing changes without affecting the actual configuration.
+
+`--ignoreVerificationErrors`
+
+Allows synchronization to proceed even if there are validation errors. Use this option if you want to continue with the synchronization process despite errors in the provided schema. Use cautiously, as it may lead to synchronization of a potentially flawed configuration.
 
 ### Schema delete
 
@@ -100,3 +128,9 @@ exh data schemas delete --id=<schema-id>
 ```
 
 You'll need the ID of the schema you want to delete. This is _not_ the name of the schema. You can retrieve ID of a schema from the [schema list](commands.md#schema-list) command.
+
+#### Arguments
+
+`--id`
+
+This argument is used to specify the id of the schema to be deleted.
