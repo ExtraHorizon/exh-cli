@@ -20,13 +20,23 @@ exh tasks create-repo my-task-name --repo=https://github.com/mycompany/my-templa
 If you're using Github, you can also use the template to directly create a repository on Github itself. Go to [https://github.com/ExtraHorizon/template-task](https://github.com/ExtraHorizon/template-task), click 'Use this template' and can you create the repository directly on Github.
 {% endhint %}
 
+#### Arguments
+
+`--repo`
+
+&#x20;Specify the repository template to clone. By default, we utilize the task template from Extra Horizon.&#x20;
+
+`--git`
+
+&#x20;Initialize the cloned folder as a new Git repository.
+
 ### List tasks
+
+This command lists all tasks currently configured in the task service.
 
 ```
 exh tasks list
 ```
-
-This command lists all tasks currently configured in the task service.
 
 ### Synchronize a task
 
@@ -84,12 +94,62 @@ If you have multiple tasks which you want to synchronize all at the same time, y
 
 When you're synchronizing a single task using a `task-config.json` file, any additional parameters passed via command-line will override the parameter specified in the file. This way you can (temporarily) override a single parameter for a task.&#x20;
 
+#### Arguments
+
+`--path`              &#x20;
+
+Specify the path to the configuration JSON file containing task parameters. If a directory is provided instead, exh-cli will search for a task-config.json file within all subdirectories and synchronize them. If this option is not used, each parameter (name, code, entryPoint, runtime, etc.) must be supplied separately.                                 &#x20;
+
+&#x20; `--name`
+
+Specify the name of the task.
+
+&#x20; `--code`           &#x20;
+
+Provide the path to a directory containing the built task. exh-cli will compress the directory and upload it.
+
+&#x20; `--entryPoint`       &#x20;
+
+Specify the code function that should be invoked. For example, use 'index.handler' for Node.js.
+
+&#x20; `--runtime`             &#x20;
+
+Specify the [runtime](https://docs.extrahorizon.com/extrahorizon/services/automation/task-service/functions#runtime) to use for the task.
+
+&#x20; `--description`        &#x20;
+
+Add a description for this task.
+
+&#x20; `--timeLimit`           &#x20;
+
+Specify the execution [time limit ](https://docs.extrahorizon.com/extrahorizon/services/automation/task-service/functions#timelimit)for this task (in seconds).
+
+&#x20; `--memoryLimit`        &#x20;
+
+Specify the allocated [memory](https://docs.extrahorizon.com/extrahorizon/services/automation/task-service/functions#memorylimit) for this task (in MB).
+
+&#x20; `--env`                 &#x20;
+
+Set environment variables for this task. This option can be used multiple times for multiple environment variables.
+
+&#x20; `--executionPermission`
+
+Specify the [permission mode](https://docs.extrahorizon.com/extrahorizon/services/automation/task-service/functions#executionoptions-properties) of the task.
+
 #### Example
 
 Take a look at our [Hello-world example](hello-world-task.md) for a nodeJS function.
 
 ### Delete a task
 
+This command deletes a task currently configured in the task service.
+
 ```
-exh tasks delete <options>
+exh tasks delete --name my-task-name
 ```
+
+#### Arguments                        &#x20;
+
+&#x20; `--name`
+
+Provide the name of the task to be deleted
