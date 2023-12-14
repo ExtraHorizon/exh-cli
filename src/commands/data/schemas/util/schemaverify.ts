@@ -142,7 +142,7 @@ export class SchemaVerify {
 
     /* Validate conditions of the other transitions */
     if (this.schema.transitions?.length) {
-      for (const [_, transition] of Object.entries<any>(this.schema.transitions)) {
+      for (const transition of this.schema.transitions) {
         const result = this.validateTransition(transition, `${transition.name}`);
         errors.push(...result);
       }

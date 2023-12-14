@@ -23,6 +23,24 @@ export const validSchema: any = {
             diastolic: {
               type: 'number',
             },
+            comments: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  text: {
+                    type: 'string',
+                  },
+                  staffIds: {
+                    type: 'array',
+                    items: {
+                      type: 'string',
+                      minimum: 1,
+                    },
+                  },
+                },
+              },
+            },
           },
         },
       },
@@ -63,6 +81,8 @@ export const validSchema: any = {
               category: {
                 type: 'string',
                 enum: ['normal', 'elevated', 'hypertension-stage-1', 'hypertension-stage-2', 'hypertensive-crisis'],
+                minLength: 1,
+                maxLength: 255,
               },
             },
             required: ['category'],
@@ -112,6 +132,23 @@ export const validSchema: any = {
     report: {
       type: 'string',
       description: 'File-token of the report',
+    },
+    comments: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          text: {
+            type: 'string',
+          },
+          staffIds: {
+            type: 'array',
+            items: {
+              type: 'string',
+            },
+          },
+        },
+      },
     },
   },
 };

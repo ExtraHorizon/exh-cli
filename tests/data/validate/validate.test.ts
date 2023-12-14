@@ -12,7 +12,7 @@ describe('Data - Schema - Validate', () => {
     schema = cloneDeep(validSchema);
   });
 
-  it('Verifies a Schema', async () => {
+  it('Verifies the properties of a schemas input conditions', async () => {
     const validate = new SchemaVerify(ajv, schema, metaschema);
     const checks = validate.RunChecks();
     for (const check of checks) {
@@ -20,6 +20,8 @@ describe('Data - Schema - Validate', () => {
         expect(check.ok).toBe(true);
       }
     }
+
+    expect.assertions(1);
   });
 
   it('Throws an error when using a property in a transition which is not defined in the schema properties', async () => {
@@ -36,6 +38,8 @@ describe('Data - Schema - Validate', () => {
         ]);
       }
     }
+
+    expect.assertions(2);
   });
 
   it('Throws an error when using a property in transition with a mismatched type in the schema properties', async () => {
@@ -52,6 +56,45 @@ describe('Data - Schema - Validate', () => {
         ]);
       }
     }
+
+    expect.assertions(2);
+  });
+
+  it('Throws an error when using a property using a property nested in multiple arrays in a transition which is not defined in the schema properties', async () => {
+    delete schema.properties.comments.items.properties.staffIds;
+
+    const validate = new SchemaVerify(ajv, schema, metaschema);
+    const checks = validate.RunChecks();
+
+    for (const check of checks) {
+      if (check.id === TestId.INPUT_CONDITIONS) {
+        expect(check.ok).toBe(false);
+        expect(check.errors).toStrictEqual([
+          "Transition - creationTransition : property 'comments.items.properties.staffIds' is defined in conditions, but not defined in the schema properties",
+          "Transition - creationTransition : property 'comments.items.properties.staffIds.items' is defined in conditions, but not defined in the schema properties",
+        ]);
+      }
+    }
+
+    expect.assertions(2);
+  });
+
+  it('Throws an error when using a property nested in multiple arrays in transition with a mismatched type in the schema properties', async () => {
+    schema.properties.comments.items.properties.staffIds.items.type = 'number';
+
+    const validate = new SchemaVerify(ajv, schema, metaschema);
+    const checks = validate.RunChecks();
+
+    for (const check of checks) {
+      if (check.id === TestId.INPUT_CONDITIONS) {
+        expect(check.ok).toBe(false);
+        expect(check.errors).toStrictEqual([
+          "Transition - creationTransition : property 'comments.items.properties.staffIds.items.type' is defined in both conditions and properties but is of the incorrect type",
+        ]);
+      }
+    }
+
+    expect.assertions(2);
   });
 
   it('Does not throw an error when using a property named type', async () => {
@@ -73,5 +116,7 @@ describe('Data - Schema - Validate', () => {
         expect(check.ok).toBe(true);
       }
     }
+
+    expect.assertions(1);
   });
 });
