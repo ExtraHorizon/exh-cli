@@ -114,7 +114,9 @@ test('Valid JSON schema in transition condition must not trigger an error', () =
         ],
       },
     ],
-    properties: {} }, metaschema);
+    properties: {
+      name: { type: 'string' },
+    } }, metaschema);
   for (const check of verify.RunChecks()) {
     expect(check.ok).toBe(true);
   }
@@ -144,8 +146,13 @@ test('Invalid JSON schema in transition input condition must trigger an error', 
     ],
     properties: {},
   };
-  const verify = ajv.compile(metaschema);
-  expect(verify(schema)).toBe(false);
+
+  const verify = new SchemaVerify(ajv, schema, metaschema);
+  for (const check of verify.RunChecks()) {
+    if (check.id === TestId.INPUT_CONDITIONS) {
+      expect(check.ok).toBe(false);
+    }
+  }
 });
 
 test('Using a status which is not defined in a transition should trigger an error', () => {
