@@ -288,8 +288,7 @@ test('An item of an array with an id should error for all properties', () => {
 });
 
 test('Valid JSON schema in transition condition must not trigger an error', () => {
-  const verify = new SchemaVerify(ajv, {
-    name: 'test',
+  const verify = new SchemaVerify(ajv, { name: 'test',
     description: 'test',
     statuses: { new: {}, processed: {} },
     creationTransition: { type: 'manual', toStatus: 'new' },
