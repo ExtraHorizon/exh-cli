@@ -32,17 +32,17 @@ jobs:
       - run: yarn build
       - run: yarn test
       - run: |
-          if [ "${{inputs.ref}}" == "refs/heads/master" ]
+          if [ "${{github.ref}}" == "refs/heads/master" ]
           then
             image_tag=v${{steps.extract_version.outputs.version}}
           else
-            if [ "${{inputs.ref}}" == "refs/heads/dev" ]
+            if [ "$${{github.ref}}" == "refs/heads/dev" ]
             then
               branch_tag="dev"
             else
               branch_tag="feat"
             fi
-            sha=${{inputs.sha}}
+            sha=${{github.sha}}
             short_commit_hash=${sha:0:7}
             image_tag=v${{steps.extract_version.outputs.version}}-$branch_tag-${{github.run_number}}-$short_commit_hash
           fi
