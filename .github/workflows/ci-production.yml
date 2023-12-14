@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - master
+      - dev
+      - feature/SVCS-2041-Publish-dev-builds-for-beta-testing'
 
 jobs:
   publish-gpr:
@@ -29,9 +31,32 @@ jobs:
       - run: yarn lint
       - run: yarn build
       - run: yarn test
-      - run: git config --global user.email "$GITHUB_ACTOR@users.noreply.github.com" && git config --global user.name "$GITHUB_ACTOR"
-      - run: git tag -a v${{steps.extract_version.outputs.version}} -m "Tagging v${{steps.extract_version.outputs.version}}"
-      - run: git push --tags && git push
+      - run: |
+          if [ "${{inputs.ref}}" == "refs/heads/master" ]
+          then
+            image_tag=v${{steps.extract_version.outputs.version}}
+          else
+            if [ "${{inputs.ref}}" == "refs/heads/dev" ]
+            then
+              branch_tag="dev"
+            else
+              branch_tag="feat"
+            fi
+            sha=${{inputs.sha}}
+            short_commit_hash=${sha:0:7}
+            image_tag=v${{steps.extract_version.outputs.version}}-$branch_tag-${{github.run_number}}-$short_commit_hash
+          fi
+          
+          git config --global user.email "$GITHUB_ACTOR@users.noreply.github.com" && git config --global user.name "$GITHUB_ACTOR"
+          
+          # Tag the commit with the correct version
+          git tag -a $image_tag -m "Tagging $image_tag"
+          git push origin $image_tag
+          
+          image_name="$repository/exhz/${PROJECT_NAME}:$image_tag"
+          docker tag service $image_name
+          aws ecr get-login-password --region eu-central-1 | docker login --username AWS --password-stdin $repository
+          docker push $image_name
       - run: yarn publish --registry https://npm.pkg.github.com/
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
