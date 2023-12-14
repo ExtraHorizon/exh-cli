@@ -34,7 +34,7 @@ jobs:
       - run: |
           if [ "${{github.ref}}" == "refs/heads/master" ]
           then
-            image_tag=v${{steps.extract_version.outputs.version}}
+            version_tag=v${{steps.extract_version.outputs.version}}
           else
             if [ "$${{github.ref}}" == "refs/heads/dev" ]
             then
@@ -44,14 +44,14 @@ jobs:
             fi
             sha=${{github.sha}}
             short_commit_hash=${sha:0:7}
-            image_tag=v${{steps.extract_version.outputs.version}}-$branch_tag-${{github.run_number}}-$short_commit_hash
+            version_tag=v${{steps.extract_version.outputs.version}}-$branch_tag-${{github.run_number}}-$short_commit_hash
           fi
           
           git config --global user.email "$GITHUB_ACTOR@users.noreply.github.com" && git config --global user.name "$GITHUB_ACTOR"
           
           # Tag the commit with the correct version
-          git tag -a $image_tag -m "Tagging $image_tag"
-          git push origin $image_tag
-      - run: yarn publish --registry https://npm.pkg.github.com/
+          git tag -a $version_tag -m "Tagging $version_tag"
+          git push origin $version_tag
+          yarn publish --registry https://npm.pkg.github.com/ --new-version $version_tag
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
