@@ -1,11 +1,10 @@
-name: Publish @extrahorizon/exh-cli
+name: Build and Publish @extrahorizon/exh-cli
 
 on:
   push:
     branches:
       - master
       - dev
-      - feature/SVCS-2041-Publish-dev-builds-for-beta-testing
 
 jobs:
   publish-gpr:
