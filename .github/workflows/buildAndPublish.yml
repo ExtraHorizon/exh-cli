@@ -7,7 +7,6 @@ on:
     branches:
       - master
       - dev
-      - feature/SVCS-2041-Publish-dev-builds-for-beta-testing
 
 jobs:
   build-and-publish:
