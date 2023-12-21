@@ -1,5 +1,10 @@
 # Extrahorizon CLI changelog
 
+### v1.4.0
+* Added a validation check for `id` properties in objects within arrays in data schemas, this will now be reported as an error if present.
+* Added validation for duplicate transition names in data schemas, this will now be reported as an error if present.
+* Changed the strictness of validation for properties of input conditions. Modifiers such as `enum`, `minLength`, `maxLength`, etc... will no longer produce an error if not present in the condition property.
+
 ### v1.3.0
 * Added a command to synchronize Dispatchers `exh dispatchers sync --file=<path>` the file argument must point to a JSON file containing an array of Dispatchers to be synchronized.
 * Added Dispatchers to the general `exh sync` command, this will synchronize all Dispatchers within a file named `dispatchers.json` in the working directory or within the provided `path` argument directory.

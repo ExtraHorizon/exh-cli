@@ -1,5 +1,4 @@
 import Ajv from 'ajv';
-import { isEqual } from 'lodash';
 
 export enum TestId {
   META_SCHEMA = 1,
@@ -7,6 +6,7 @@ export enum TestId {
   INPUT_CONDITIONS= 3,
   STATUS_CHECK = 4,
   CONDITION_TYPES = 5,
+  TRANSITION_NAMES = 6,
 }
 
 interface InternalTestResult {
@@ -50,6 +50,7 @@ export class SchemaVerify {
     yield { id: TestId.INPUT_CONDITIONS, test: 'Check if all input conditions of transitions are valid JSON schema', ...this.#verifyInputConditions() };
     yield { id: TestId.STATUS_CHECK, test: 'Check if all statuses are accounted for', ...this.#verifyStatuses() };
     yield { id: TestId.CONDITION_TYPES, test: 'Check if all condition types are used in the correct transitions', ...this.#verifyConditionTypes() };
+    yield { id: TestId.TRANSITION_NAMES, test: 'Check if all transition names are unique', ...this.#verifyTransitionNames() };
   }
 
   #verifyMetaSchema(): InternalTestResult {
@@ -58,6 +59,23 @@ export class SchemaVerify {
       return { ok: false, errors: transformAjvErrors('', validate.errors) };
     }
     return { ok: true, errors: [] };
+  }
+
+  #verifyTransitionNames(): InternalTestResult {
+    const transitionNames = new Set();
+    const nonUniqueNames = new Set();
+
+    for (const transition of (this.schema.transitions || [])) {
+      const { name } = transition;
+
+      if (transitionNames.has(name)) {
+        nonUniqueNames.add(name);
+      } else {
+        transitionNames.add(name);
+      }
+    }
+
+    return { ok: nonUniqueNames.size === 0, errors: [...nonUniqueNames].map(name => `Transition name '${name}' is not unique`) };
   }
 
   #verifyProperties(): InternalTestResult {
@@ -69,6 +87,10 @@ export class SchemaVerify {
       };
       if (!this.ajv.validateSchema(tmpSchema)) {
         return { ok: false, errors: transformAjvErrors('', this.ajv.errors) };
+      }
+      const errors = getIdInObjectArrayErrors(this.schema.properties);
+      if (errors.length > 0) {
+        return { ok: false, errors: errors.map(path => `The following id property is not allowed: ${path}`) };
       }
     }
 
@@ -112,61 +134,82 @@ export class SchemaVerify {
     let ok = true;
     const errors: any[] = [];
 
-    /* check all conditions of the creation transition */
+    /* Validate conditions of the creation transition */
     if (this.schema.creationTransition?.conditions?.length) {
-      const schemaProperties = this.schema.properties || [];
+      const result = this.validateTransition(this.schema.creationTransition, 'creationTransition');
+      errors.push(...result);
+    }
 
-      // Validate that all properties in the conditions are defined in the schema properties
-      const transitionConditions = this.schema.creationTransition.conditions || [];
-      transitionConditions.forEach(condition => {
-        const conditionProperties = condition.configuration?.properties || [];
+    /* Validate conditions of the other transitions */
+    if (this.schema.transitions?.length) {
+      for (const transition of this.schema.transitions) {
+        const result = this.validateTransition(transition, `${transition.name}`);
+        errors.push(...result);
+      }
+    }
 
-        Object.keys(conditionProperties).forEach(key => {
-          // Check if the condition property is not defined in the schema properties
-          if (!schemaProperties[key]) {
-            errors.push(`Property '${key}' is defined in the creation transition properties but not in the schema properties`);
-            ok = false;
-            return;
-          }
+    if (errors.length) {
+      ok = false;
+    }
 
-          // Check if the condition property is incorrectly typed vs the schema properties
-          if (!isEqual(schemaProperties[key], conditionProperties[key])) {
-            errors.push(`Property '${key}' has different type definitions in the creation transition and schema properties`);
-            ok = false;
-          }
-        });
-      });
+    return { ok, errors };
+  }
 
-      for (const [index, condition] of this.schema.creationTransition.conditions.entries()) {
-        if (condition.type !== 'input') {
-          continue;
-        }
+  validateTransition(transition: any, name: string) {
+    const errors = [];
+    const conditions = transition.conditions || [];
+
+    for (const [index, condition] of Object.entries<any>(conditions)) {
+      if (condition.type === 'input') {
         condition.configuration.$schema = 'http://json-schema.org/draft-07/schema#';
-        if (!this.ajv.validateSchema(condition.configuration)) {
-          ok = false;
+
+        const isValidConfiguration = this.ajv.validateSchema(condition.configuration);
+        if (!isValidConfiguration) {
           errors.push(...transformAjvErrors(`/creationTransition/conditions[${index}]/configuration`, this.ajv.errors));
         }
+
+        const result = this.validateConditionPropertiesAgainstSchemaProperties(condition.configuration.properties, this.schema.properties, '');
+        result.forEach((error: string) => errors.push(`Transition - ${name} : property ${error}`));
       }
     }
 
-    /* check all conditions of the other transitions */
-    if (this.schema.transitions?.length) {
-      for (const [tIndex, transition] of this.schema.transitions.entries()) {
-        if (!transition.conditions) {
-          continue;
+    return errors;
+  }
+
+  validateConditionPropertiesAgainstSchemaProperties(conditionProperties: any, schemaProperties: any, path: string) {
+    const invalidPaths = new Set([]);
+
+    // If the provided source object is not an object the property tree has been exhausted, thus return
+    if (typeof conditionProperties !== 'object') {
+      return invalidPaths;
+    }
+
+    for (const key of Object.keys(conditionProperties)) {
+      const conditionProperty = conditionProperties[key];
+      const schemaProperty = schemaProperties?.[key];
+
+      /**
+       * If the source key is type and the value is a string we have reached a type definition
+       * If the property is not a string most likely the user has defined a property with the name of type
+       */
+      if (key === 'type' && typeof conditionProperty === 'string') {
+        // If the type property exists at the given path in the target, check if the types match
+        if (schemaProperty && conditionProperty !== schemaProperty) {
+          invalidPaths.add(`'${path}.type' does not match the value found in the schema properties`);
         }
-        for (const [cIndex, condition] of transition.conditions?.entries()) {
-          if (condition.type !== 'input') {
-            continue;
-          }
-          if (!this.ajv.validateSchema(condition.configuration)) {
-            ok = false;
-            errors.push(...transformAjvErrors(`/transitions[${tIndex}]/conditions[${cIndex}]/configuration`, this.ajv.errors));
-          }
+
+        // If the type property does not exist at the target path, throw an error
+        if (!schemaProperty) {
+          invalidPaths.add(`'${path}' is defined in the condition properties, but not defined in the schema properties`);
         }
       }
+
+      const currentPath = path ? `${path}.${key}` : key;
+      const result = this.validateConditionPropertiesAgainstSchemaProperties(conditionProperty, schemaProperty, currentPath);
+      result.forEach(error => invalidPaths.add(error));
     }
-    return { ok, errors };
+
+    return invalidPaths;
   }
 
   #verifyConditionTypes(): InternalTestResult {
@@ -188,4 +231,38 @@ export class SchemaVerify {
     }
     return { ok, errors };
   }
+}
+
+// The data service automatically assigns an id to all objects in an array
+// This function checks if the schema has an array of objects with an id property conflicting the one from the data service
+function getIdInObjectArrayErrors(properties: any, path = []) {
+  const pathsWithIdInArray = [];
+  let name;
+  let value;
+
+  for ([name, value] of Object.entries<any>(properties)) {
+    // Keep going deeper into the schema until the next value is no longer an array
+    while (value.type === 'array' && value.items.type === 'array') {
+      value = value.items;
+      name = `${name}.items`;
+    }
+
+    // For all properties with type array of objects, check if they have an id property
+    if (value.type === 'array' && value.items.type === 'object') {
+      // Check if the array has an id property, if so add it to the list of paths
+      if ('id' in value.items.properties) {
+        pathsWithIdInArray.push([...path, `${name}.items.properties`, 'id'].join('.'));
+      }
+
+      // Continue to check if the object in the items array has an array with an object with an id property
+      pathsWithIdInArray.push(...getIdInObjectArrayErrors(value.items.properties, [...path, `${name}.items.properties`]));
+    }
+
+    // Continue to check if the object has an array with an object with an id property
+    if (value.type === 'object') {
+      pathsWithIdInArray.push(...getIdInObjectArrayErrors(value.properties, [...path, `${name}.properties`]));
+    }
+  }
+
+  return pathsWithIdInArray;
 }
