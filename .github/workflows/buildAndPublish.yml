@@ -2,11 +2,12 @@ name: Build and Publish @extrahorizon/exh-cli
 
 on:
   workflow_dispatch:
-    
+
   push:
     branches:
       - master
       - dev
+      - feature/SVCS-2041-Publish-dev-builds-for-beta-testing
 
 jobs:
   build-and-publish:
@@ -52,7 +53,7 @@ jobs:
           git config --global user.email "$GITHUB_ACTOR@users.noreply.github.com" && git config --global user.name "$GITHUB_ACTOR"
           
           # Tag the commit with the correct version
-          git tag -a v$version_tag -m "Tagging $version_tag"
+          git tag -a $version_tag -m "Tagging $version_tag"
           git push origin $version_tag
           yarn publish --registry https://npm.pkg.github.com/ --new-version $version_tag --tag=$branch_tag
         env:
