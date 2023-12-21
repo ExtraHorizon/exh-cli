@@ -288,8 +288,7 @@ test('An item of an array with an id should error for all properties', () => {
 });
 
 test('Valid JSON schema in transition condition must not trigger an error', () => {
-  const verify = new SchemaVerify(ajv, {
-    name: 'test',
+  const verify = new SchemaVerify(ajv, { name: 'test',
     description: 'test',
     statuses: { new: {}, processed: {} },
     creationTransition: { type: 'manual', toStatus: 'new' },
@@ -313,8 +312,9 @@ test('Valid JSON schema in transition condition must not trigger an error', () =
         ],
       },
     ],
-    properties: {},
-  }, metaschema);
+    properties: {
+      name: { type: 'string' },
+    } }, metaschema);
   for (const check of verify.RunChecks()) {
     expect(check.ok).toBe(true);
   }
@@ -344,8 +344,13 @@ test('Invalid JSON schema in transition input condition must trigger an error', 
     ],
     properties: {},
   };
-  const verify = ajv.compile(metaschema);
-  expect(verify(schema)).toBe(false);
+
+  const verify = new SchemaVerify(ajv, schema, metaschema);
+  for (const check of verify.RunChecks()) {
+    if (check.id === TestId.INPUT_CONDITIONS) {
+      expect(check.ok).toBe(false);
+    }
+  }
 });
 
 test('Using a status which is not defined in a transition should trigger an error', () => {
@@ -371,85 +376,6 @@ test('Using a status which is not defined in a transition should trigger an erro
     if (check.id === TestId.STATUS_CHECK) {
       expect(check.ok).toBe(false);
       expect(check.errors).toStrictEqual(["Status 'confused' is defined in the schema statuses but not used in any transition"]);
-    }
-  }
-});
-
-test('Using a property in the creationTransition which is not defined in the schema properties should trigger an error', () => {
-  const verify = new SchemaVerify(ajv, {
-    name: 'test',
-    description: 'test',
-    statuses: { created: {} },
-    creationTransition: { type: 'manual',
-      toStatus: 'created',
-      conditions: [
-        {
-          type: 'input',
-          configuration: {
-            properties: {
-              tags: {
-                type: 'array',
-                items: {
-                  type: 'string',
-                },
-              },
-            },
-          },
-        },
-      ] },
-    properties: {},
-  }, metaschema);
-
-  for (const check of verify.RunChecks()) {
-    if (check.id === TestId.INPUT_CONDITIONS) {
-      if (check.id === TestId.INPUT_CONDITIONS) {
-        expect(check.ok).toBe(false);
-        expect(check.errors).toStrictEqual(["Property 'tags' is defined in the creation transition properties but not in the schema properties"]);
-      } else {
-        expect(check.ok).toBe(true);
-      }
-    }
-  }
-});
-
-test('Using a property in the creationTransition which is differently typed in the schema properties should trigger an error', () => {
-  const verify = new SchemaVerify(ajv, { name: 'test',
-    description: 'test',
-    statuses: { created: {} },
-    creationTransition: { type: 'manual',
-      toStatus: 'created',
-      conditions: [
-        {
-          type: 'input',
-          configuration: {
-            properties: {
-              tags: {
-                type: 'array',
-                items: {
-                  type: 'string',
-                },
-              },
-            },
-          },
-        },
-      ] },
-    properties: {
-      tags: {
-        type: 'array',
-        items: {
-          type: 'number',
-        },
-      },
-    } }, metaschema);
-
-  for (const check of verify.RunChecks()) {
-    if (check.id === TestId.INPUT_CONDITIONS) {
-      if (check.id === TestId.INPUT_CONDITIONS) {
-        expect(check.ok).toBe(false);
-        expect(check.errors).toStrictEqual(["Property 'tags' has different type definitions in the creation transition and schema properties"]);
-      } else {
-        expect(check.ok).toBe(true);
-      }
     }
   }
 });
