@@ -33,7 +33,7 @@ jobs:
       - run: |
           if [ "${{github.ref}}" == "refs/heads/master" ]
           then
-            version_tag=v${{steps.extract_version.outputs.version}}
+            version_tag=${{steps.extract_version.outputs.version}}
             branch_tag="latest"
           else
             if [ "${{github.ref}}" == "refs/heads/dev" ]
@@ -44,13 +44,13 @@ jobs:
             fi
             sha=${{github.sha}}
             short_commit_hash=${sha:0:7}
-            version_tag=v${{steps.extract_version.outputs.version}}-$branch_tag-${{github.run_number}}-$short_commit_hash
+            version_tag=${{steps.extract_version.outputs.version}}-$branch_tag-${{github.run_number}}-$short_commit_hash
           fi
           
           git config --global user.email "$GITHUB_ACTOR@users.noreply.github.com" && git config --global user.name "$GITHUB_ACTOR"
           
           # Tag the commit with the correct version
-          git tag -a $version_tag -m "Tagging $version_tag"
+          git tag -a v$version_tag -m "Tagging $version_tag"
           git push origin $version_tag
           yarn publish --registry https://npm.pkg.github.com/ --new-version $version_tag --tag=$branch_tag
         env:
