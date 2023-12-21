@@ -2,11 +2,12 @@ name: Build and Publish @extrahorizon/exh-cli
 
 on:
   workflow_dispatch:
-    
+
   push:
     branches:
       - master
       - dev
+      - feature/SVCS-2041-Publish-dev-builds-for-beta-testing
 
 jobs:
   build-and-publish:
