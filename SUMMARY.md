@@ -5,7 +5,7 @@
 ## setup
 
 * [Installation](setup/installation.md)
-* [Credentials](setup/credentials.md)
+* [Login](setup/login.md)
 
 ## features
 
