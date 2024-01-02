@@ -4,13 +4,13 @@ In the Extra Horizon cloud, you can create mail templates which the mail service
 
 ## Listing templates
 
-To list all the templates, do
+List the id, name and the description of all templates:
 
 ```
 exh templates list
 ```
 
-It will not list all the details of the template, just `id`, `name` & `description`
+To get more information than the three properties listed use the `get` command on a single template.
 
 ## Get a single template
 
@@ -26,16 +26,31 @@ Or by `id`
 exh templates get --id=620d0eaacff47e000714b13d
 ```
 
+#### Arguments
+
+`--name`
+
+This argument is used to specify the name of the template to retrieve
+
+`--id`
+
+This argument is used to specify the id of the template to retrieve
+
 ## Synchronizing template
 
-If you want to create a new template, you need to create a json file which defines how it should look like. See [Extrahorizon documentation](https://docs.extrahorizon.com/template-service/features/templates) to get more information on creating templates.
+If you want to create a new template, you need to create a json file which defines how it should look like. See [Extra Horizon documentation](https://docs.extrahorizon.com/template-service/features/templates) to get more information on creating templates.
 
 Building on that functionality, the CLI offers additional functionality to more easily manage templates and allowing templates to build upon other templates. Once you've built these templates, you can use `exh templates sync [options]` to synchronise these templates to the cloud.
 
-There are 2 ways to use the sync command:
+#### Arguments
 
-1. Sync a single json template using the `template` option. This can be a file or a folder, depending on how you defined your template (see next paragraph).
-2. Sync a folder which contains templates using the `path` option.
+`--template`
+
+This argument is used to specify the path to the JSON file or the directory that contains the single template to be synced.
+
+`--path`&#x20;
+
+This argument is used to specify the directory that contains all the template files to be synced.
 
 ### Creating templates <a href="#markdown-header-template-folder-vs-template-file" id="markdown-header-template-folder-vs-template-file"></a>
 
@@ -197,3 +212,13 @@ Or by id
 ```
 exh templates delete --id=620d0eaacff47e000714b13d
 ```
+
+#### Arguments
+
+`--name`
+
+This argument is used to specify the name of the template to delete.
+
+`--id`
+
+This argument is used to specify the id of the template to delete.
