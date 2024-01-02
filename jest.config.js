@@ -9,7 +9,7 @@ module.exports = {
   transform: {
     '\\.ts$': 'ts-jest'
   },
-  testRegex: '/tests/.*\\.test.(ts|js)$',
+  testRegex: '/tests/.*\\.(ts|js)$',
   // setupFiles: [
   //   "<rootDir>/tests/__helpers__/beforeEachSuite.ts"
   // ],

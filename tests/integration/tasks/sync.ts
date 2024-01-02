@@ -1,8 +1,8 @@
 import { handler } from '../../../src/commands/tasks/sync';
 import { runtimeChoices } from '../../../src/constants';
 
-describe('Tasks - Sync - Runtimes', () => {
-  const root = './tests/tasks/sync/configs/invalid-runtimes/';
+describe('exh tasks sync', () => {
+  const root = 'tests/__helpers__/task-configs/invalid-runtimes/';
   const runtimes = runtimeChoices.map(runtime => runtime).join(', ');
 
   it('Accepts a valid runtime when provided a task config file with a valid runtime', async () => {
@@ -10,7 +10,7 @@ describe('Tasks - Sync - Runtimes', () => {
       .catch(e => e);
 
     // Proves that it proceeds passes the runtime validation
-    const codePath = 'tests/tasks/sync/configs/invalid-runtimes/build';
+    const codePath = 'tests/__helpers__/task-configs/invalid-runtimes/build';
     expect(error.message).toBe(`Please provide a valid directory path for your code, ${codePath} not found`);
   });
 

@@ -1,4 +1,4 @@
-import { runtimeChoices } from '../src/constants';
+import { runtimeChoices } from '../../../src/constants';
 
 export const simpleVariableConfig = {
   name: '$TESTNAME',

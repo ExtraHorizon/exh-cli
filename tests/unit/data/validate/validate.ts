@@ -1,8 +1,8 @@
 import Ajv from 'ajv';
 import { cloneDeep } from 'lodash';
-import * as metaschema from '../../../src/commands/data/schemas/util/metaschema.json';
-import { SchemaVerify, TestId } from '../../../src/commands/data/schemas/util/schemaverify';
-import { validSchema } from '../../__helpers__/schemas';
+import * as metaschema from '../../../../src/commands/data/schemas/util/metaschema.json';
+import { SchemaVerify, TestId } from '../../../../src/commands/data/schemas/util/schemaverify';
+import { validSchema } from '../../../__helpers__/schemas';
 
 describe('Data - Schema - Validate', () => {
   const ajv = new Ajv();
