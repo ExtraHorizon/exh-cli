@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs';
-import { sdkMock } from '../__mocks__/@extrahorizon/javascript-sdk';
-import { sdkAuth } from '../src/exh';
+import { sdkMock } from '../../../__mocks__/@extrahorizon/javascript-sdk';
+import { sdkAuth } from '../../../src/exh';
 
 jest.mock('fs');
 

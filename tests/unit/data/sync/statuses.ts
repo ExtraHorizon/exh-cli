@@ -1,13 +1,13 @@
 import * as path from 'path';
-import { compareStatuses, calculateStatusUpdateData } from '../../../src/commands/data/schemas/sync/statusHelpers';
-import { readJsonFile } from '../../../src/commands/data/schemas/util/readJson';
+import { compareStatuses, calculateStatusUpdateData } from '../../../../src/commands/data/schemas/sync/statusHelpers';
+import { readJsonFile } from '../../../../src/commands/data/schemas/util/readJson';
 
 describe('Sync - Statuses', () => {
   let cloudSchema;
   let localSchema;
 
   beforeAll(async () => {
-    const root = './tests/data/sync/schemas';
+    const root = 'tests/__helpers__/schemas';
 
     const cloudSchemaPath = path.resolve(`${root}/cloud.json`);
     cloudSchema = await readJsonFile(cloudSchemaPath);
