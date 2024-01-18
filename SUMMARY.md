@@ -17,7 +17,7 @@
   * [Hello world (Py)](features/tasks/hello-world-py.md)
   * [Hello World (Docker)](features/tasks/hello-world-docker.md)
 * [Templates](features/templates.md)
-* [Repository configuration](features/repository-configuration.md)
+* [Sync](features/sync.md)
 
 ## other
 
