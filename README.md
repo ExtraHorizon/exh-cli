@@ -6,47 +6,51 @@ The ExtraHorizon CLI is currently in **Beta**
 
 To get started with the ExtraHorizon CLI (exh-cli) you'll need to install it and get credentials which will allow you to access the backend.
 
-* [Installation](setup/installation.md)
-* [configure credentials](setup/login.md)
-* [command overview](./#general)
+* [Installation](broken-reference)
+* [Login](readme/login.md)
 
-### Command Overview
-
-* [**Data**](commands/commands.md) **->**commands related to data service management
-* [**Tasks**](commands/tasks/) **->**command related to task service management
-* [**Templates**](features/templates.md) **->**command related to (mail) template management
+## Help
 
 You can always use the `--help` option in order to get help on a certain command. For example
 
 ```
+exh --help
+
+exh <command>
+
+Commands:
+  exh completion             Install shell completion for bash & zsh
+  exh data <command>         Manage data
+  exh dispatchers <command>  Manage Dispatchers within Extra Horizon
+  exh login                  Retrieve credentials from ExH
+  exh sync                   Upload all schemas, templates & tasks to the cloud
+                             environment
+  exh tasks <command>        Manage tasks
+  exh templates <command>    Manage templates
+
+Options:
+  --help     Show help                                                 [boolean]
+  --version  Show version number                                       [boolean]
+```
+
+and then you can dig down further asking help for a specific command such as
+
+```
 exh data schemas --help
-```
 
-will return
-
-```
-build data schemas <command>
+exh data schemas <command>
 
 Manage data schemas
 
 Commands:
-  build data schemas delete  Delete a schema
-  build data schemas list    List all schemas
-  build data schemas sync    Sync all schemas in a directory with the ExH cloud
-  build data schemas verify  Syntactically verify a local schema
+  exh data schemas delete  Delete a schema
+  exh data schemas list    List all schemas
+  exh data schemas sync    Sync all schemas in a directory with the ExH cloud
+  exh data schemas verify  Syntactically verify a local schema
 
 Options:
   --help     Show help                                                 [boolean]
   --version  Show version number                                       [boolean]
 
 Visit https://docs.extrahorizon.com/extrahorizon-cli/ for more information.
-```
-
-and then you can dig down further asking help for a specific command such as
-
-```
-exh {service} {subcCommands...} --help
-
-//an example
-exh data schemas sync --help
 ```
