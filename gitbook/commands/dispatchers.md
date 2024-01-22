@@ -34,7 +34,7 @@ This optional argument will delete all Dispatchers with the `EXH_CLI_MANAGED` ta
 The `--clean` argument performs a destructive operation that can not be reverted.
 {% endhint %}
 
-### Example
+#### Example
 
 {% tabs %}
 {% tab title="CLI" %}
@@ -43,6 +43,14 @@ exh dispatchers sync --file=./path/to/dispatchers.json --clean
 ```
 {% endtab %}
 {% endtabs %}
+
+### File format
+
+Dispatchers must be provided in a `.json` file as defined in the [arguments](dispatchers.md#arguments) section. This file must contain an array of Dispatcher objects as shown in the [example](dispatchers.md#example-1) below.
+
+For detailed information regarding the structure of a Dispatcher, please refer to the section [Create your first Dispatcher](https://docs.extrahorizon.com/extrahorizon/services/automation/dispatchers-service#create-your-first-dispatcher).
+
+#### Example
 
 {% tabs %}
 {% tab title="JSON" %}
@@ -78,3 +86,4 @@ exh dispatchers sync --file=./path/to/dispatchers.json --clean
 ```
 {% endtab %}
 {% endtabs %}
+
