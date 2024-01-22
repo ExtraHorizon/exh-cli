@@ -24,9 +24,9 @@ The Extra Horizon CLI by default will execute the relevant commands for these su
 
 | Command                                                      | Path               |
 | ------------------------------------------------------------ | ------------------ |
-| [Schemas Sync](../commands/commands.md#schema-sync)          | ./schemas          |
+| [Schemas Sync](commands.md#schema-sync)                      | ./schemas          |
 | [Templates Sync](templates.md#synchronizing-template)        | ./templates        |
-| [Tasks Sync](../commands/tasks/#synchronize-a-task)          | ./tasks            |
+| [Tasks Sync](tasks.md#synchronize-a-task)                    | ./tasks            |
 | [Dispatchers Sync](dispatchers.md#synchronizing-dispatchers) | ./dispatchers.json |
 
 ### Custom configuration
