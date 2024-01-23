@@ -1,28 +1,12 @@
 import * as fs from 'fs/promises';
+import { rqlBuilder } from '@extrahorizon/javascript-sdk';
 import * as chalk from 'chalk';
 import { runtimeChoices } from '../../constants';
 import { epilogue } from '../../helpers/util';
-import { assertExecutionPermission, getValidatedConfigIterator, permissionModes, TaskConfig } from './taskConfig';
+import * as taskRepository from '../../repositories/tasks';
+import { FunctionCreation } from '../../repositories/tasks';
+import { assertExecutionPermission, getValidatedConfigIterator, TaskConfig } from './taskConfig';
 import { zipFileFromDirectory } from './util';
-
-/* Structure for the request which will be sent to the backend */
-interface TaskRequest {
-  name: string;
-  description: string;
-  entryPoint: string;
-  code: string;
-  runtime: string;
-  timeLimit?: number;
-  memoryLimit?: number;
-  environmentVariables?: Record<string, any>;
-  executionOptions?: {
-    permissionMode: permissionModes;
-  };
-  retryPolicy?: {
-    enabled: boolean;
-    errorsToRetry: string[];
-  };
-}
 
 export const command = 'sync';
 export const desc = 'Sync a task. Will create the task first if it doesn\'t exist yet';
@@ -85,17 +69,6 @@ export const builder = (yargs: any) => epilogue(yargs).options({
     return true;
   });
 
-async function createTask(sdk:any, request: TaskRequest) {
-  await sdk.raw.post('/tasks/v1/functions', request);
-}
-
-async function updateTask(sdk: any, request: TaskRequest) {
-  const response1 = await sdk.raw.put(`/tasks/v1/functions/${request.name}`, request);
-  if (!response1.data?.affectedRecords) {
-    throw new Error(`Failed to update task ${request.name}`);
-  }
-}
-
 export const handler = async ({ sdk, ...cmdLineParams }) => {
   for await (const config of getValidatedConfigIterator(cmdLineParams)) {
     console.log('Syncing task', config.name, '...');
@@ -110,11 +83,11 @@ async function syncSingleTask(sdk:any, config: TaskConfig) {
   const file = await fs.readFile(uploadFilePath);
 
   /* Check if the function already exists */
-  const allFunctions = (await sdk.raw.get('/tasks/v1/functions')).data.data;
-  const myFunction = allFunctions.find((f:any) => f.name === config.name);
+  const rql = rqlBuilder().eq('name', config.name).build();
+  const myFunction = await taskRepository.functions.findFirst(sdk, { rql });
 
   /* Construct a request object to send to the API */
-  const request: TaskRequest = {
+  const request: FunctionCreation = {
     name: config.name,
     description: config.description || 'none',
     entryPoint: config.entryPoint,
@@ -141,16 +114,16 @@ async function syncSingleTask(sdk:any, config: TaskConfig) {
   }
 
   if (myFunction === undefined) {
-    await createTask(sdk, request);
+    await taskRepository.functions.create(sdk, request);
     console.log(chalk.green('Successfully created task', config.name));
   } else {
     // TODO: Check all fields and only update if they are different
-    const { data: existingFunction } = await sdk.raw.get(`/tasks/v1/functions/${myFunction.name}`);
+    const existingFunction = await taskRepository.functions.findByName(sdk, myFunction.name);
     if (request.runtime === existingFunction.runtime) {
       delete request.runtime;
     }
 
-    await updateTask(sdk, request);
+    await taskRepository.functions.update(sdk, request);
     console.log(chalk.green('Successfully updated task', config.name));
   }
   /* Remove temp file */
