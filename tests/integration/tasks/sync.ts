@@ -1,15 +1,17 @@
 import * as chalk from 'chalk';
 import { handler } from '../../../src/commands/tasks/sync';
 import { runtimeChoices } from '../../../src/constants';
-import * as taskRepository from '../../../src/repositories/tasks';
-import { functionCode, functionConfig, functionDetails } from '../../__helpers__/functions';
+import { functionCode } from '../../__helpers__/functions';
+import { tasksRepositoryMock } from '../../__helpers__/tasksRepositoryMock';
 import { createTempDirectoryManager } from '../../__helpers__/tempDirectoryManager';
 
 describe('exh tasks sync', () => {
   let tempDirectoryManager;
+  let repositoryMock;
 
   beforeAll(async () => {
     tempDirectoryManager = await createTempDirectoryManager();
+    repositoryMock = tasksRepositoryMock();
   });
 
   afterEach(() => {
@@ -24,16 +26,15 @@ describe('exh tasks sync', () => {
   const runtimes = runtimeChoices.map(runtime => runtime).join(', ');
 
   it('Creates a Function', async () => {
-    const taskConfigPath = await tempDirectoryManager.createTempJsonFile(functionConfig);
+    const taskConfigPath = await tempDirectoryManager.createTempJsonFile(repositoryMock.functionConfig);
     await tempDirectoryManager.createTempJsFile('index', functionCode);
 
     const logSpy = jest.spyOn(global.console, 'log');
-    jest.spyOn(taskRepository.functions, 'find').mockImplementationOnce(() => Promise.resolve([]));
-    jest.spyOn(taskRepository.functions, 'create').mockImplementationOnce(() => Promise.resolve(functionDetails(functionConfig)));
-    jest.spyOn(taskRepository.functions, 'findByName').mockImplementationOnce(() => Promise.resolve(functionDetails(functionConfig)));
 
     await handler({ sdk: null, path: taskConfigPath });
-    expect(logSpy).toHaveBeenCalledWith(chalk.green('Successfully created task', functionConfig.name));
+    expect(repositoryMock.findFunctionsSpy).toHaveBeenCalledTimes(1);
+    expect(repositoryMock.createFunctionSpy).toHaveBeenCalledTimes(1);
+    expect(logSpy).toHaveBeenCalledWith(chalk.green('Successfully created task', repositoryMock.functionConfig.name));
   });
 
   it('Accepts a valid runtime when provided a task config file with a valid runtime', async () => {

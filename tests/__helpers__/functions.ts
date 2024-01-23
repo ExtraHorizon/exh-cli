@@ -13,7 +13,7 @@ export const functionConfig = {
   },
 };
 
-export const functionDetails = (config: typeof functionConfig) => (
+export const generateFunction = (config: typeof functionConfig) => (
   {
     description: config.description,
     name: config.name,
