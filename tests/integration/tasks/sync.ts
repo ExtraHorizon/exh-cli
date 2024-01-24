@@ -11,14 +11,10 @@ describe('exh tasks sync', () => {
 
   beforeAll(async () => {
     tempDirectoryManager = await createTempDirectoryManager();
-    repositoryMock = tasksRepositoryMock();
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     jest.clearAllMocks();
-  });
-
-  afterAll(async () => {
     await tempDirectoryManager.removeDirectory();
   });
 
@@ -26,6 +22,7 @@ describe('exh tasks sync', () => {
   const runtimes = runtimeChoices.map(runtime => runtime).join(', ');
 
   it('Creates a Function', async () => {
+    repositoryMock = tasksRepositoryMock();
     const taskConfigPath = await tempDirectoryManager.createTempJsonFile(repositoryMock.functionConfig);
     await tempDirectoryManager.createTempJsFile('index', functionCode);
 
@@ -35,6 +32,20 @@ describe('exh tasks sync', () => {
     expect(repositoryMock.findFunctionsSpy).toHaveBeenCalledTimes(1);
     expect(repositoryMock.createFunctionSpy).toHaveBeenCalledTimes(1);
     expect(logSpy).toHaveBeenCalledWith(chalk.green('Successfully created task', repositoryMock.functionConfig.name));
+  });
+
+  it('Updates a Function', async () => {
+    repositoryMock = tasksRepositoryMock(true);
+    const taskConfigPath = await tempDirectoryManager.createTempJsonFile(repositoryMock.functionConfig);
+    await tempDirectoryManager.createTempJsFile('index', functionCode);
+
+    const logSpy = jest.spyOn(global.console, 'log');
+
+    await handler({ sdk: null, path: taskConfigPath });
+    expect(repositoryMock.findFunctionsSpy).toHaveBeenCalledTimes(1);
+    expect(repositoryMock.findFunctionByNameSpy).toHaveBeenCalledTimes(1);
+    expect(repositoryMock.updateFunctionSpy).toHaveBeenCalledTimes(1);
+    expect(logSpy).toHaveBeenCalledWith(chalk.green('Successfully updated task', repositoryMock.functionConfig.name));
   });
 
   it('Accepts a valid runtime when provided a task config file with a valid runtime', async () => {
