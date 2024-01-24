@@ -2,8 +2,8 @@ import * as fs from 'fs/promises';
 import * as chalk from 'chalk';
 import { runtimeChoices } from '../../constants';
 import { epilogue } from '../../helpers/util';
-import * as taskRepository from '../../repositories/tasks';
-import { FunctionCreation } from '../../repositories/tasks';
+import * as functionRepository from '../../repositories/functions';
+import { FunctionCreation } from '../../repositories/functions';
 import { assertExecutionPermission, getValidatedConfigIterator, TaskConfig } from './taskConfig';
 import { zipFileFromDirectory } from './util';
 
@@ -82,7 +82,7 @@ async function syncSingleTask(sdk:any, config: TaskConfig) {
   const file = await fs.readFile(uploadFilePath);
 
   /* Check if the function already exists */
-  const allFunctions = await taskRepository.functions.find(sdk);
+  const allFunctions = await functionRepository.find(sdk);
   const myFunction = allFunctions.find((f:any) => f.name === config.name);
 
   /* Construct a request object to send to the API */
@@ -113,16 +113,16 @@ async function syncSingleTask(sdk:any, config: TaskConfig) {
   }
 
   if (myFunction === undefined) {
-    await taskRepository.functions.create(sdk, request);
+    await functionRepository.create(sdk, request);
     console.log(chalk.green('Successfully created task', config.name));
   } else {
     // TODO: Check all fields and only update if they are different
-    const existingFunction = await taskRepository.functions.findByName(sdk, myFunction.name);
+    const existingFunction = await functionRepository.findByName(sdk, myFunction.name);
     if (request.runtime === existingFunction.runtime) {
       delete request.runtime;
     }
 
-    const updateResponse = await taskRepository.functions.update(sdk, request);
+    const updateResponse = await functionRepository.update(sdk, request);
     if (!updateResponse?.affectedRecords) {
       throw new Error(`Failed to update task ${request.name}`);
     }
