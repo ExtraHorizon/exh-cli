@@ -9,7 +9,7 @@ describe('exh tasks sync', () => {
   let tempDirectoryManager;
   let repositoryMock;
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     tempDirectoryManager = await createTempDirectoryManager();
   });
 
