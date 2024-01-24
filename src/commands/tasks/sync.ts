@@ -1,5 +1,4 @@
 import * as fs from 'fs/promises';
-import { rqlBuilder } from '@extrahorizon/javascript-sdk';
 import * as chalk from 'chalk';
 import { runtimeChoices } from '../../constants';
 import { epilogue } from '../../helpers/util';

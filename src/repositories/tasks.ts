@@ -1,4 +1,4 @@
-import { OAuth1Client, OptionsWithRql } from '@extrahorizon/javascript-sdk';
+import { OAuth1Client } from '@extrahorizon/javascript-sdk';
 import { permissionModes } from '../commands/tasks/taskConfig';
 
 export interface FunctionCreation {
