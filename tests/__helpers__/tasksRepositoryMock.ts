@@ -15,7 +15,7 @@ export const tasksRepositoryMock = (update = false) => {
     .mockImplementation(() => Promise.resolve(existingFunction));
 
   const updateFunctionSpy = jest.spyOn(taskRepository.functions, 'update')
-    .mockImplementation(() => Promise.resolve(existingFunction));
+    .mockImplementation(() => Promise.resolve({ affectedRecords: 1 }));
 
   return {
     functionConfig,

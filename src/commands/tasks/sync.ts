@@ -123,7 +123,7 @@ async function syncSingleTask(sdk:any, config: TaskConfig) {
     }
 
     const updateResponse = await taskRepository.functions.update(sdk, request);
-    if (updateResponse.data?.affectedRecords) {
+    if (!updateResponse?.affectedRecords) {
       throw new Error(`Failed to update task ${request.name}`);
     }
 
