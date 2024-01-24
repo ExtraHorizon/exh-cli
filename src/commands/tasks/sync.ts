@@ -83,8 +83,8 @@ async function syncSingleTask(sdk:any, config: TaskConfig) {
   const file = await fs.readFile(uploadFilePath);
 
   /* Check if the function already exists */
-  const rql = rqlBuilder().eq('name', config.name).build();
-  const myFunction = await taskRepository.functions.findFirst(sdk, { rql });
+  const allFunctions = await taskRepository.functions.find(sdk);
+  const myFunction = allFunctions.find((f:any) => f.name === config.name);
 
   /* Construct a request object to send to the API */
   const request: FunctionCreation = {
@@ -123,7 +123,11 @@ async function syncSingleTask(sdk:any, config: TaskConfig) {
       delete request.runtime;
     }
 
-    await taskRepository.functions.update(sdk, request);
+    const updateResponse = await taskRepository.functions.update(sdk, request);
+    if (updateResponse.data?.affectedRecords) {
+      throw new Error(`Failed to update task ${request.name}`);
+    }
+
     console.log(chalk.green('Successfully updated task', config.name));
   }
   /* Remove temp file */
