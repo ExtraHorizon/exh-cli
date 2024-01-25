@@ -16,6 +16,9 @@ export const functionRepositoryMock = () => {
   const updateSpy = jest.spyOn(functionRepository, 'update')
     .mockImplementation(() => Promise.resolve({ affectedRecords: 1 }));
 
+  const removeSpy = jest.spyOn(functionRepository, 'remove')
+    .mockImplementation(() => Promise.resolve({ affectedRecords: 1 }));
+
   return {
     functionConfig,
     existingFunction,
@@ -23,5 +26,6 @@ export const functionRepositoryMock = () => {
     findByNameSpy,
     createSpy,
     updateSpy,
+    removeSpy,
   };
 };

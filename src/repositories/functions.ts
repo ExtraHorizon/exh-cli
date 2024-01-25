@@ -38,3 +38,8 @@ export async function update(sdk: OAuth1Client, data: FunctionCreation) {
   const response = await sdk.raw.put(`/tasks/v1/functions/${data.name}`, data);
   return response.data;
 }
+
+export async function remove(sdk: OAuth1Client, name: string) {
+  const response = await sdk.raw.delete(`/tasks/v1/functions/${name}`);
+  return response.data;
+}

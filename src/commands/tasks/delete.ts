@@ -1,4 +1,5 @@
 import * as chalk from 'chalk';
+import * as functionRepository from '../../../src/repositories/functions';
 import { epilogue } from '../../helpers/util';
 
 export const command = 'delete';
@@ -11,8 +12,8 @@ export const builder = (yargs: any) => epilogue(yargs).option('name', {
 
 export const handler = async ({ sdk, name }) => {
   try {
-    const response = await sdk.raw.delete(`/tasks/v1/functions/${name}`);
-    if (response.data?.affectedRecords) {
+    const response = await functionRepository.remove(sdk, name);
+    if (response?.affectedRecords) {
       console.log(chalk.green('Successfully deleted task', name));
     } else {
       console.log(chalk.red('Failed to delete task', name));
