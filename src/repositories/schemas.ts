@@ -59,7 +59,8 @@ export async function updateSchema(sdk: OAuth1Client, id: string, data: any) {
  * @param {string} data.configuration.type
  */
 export async function createProperty(sdk: OAuth1Client, id: string, data: { name: string; configuration: { type: string; }; }) {
-  return await sdk.raw.post(`/data/v1/${id}/properties`, data);
+  const response = await sdk.raw.post(`/data/v1/${id}/properties`, data);
+  return response.data;
 }
 
 /**
@@ -72,7 +73,8 @@ export async function createProperty(sdk: OAuth1Client, id: string, data: { name
  * @param {string} data.configuration.type
  */
 export async function updateProperty(sdk: OAuth1Client, id: string, path: string, data: { name: string; configuration: { type: string; }; }) {
-  return await sdk.raw.put(`/data/v1/${id}/properties/${path}`, data);
+  const response = await sdk.raw.put(`/data/v1/${id}/properties/${path}`, data);
+  return response.data;
 }
 
 /**
@@ -81,7 +83,8 @@ export async function updateProperty(sdk: OAuth1Client, id: string, path: string
  * @param {string} path the property path
  */
 export async function deleteProperty(sdk: OAuth1Client, id: string, path: string) {
-  return await sdk.raw.delete(`/data/v1/${id}/properties/${path}`);
+  const response = await sdk.raw.delete(`/data/v1/${id}/properties/${path}`);
+  return response.data;
 }
 
 /**
@@ -91,7 +94,8 @@ export async function deleteProperty(sdk: OAuth1Client, id: string, path: string
  * @param {*} data  a status object
  */
 export async function createStatus(sdk: OAuth1Client, id: string, name: string, data: object) {
-  return await sdk.raw.post(`/data/v1/${id}/statuses`, { name, data });
+  const response = await sdk.raw.post(`/data/v1/${id}/statuses`, { name, data });
+  return response.data;
 }
 
 /**
@@ -101,7 +105,8 @@ export async function createStatus(sdk: OAuth1Client, id: string, name: string, 
  * @param {*} data  a status object
  */
 export async function updateStatus(sdk: OAuth1Client, id: string, name: string, data: object) {
-  return await sdk.raw.put(`/data/v1/${id}/statuses/${name}`, { data });
+  const response = await sdk.raw.put(`/data/v1/${id}/statuses/${name}`, { data });
+  return response.data;
 }
 
 /**
@@ -110,7 +115,8 @@ export async function updateStatus(sdk: OAuth1Client, id: string, name: string, 
  * @param {*} name  the name of the status to delete
  */
 export async function deleteStatus(sdk: OAuth1Client, id: string, name: string) {
-  return await sdk.raw.delete(`/data/v1/${id}/statuses/${name}`);
+  const response = await sdk.raw.delete(`/data/v1/${id}/statuses/${name}`);
+  return response.data;
 }
 
 /**
@@ -133,7 +139,8 @@ export async function deleteStatus(sdk: OAuth1Client, id: string, name: string) 
  * @param {transition} data the new creationTransition data
  */
 export async function updateCreationTransition(sdk: OAuth1Client, id: string, data: Transition) {
-  return await sdk.raw.put(`/data/v1/${id}/creationTransition`, data);
+  const response = await sdk.raw.put(`/data/v1/${id}/creationTransition`, data);
+  return response.data;
 }
 
 /**
@@ -142,7 +149,8 @@ export async function updateCreationTransition(sdk: OAuth1Client, id: string, da
  * @param {transition} data a transition object
  */
 export async function createTransition(sdk: OAuth1Client, id: string, data:Transition) {
-  return await sdk.raw.post(`/data/v1/${id}/transitions`, data);
+  const response = await sdk.raw.post(`/data/v1/${id}/transitions`, data);
+  return response.data;
 }
 
 /**
@@ -152,7 +160,8 @@ export async function createTransition(sdk: OAuth1Client, id: string, data:Trans
  * @param {transition} data     the new transition object data
  */
 export async function updateTransition(sdk: OAuth1Client, schemaId: string, transitionId:string, data:Transition) {
-  return await sdk.raw.put(`/data/v1/${schemaId}/transitions/${transitionId}`, data);
+  const response = await sdk.raw.put(`/data/v1/${schemaId}/transitions/${transitionId}`, data);
+  return response.data;
 }
 
 /**
@@ -161,7 +170,8 @@ export async function updateTransition(sdk: OAuth1Client, schemaId: string, tran
  * @param {string} transitionId  the identifier for the thransition to remove
  */
 export async function deleteTransition(sdk: OAuth1Client, schemaId:string, transitionId:string) {
-  return await sdk.raw.delete(`/data/v1/${schemaId}/transitions/${transitionId}`);
+  const response = await sdk.raw.delete(`/data/v1/${schemaId}/transitions/${transitionId}`);
+  return response.data;
 }
 
 /**
@@ -170,7 +180,8 @@ export async function deleteTransition(sdk: OAuth1Client, schemaId:string, trans
  * @param {string} index      the identifier for the index to remove
  */
 export async function createIndex(sdk: OAuth1Client, schemaId:string, index: any) {
-  return await sdk.raw.post(`/data/v1/${schemaId}/indexes`, index);
+  const response = await sdk.raw.post(`/data/v1/${schemaId}/indexes`, index);
+  return response.data;
 }
 
 /**
@@ -179,5 +190,6 @@ export async function createIndex(sdk: OAuth1Client, schemaId:string, index: any
  * @param {string} indexId      the identifier for the index to remove
  */
 export async function deleteIndex(sdk: OAuth1Client, schemaId:string, indexId:string) {
-  return await sdk.raw.delete(`/data/v1/${schemaId}/indexes/${indexId}`);
+  const response = await sdk.raw.delete(`/data/v1/${schemaId}/indexes/${indexId}`);
+  return response.data;
 }

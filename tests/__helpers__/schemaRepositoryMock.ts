@@ -15,24 +15,20 @@ export const schemaRepositoryMock = () => {
     .mockImplementation((_sdk, name, description) => Promise.resolve(createEmptySchema(name, description)));
 
   const createPropertySpy = jest.spyOn(schemaRepository, 'createProperty')
-    // @ts-expect-error axios object is being returned, hard to mock
-    .mockImplementation(() => Promise.resolve({ status: 200, data: { affectedRecords: 1 } }));
+    .mockImplementation(() => Promise.resolve({ affectedRecords: 1 }));
 
   const createStatusSpy = jest.spyOn(schemaRepository, 'createStatus')
-    // @ts-expect-error axios object is being returned, hard to mock
-    .mockImplementation(() => Promise.resolve({ status: 200, data: { affectedRecords: 1 } }));
+
+    .mockImplementation(() => Promise.resolve({ affectedRecords: 1 }));
 
   const updateCreationTransitionSpy = jest.spyOn(schemaRepository, 'updateCreationTransition')
-    // @ts-expect-error axios object is being returned, hard to mock
-    .mockImplementation(() => Promise.resolve({ status: 200, data: { affectedRecords: 1 } }));
+    .mockImplementation(() => Promise.resolve({ affectedRecords: 1 }));
 
   const createTransitionSpy = jest.spyOn(schemaRepository, 'createTransition')
-    // @ts-expect-error axios object is being returned, hard to mock
-    .mockImplementation((_sdk, _id, data) => Promise.resolve({ status: 200, data }));
+    .mockImplementation((_sdk, _id, data) => Promise.resolve(data));
 
   const deleteStatusSpy = jest.spyOn(schemaRepository, 'deleteStatus')
-    // @ts-expect-error axios object is being returned, hard to mock
-    .mockImplementation(() => Promise.resolve({ status: 200, data: { affectedRecords: 1 } }));
+    .mockImplementation(() => Promise.resolve({ affectedRecords: 1 }));
 
   return {
     removeSchemaSpy,
