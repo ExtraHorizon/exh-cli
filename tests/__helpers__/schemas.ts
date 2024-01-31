@@ -169,11 +169,10 @@ export const createEmptySchema = (name: string, description: string): Schema => 
     // @ts-expect-error status values are typed as never for some reason
     start: {},
   },
-  creationTransition:
-    {
-      toStatus: 'start',
-      type: 'manual',
-    },
+  creationTransition: {
+    toStatus: 'start',
+    type: 'manual',
+  },
   transitions: [],
   properties: {},
   indexes: [],

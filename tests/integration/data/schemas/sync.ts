@@ -33,10 +33,10 @@ describe('exh data schemas sync', () => {
 
     // Property creation is called for every property
     expect(repositoryMock.createPropertySpy).toBeCalledTimes(Object.keys(validSchema.properties).length);
-    Object.keys(validSchema.properties).forEach((key: string) => {
+    Object.entries(validSchema.properties).forEach(([key, value]) => {
       expect(repositoryMock.createPropertySpy)
         .toHaveBeenCalledWith(undefined, expect.any(String), expect.objectContaining({
-          configuration: expect.any(Object),
+          configuration: value,
           name: key,
         }));
     });
@@ -50,9 +50,9 @@ describe('exh data schemas sync', () => {
 
     // Status creation is called for every status
     expect(repositoryMock.createStatusSpy).toBeCalledTimes(Object.keys(validSchema.statuses).length);
-    Object.keys(validSchema.statuses).forEach(name => {
+    Object.entries(validSchema.statuses).forEach(([name, value]) => {
       expect(repositoryMock.createStatusSpy)
-        .toHaveBeenCalledWith(undefined, expect.any(String), name, expect.any(Object));
+        .toHaveBeenCalledWith(undefined, expect.any(String), name, value);
     });
   });
 
@@ -78,8 +78,8 @@ describe('exh data schemas sync', () => {
     // Property creation is called for the new property
     expect(repositoryMock.createPropertySpy).toBeCalledTimes(1);
     expect(repositoryMock.createPropertySpy)
-      .toHaveBeenCalledWith(undefined, expect.any(String), expect.objectContaining({
-        configuration: expect.any(Object),
+      .toHaveBeenCalledWith(undefined, 'anyid', expect.objectContaining({
+        configuration: { type: 'string' },
         name: 'newProp',
       }));
   });

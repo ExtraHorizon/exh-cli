@@ -18,7 +18,6 @@ export const schemaRepositoryMock = () => {
     .mockImplementation(() => Promise.resolve({ affectedRecords: 1 }));
 
   const createStatusSpy = jest.spyOn(schemaRepository, 'createStatus')
-
     .mockImplementation(() => Promise.resolve({ affectedRecords: 1 }));
 
   const updateCreationTransitionSpy = jest.spyOn(schemaRepository, 'updateCreationTransition')
