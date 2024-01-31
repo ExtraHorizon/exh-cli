@@ -1,7 +1,7 @@
 /* eslint-disable lines-between-class-members */
 import chalk = require('chalk');
 import * as _ from 'lodash';
-import * as dataServiceRepository from '../../../../repositories/schemas';
+import * as schemaRepository from '../../../../repositories/schemas';
 import { compareStatuses, calculateStatusUpdateData } from '../sync/statusHelpers';
 
 export class SyncSchema {
@@ -28,14 +28,14 @@ export class SyncSchema {
     }
 
     console.log(`Syncing ${this.localSchema.name}`);
-    this.cloudSchema = await dataServiceRepository.fetchSchemaByName(this.sdk, this.localSchema.name);
+    this.cloudSchema = await schemaRepository.fetchSchemaByName(this.sdk, this.localSchema.name);
 
     if (!this.cloudSchema) {
       if (this.dry) {
         console.log(`\t-> Will be created: ${chalk.green(this.localSchema.name)}`);
         return;
       }
-      this.cloudSchema = await dataServiceRepository.createSchema(this.sdk, this.localSchema.name, this.localSchema.description);
+      this.cloudSchema = await schemaRepository.createSchema(this.sdk, this.localSchema.name, this.localSchema.description);
     }
 
     //  root attributes: update
@@ -81,7 +81,7 @@ export class SyncSchema {
     }
 
     if (Object.keys(diff).length > 0) {
-      await dataServiceRepository.updateSchema(this.sdk, this.cloudSchema.id, diff);
+      await schemaRepository.updateSchema(this.sdk, this.cloudSchema.id, diff);
     }
   }
 
@@ -106,7 +106,7 @@ export class SyncSchema {
     //  add missing
     for (const key of toAdd) {
       console.log(`properties: adding ${key}`);
-      await dataServiceRepository.createProperty(this.sdk, this.cloudSchema.id, {
+      await schemaRepository.createProperty(this.sdk, this.cloudSchema.id, {
         name: key,
         configuration: this.localSchema.properties[key],
       });
@@ -115,7 +115,7 @@ export class SyncSchema {
     //  update existing where needed
     for (const key of toUpdate) {
       console.log(`properties: updating ${key}`);
-      await dataServiceRepository.updateProperty(
+      await schemaRepository.updateProperty(
         this.sdk,
         this.cloudSchema.id,
         key,
@@ -126,7 +126,7 @@ export class SyncSchema {
     //  delete excess
     for (const key of toRemove) {
       console.log(`properties: removing ${key}`);
-      await dataServiceRepository.deleteProperty(this.sdk, this.cloudSchema.id, key);
+      await schemaRepository.deleteProperty(this.sdk, this.cloudSchema.id, key);
     }
   }
 
@@ -152,13 +152,13 @@ export class SyncSchema {
 
     for (const key of toAdd) {
       console.log(`statuses: adding ${key}`);
-      await dataServiceRepository.createStatus(this.sdk, this.cloudSchema.id, key, this.localSchema.statuses[key]);
+      await schemaRepository.createStatus(this.sdk, this.cloudSchema.id, key, this.localSchema.statuses[key]);
     }
 
     for (const key of toUpdate) {
       console.log(`statuses: updating ${key}`);
       const data = calculateStatusUpdateData(this.localSchema.statuses[key], this.cloudSchema.statuses[key]);
-      await dataServiceRepository.updateStatus(this.sdk, this.cloudSchema.id, key, data);
+      await schemaRepository.updateStatus(this.sdk, this.cloudSchema.id, key, data);
     }
 
     // don't delete yet, first some other data needs to be adjusted
@@ -197,7 +197,7 @@ export class SyncSchema {
       }
 
       console.log('creation transition: updating');
-      await dataServiceRepository.updateCreationTransition(this.sdk, this.cloudSchema.id, this.localSchema.creationTransition);
+      await schemaRepository.updateCreationTransition(this.sdk, this.cloudSchema.id, this.localSchema.creationTransition);
     }
   }
 
@@ -220,18 +220,18 @@ export class SyncSchema {
     const { toAdd, toRemove, toUpdate } = transitionsDiff;
     for (const transition of toAdd) {
       console.log(`transitions: adding ${transition.name}`);
-      await dataServiceRepository.createTransition(this.sdk, this.cloudSchema.id, transition);
+      await schemaRepository.createTransition(this.sdk, this.cloudSchema.id, transition);
     }
 
     for (const transition of toUpdate) {
       console.log(`transitions: updating ${transition.name}`);
       const currentTransition = findTransitionByName(transition.name, this.cloudSchema.transitions);
-      await dataServiceRepository.updateTransition(this.sdk, this.cloudSchema.id, currentTransition.id, transition);
+      await schemaRepository.updateTransition(this.sdk, this.cloudSchema.id, currentTransition.id, transition);
     }
 
     for (const transition of toRemove) {
       console.log(`transitions: removing ${transition.name}`);
-      await dataServiceRepository.deleteTransition(this.sdk, this.cloudSchema.id, transition.id);
+      await schemaRepository.deleteTransition(this.sdk, this.cloudSchema.id, transition.id);
     }
   }
 
@@ -257,7 +257,7 @@ export class SyncSchema {
     //  delete excess statuses
     for (const key of excessStatuses) {
       console.log(`statuses: removing ${key}`);
-      await dataServiceRepository.deleteStatus(this.sdk, this.cloudSchema.id, key);
+      await schemaRepository.deleteStatus(this.sdk, this.cloudSchema.id, key);
     }
   }
 
@@ -272,13 +272,13 @@ export class SyncSchema {
     /*  Delete indexes to be deleted */
     for (const idx of removedIndexes) {
       console.log(`Indexes: remove index ${idx.id}`);
-      await dataServiceRepository.deleteIndex(this.sdk, this.cloudSchema.id, idx.id);
+      await schemaRepository.deleteIndex(this.sdk, this.cloudSchema.id, idx.id);
     }
 
     /* Create new indexes */
     for (const idx of newIndexes) {
       console.log('\t-> Creating new index');
-      await dataServiceRepository.createIndex(this.sdk, this.cloudSchema.id, idx);
+      await schemaRepository.createIndex(this.sdk, this.cloudSchema.id, idx);
     }
   }
 }
