@@ -1,3 +1,5 @@
+import { Schema } from '@extrahorizon/javascript-sdk';
+
 export const validSchema: any = {
   name: 'blood-pressure-measurement',
   description: 'Blood pressure measurement',
@@ -111,6 +113,7 @@ export const validSchema: any = {
       ],
     },
   ],
+  indexes: [],
   properties: {
     systolic: {
       type: 'number',
@@ -152,3 +155,27 @@ export const validSchema: any = {
     },
   },
 };
+
+export const createEmptySchema = (name: string, description: string): Schema => ({
+  name,
+  description,
+  id: '65b2291d9bfa72b8fdc6a7b2',
+  createMode: 'default',
+  readMode: 'default',
+  updateMode: 'default',
+  deleteMode: 'permissionRequired',
+  groupSyncMode: 'disabled',
+  statuses: {
+    // @ts-expect-error status values are typed as never for some reason
+    start: {},
+  },
+  creationTransition: {
+    toStatus: 'start',
+    type: 'manual',
+  },
+  transitions: [],
+  properties: {},
+  indexes: [],
+  updateTimestamp: new Date(),
+  creationTimestamp: new Date(),
+});
