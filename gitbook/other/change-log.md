@@ -1,4 +1,7 @@
-# Extrahorizon CLI changelog
+# Extra Horizon CLI changelog
+
+### v1.4.1
+* Updated the supported runtimes for task functions
 
 ### v1.4.0
 * Added a validation check for `id` properties in objects within arrays in data schemas, this will now be reported as an error if present.
