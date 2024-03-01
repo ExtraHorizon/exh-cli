@@ -1,5 +1,5 @@
 import * as chalk from 'chalk';
-import * as functionRepository from '../../../src/repositories/functions';
+import * as functionRepository from '../../repositories/functions';
 import { epilogue } from '../../helpers/util';
 
 export const command = 'delete';
