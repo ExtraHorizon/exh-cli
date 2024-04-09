@@ -1,3 +1,4 @@
+import * as path from 'path';
 import * as chalk from 'chalk';
 import { handler } from '../../../src/commands/tasks/sync';
 import { runtimeChoices } from '../../../src/constants';
@@ -63,7 +64,7 @@ describe('exh tasks sync', () => {
       .catch(e => e);
 
     // Proves that it proceeds passes the runtime validation
-    const codePath = 'tests/__helpers__/task-configs/invalid-runtimes/build';
+    const codePath = path.join(root, 'build');
     expect(error.message).toBe(`Please provide a valid directory path for your code, ${codePath} not found`);
   });
 

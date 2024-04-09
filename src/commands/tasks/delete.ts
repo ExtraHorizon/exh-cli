@@ -1,6 +1,6 @@
 import * as chalk from 'chalk';
-import * as functionRepository from '../../repositories/functions';
 import { epilogue } from '../../helpers/util';
+import * as functionRepository from '../../repositories/functions';
 
 export const command = 'delete';
 export const desc = 'Delete a task';
