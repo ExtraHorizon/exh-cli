@@ -65,8 +65,8 @@ but this can be very tedious to use. Instead you can create a `task-config.json`
   "name": "my-task",
   "description": "My sample task",
   "path": "build",
-  "entryPoint": "build/index",
-  "runtime": "nodejs14.x",
+  "entryPoint": "build/index.handler",
+  "runtime": "nodejs18.x",
   "timeLimit": 60,
   "memoryLimit": 128,
   "environment": {
