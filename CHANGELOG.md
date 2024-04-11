@@ -1,6 +1,6 @@
 # Extra Horizon CLI changelog
 
-### v1.4.1
+### v1.5.0
 * Updated the supported runtimes for task functions
 
 ### v1.4.0
