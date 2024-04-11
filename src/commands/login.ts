@@ -1,7 +1,7 @@
 import * as fs from 'fs/promises';
-import { OAuth1Client } from '@extrahorizon/javascript-sdk';
 import * as chalk from 'chalk';
 import { EXH_CONFIG_FILE_DIR, EXH_CONFIG_FILE } from '../constants';
+import { sdkInitOnly } from '../exh';
 import { epilogue } from '../helpers/util';
 
 export const command = 'login';
@@ -34,9 +34,10 @@ export const builder = (yargs: any) => epilogue(yargs).options({
   },
 });
 
-export const handler = async ({ sdk, host, email, password, consumerKey, consumerSecret }:
-  {sdk: OAuth1Client; host:string; email: string; password: string; consumerKey: string; consumerSecret: string;}) => {
+export const handler = async ({ host, email, password, consumerKey, consumerSecret }:
+  { host:string; email: string; password: string; consumerKey: string; consumerSecret: string;}) => {
   // authenticate
+  const sdk = sdkInitOnly(host, consumerKey, consumerSecret);
   const response = await sdk.auth.authenticate({
     email,
     password,
