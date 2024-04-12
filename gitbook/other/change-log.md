@@ -1,7 +1,10 @@
 # Extra Horizon CLI changelog
 
-### v1.4.1
+### v1.5.0
 * Updated the supported runtimes for task functions
+* `exh data schemas verify` and `exh tasks create-repo` no longer require you to be authenticated
+* `@extra-horizon/javascript-sdk` has been updated to `8.2.0`
+* Unused dependencies have been removed
 
 ### v1.4.0
 * Added a validation check for `id` properties in objects within arrays in data schemas, this will now be reported as an error if present.
