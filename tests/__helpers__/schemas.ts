@@ -166,7 +166,6 @@ export const createEmptySchema = (name: string, description: string): Schema => 
   deleteMode: 'permissionRequired',
   groupSyncMode: 'disabled',
   statuses: {
-    // @ts-expect-error status values are typed as never for some reason
     start: {},
   },
   creationTransition: {
