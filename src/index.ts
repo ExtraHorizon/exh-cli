@@ -1,9 +1,10 @@
 #! /usr/bin/env node
 
 import * as tty from 'tty';
+import { isEqual } from 'lodash';
 import * as yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
-import { sdkAuth, sdkInitOnly } from './exh';
+import { sdkAuth } from './exh';
 
 function checkVersion() {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -19,27 +20,24 @@ function checkVersion() {
 checkVersion();
 
 /* eslint-disable @typescript-eslint/no-floating-promises */
-yargs(hideBin(process.argv)).middleware(async argv => {
-  /* Check if output is tty or not */
-  let isTTY = true;
-  if (!tty.isatty(process.stdout.fd)) {
-    isTTY = false;
-  }
+yargs(hideBin(process.argv))
+  .middleware(async argv => {
+    /* Check if output is tty or not */
+    const isTTY = tty.isatty(process.stdout.fd);
 
-  if (argv.host && argv.consumerKey && argv.consumerSecret) {
-    const sdk = await sdkInitOnly(argv.host as string, argv.consumerKey as string, argv.consumerSecret as string);
-    /* Login command, don't authenticate with sdk */
-    return { sdk, isTTY } as any;
-  }
+    if (
+      isEqual(argv._, ['login']) ||
+      isEqual(argv._, ['data', 'schemas', 'verify']) ||
+      isEqual(argv._, ['tasks', 'create-repo']) ||
+      process.env.NO_SDK
+    ) {
+      return { sdk: 'no-sdk', isTTY } as any;
+    }
 
-  /* Inject sdk authentication into every command */
-  if (process.env.NO_SDK) {
-    return { sdk: 'no-sdk', isTTY } as any;
-  }
-
-  const sdk = await sdkAuth();
-  return { sdk, isTTY };
-}).commandDir('commands')
+    const sdk = await sdkAuth();
+    return { sdk, isTTY };
+  })
+  .commandDir('commands')
   .scriptName('exh')
   .strict()
   .demandCommand(1)

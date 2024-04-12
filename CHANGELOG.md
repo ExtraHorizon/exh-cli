@@ -2,6 +2,7 @@
 
 ### v1.4.1
 * Updated the supported runtimes for task functions
+* `exh data schemas verify` and `exh tasks create-repo` no longer require you to be authenticated
 
 ### v1.4.0
 * Added a validation check for `id` properties in objects within arrays in data schemas, this will now be reported as an error if present.
