@@ -1,13 +1,13 @@
 import * as fs from 'fs/promises';
 import { red } from 'chalk';
-import { handler } from '../../src/commands/dispatchers/sync';
-import * as dispatcherRepository from '../../src/repositories/dispatchers';
-import { cliManagedTag } from '../../src/services/dispatchers';
-import { generateMailAction, generateTaskAction } from '../__helpers__/actions';
-import { dispatcherRepositoryMock } from '../__helpers__/dispatcherRepositoryMock';
-import { generateDispatcher, generateMinimalDispatcher } from '../__helpers__/dispatchers';
+import { handler } from '../../../src/commands/dispatchers/sync';
+import * as dispatcherRepository from '../../../src/repositories/dispatchers';
+import { cliManagedTag } from '../../../src/services/dispatchers';
+import { generateMailAction, generateTaskAction } from '../../__helpers__/actions';
+import { dispatcherRepositoryMock } from '../../__helpers__/dispatcherRepositoryMock';
+import { generateDispatcher, generateMinimalDispatcher } from '../../__helpers__/dispatchers';
 
-describe('Dispatchers - Sync', () => {
+describe('exh dispatchers sync', () => {
   let repositoryMock;
   beforeAll(() => {
     repositoryMock = dispatcherRepositoryMock();

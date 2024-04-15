@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import { createOAuth1Client } from '@extrahorizon/javascript-sdk';
+import { createOAuth1Client, OAuth1Client } from '@extrahorizon/javascript-sdk';
 import { EXH_CONFIG_FILE } from './constants';
 
 interface ExHCredentials {
@@ -10,9 +10,9 @@ interface ExHCredentials {
   API_OAUTH_TOKEN_SECRET?: string;
 }
 
-let sdk = null;
+let sdk: OAuth1Client = null;
 
-export async function sdkInitOnly(apiHost: string, consumerKey: string, consumerSecret: string) {
+export function sdkInitOnly(apiHost: string, consumerKey: string, consumerSecret: string) {
   sdk = createOAuth1Client({
     consumerKey,
     consumerSecret,
