@@ -15,3 +15,4 @@
 ## other
 
 * [Change Log](other/change-log.md)
+* [GitHub](https://github.com/ExtraHorizon/exh-cli/)
