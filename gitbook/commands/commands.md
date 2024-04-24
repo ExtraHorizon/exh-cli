@@ -8,44 +8,57 @@ This section assumes some basic familiarity with the data service and the concep
 
 When creating a data schema, you'll typically make a JSON file containing a specification of how your data should look like and how it should behave in transitions. This JSON file can then be easily managed through version control. The exh-cli will help you to verify and synchronise the schema with the ExtraHorizon cloud. An example schema JSON file looks as follows:
 
-```
+```json
 {
   "name": "MyFirstSchema",
   "description": "Example of a schema",
-  "createMode": "permissionRequired",
-  "readMode": "allUsers",
+  "createMode": "default",
+  "readMode": "default",
   "updateMode": "default",
   "deleteMode": "permissionRequired",
   "statuses": {
     "created": {},
     "active": {},
-    "done": {},
+    "done": {}
   },
   "creationTransition": {
     "type": "manual",
     "toStatus": "created",
     "conditions": [
       {
-         ...
+        "type": "input",
+        "configuration": {
+          "type": "object",
+          "properties": {
+            "firstProperty": {
+              "type": "string"
+            }
+          },
+          "required": ["firstProperty"]
+        }
+      }
+    ],
+    "actions": [
+      {
+        "type": "linkCreator"
       }
     ]
   },
   "transitions": [
     {
       "name": "activate",
-      "type": "automatic",
+      "type": "manual",
       "fromStatuses": [
         "created"
       ],
       "toStatus": "active"
-    },
-    ...
+    }
   ],
   "properties": {
-    "firstproperty": {
-      "type": "string",
+    "firstProperty": {
+      "type": "string"
     },
-    "secondproperty": {
+    "secondProperty": {
       "type": "number"
     }
   }
@@ -82,13 +95,13 @@ exh data schemas verify --dir=<directory-path>
 
 This argument is used to specify the path to the JSON file that contains the schema to be verified.
 
-`--dir`&#x20;
+`--dir`
 
 This argument is used to specify the directory that contains all the schema files to be verified.
 
 ### Schema sync
 
-When you've created your schemas & verified that they are correct, you can upload them to the ExtraHorizon cloud & start working with them! This upload can be done using the `sync` command.&#x20;
+When you've created your schemas & verified that they are correct, you can upload them to the ExtraHorizon cloud & start working with them! This upload can be done using the `sync` command.
 
 ```
 exh data schemas sync --dir=<pathToSchemaDir> 
@@ -96,7 +109,7 @@ exh data schemas sync --dir=<pathToSchemaDir>
 
 This will upload the entire directory at once. The cli will:
 
-* Check whether the schema already exists and create a new one if it doesn't&#x20;
+* Check whether the schema already exists and create a new one if it doesn't
 * Look for differences between the schema in the cloud and your local schema and make sure that these differences are synchronized.
 
 Therefore, if you make any subsequent changes to the schemas, you can just run the sync again and the cli will make sure that the changes are properly synced.
@@ -107,7 +120,7 @@ Therefore, if you make any subsequent changes to the schemas, you can just run t
 
 This argument is used to specify the path to the JSON file that contains the schema to be synchronized.
 
-`--dir`&#x20;
+`--dir`
 
 This argument is used to specify the directory that contains all the schema files to be synchronized.
 
