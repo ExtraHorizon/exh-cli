@@ -7,7 +7,6 @@ on:
     branches:
       - master
       - dev
-      - feature/*
 
 jobs:
   build-and-publish:
@@ -30,7 +29,7 @@ jobs:
       - run: yarn build
       - run: yarn test
       
-      - name: Determine version number and tag
+      - name: Determine version number and branch tag
         run: |
           package_version=$(node -p "require('./package.json').version")
 
@@ -53,7 +52,7 @@ jobs:
           echo "VERSION_TAG=$version_tag" >> $GITHUB_ENV
           echo "BRANCH_TAG=$branch_tag" >> $GITHUB_ENV
 
-      - name: Create a git tag
+      - name: Publish a git tag
         run: |
           git config --global user.email "$GITHUB_ACTOR@users.noreply.github.com" && git config --global user.name "$GITHUB_ACTOR"
           
@@ -62,7 +61,7 @@ jobs:
           git push origin $VERSION_TAG
 
 
-      - name: Publish to GitHub Packages Registry
+      - name: Publish to the GitHub Packages registry
         run: yarn publish --new-version $VERSION_TAG --tag=$BRANCH_TAG
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
@@ -73,7 +72,7 @@ jobs:
           registry-url: https://registry.npmjs.org/
           scope: '@extrahorizon'
 
-      - name: Publish to NPM Registry
+      - name: Publish to the NPM Registry
         run: yarn publish --new-version $VERSION_TAG --tag=$BRANCH_TAG
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_EXH_PUBLISH_TOKEN}}
