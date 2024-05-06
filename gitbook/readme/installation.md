@@ -4,28 +4,12 @@
 
 #### Install CLI
 
-Next, install exh-cli in your project as a developer dependency.
+We recommend installing the CLI globally. Installing the CLI globally makes sure it can be used in all your projects. For that reason all examples in this documentation will assume a global installation.
 
 {% tabs %}
 {% tab title="npm" %}
 ```
-npm install -D @extrahorizon/exh-cli
-```
-{% endtab %}
-
-{% tab title="yarn" %}
-```
-yarn add -D @extrahorizon/exh-cli
-```
-{% endtab %}
-{% endtabs %}
-
-In you want to use exh-cli in all your projects, you can also install it globally using
-
-{% tabs %}
-{% tab title="npm" %}
-```
-npm install -g @extrahorizon/exh-cli
+npm install --global @extrahorizon/exh-cli
 ```
 {% endtab %}
 
@@ -36,9 +20,25 @@ yarn global add @extrahorizon/exh-cli
 {% endtab %}
 {% endtabs %}
 
+For more advanced uses, the CLI can be installed in your project as a developer dependency.
+
+{% tabs %}
+{% tab title="npm" %}
+```
+npm install --save-dev @extrahorizon/exh-cli
+```
+{% endtab %}
+
+{% tab title="yarn" %}
+```
+yarn add --dev @extrahorizon/exh-cli
+```
+{% endtab %}
+{% endtabs %}
+
 #### Check if the installation worked
 
-When installed globally, trying running the following command in your Terminal to verify wether it's installed correctly.
+When installed globally, trying running the following command in your Terminal to verify whether it's installed correctly.
 
 ```
 exh --help 
@@ -69,6 +69,22 @@ If the command isn't recognized, it might be because the yarn global bin folder 
 {% endhint %}
 
 In case your are using bash, you can add `export PATH="$PATH:$(yarn global bin)"` to your `~/.bash_profile` and reload it with `source ~/.bash_profile`
+
+If when installed as a developer dependency, run the following command to verify the CLI is working correctly:
+
+{% tabs %}
+{% tab title="npx" %}
+```
+npx exh --help
+```
+{% endtab %}
+
+{% tab title="yarn" %}
+```
+yarn exh --help
+```
+{% endtab %}
+{% endtabs %}
 
 #### Completion
 
