@@ -20,7 +20,7 @@ yarn global add @extrahorizon/exh-cli
 {% endtab %}
 {% endtabs %}
 
-For more advanced uses, the CLI can be installed in your project as a developer dependency.
+For more advanced uses, the CLI can be installed in your project as a development dependency.
 
 {% tabs %}
 {% tab title="npm" %}
@@ -70,7 +70,7 @@ If the command isn't recognized, it might be because the yarn global bin folder 
 
 In case your are using bash, you can add `export PATH="$PATH:$(yarn global bin)"` to your `~/.bash_profile` and reload it with `source ~/.bash_profile`
 
-If when installed as a developer dependency, run the following command to verify the CLI is working correctly:
+When installed as a development dependency, run the following command to verify the CLI is working correctly:
 
 {% tabs %}
 {% tab title="npx" %}
