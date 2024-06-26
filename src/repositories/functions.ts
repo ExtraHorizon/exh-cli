@@ -1,4 +1,4 @@
-import { OAuth1Client } from '@extrahorizon/javascript-sdk';
+import { HttpRequestConfig, OAuth1Client } from '@extrahorizon/javascript-sdk';
 import { permissionModes } from '../commands/tasks/taskConfig';
 
 export interface FunctionCreation {
@@ -30,12 +30,28 @@ export async function findByName(sdk: OAuth1Client, name: string) {
 }
 
 export async function create(sdk: OAuth1Client, data: FunctionCreation) {
-  const response = await sdk.raw.post('/tasks/v1/functions', data, { maxBodyLength: Infinity, maxContentLength: Infinity });
+  const config: HttpRequestConfig = {
+    headers: {},
+    // Since we don't have resumeable uploads yet, re-directs will trigger a connection timeout error
+    maxRedirects: 0,
+    maxContentLength: Infinity,
+    maxBodyLength: Infinity,
+  };
+
+  const response = await sdk.raw.post('/tasks/v1/functions', data, config);
   return response.data;
 }
 
 export async function update(sdk: OAuth1Client, data: FunctionCreation) {
-  const response = await sdk.raw.put(`/tasks/v1/functions/${data.name}`, data, { maxBodyLength: Infinity, maxContentLength: Infinity });
+  const config: HttpRequestConfig = {
+    headers: {},
+    // Since we don't have resumeable uploads yet, re-directs will trigger a connection timeout error
+    maxRedirects: 0,
+    maxContentLength: Infinity,
+    maxBodyLength: Infinity,
+  };
+
+  const response = await sdk.raw.put(`/tasks/v1/functions/${data.name}`, data, config);
   return response.data;
 }
 
