@@ -30,12 +30,12 @@ export async function findByName(sdk: OAuth1Client, name: string) {
 }
 
 export async function create(sdk: OAuth1Client, data: FunctionCreation) {
-  const response = await sdk.raw.post('/tasks/v1/functions', data);
+  const response = await sdk.raw.post('/tasks/v1/functions', data, { maxBodyLength: Infinity, maxContentLength: Infinity });
   return response.data;
 }
 
 export async function update(sdk: OAuth1Client, data: FunctionCreation) {
-  const response = await sdk.raw.put(`/tasks/v1/functions/${data.name}`, data);
+  const response = await sdk.raw.put(`/tasks/v1/functions/${data.name}`, data, { maxBodyLength: Infinity, maxContentLength: Infinity });
   return response.data;
 }
 
