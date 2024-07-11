@@ -1,4 +1,5 @@
 import { exec } from 'child_process';
+import { readFileSync } from 'fs';
 import * as chalk from 'chalk';
 import * as yargs from 'yargs';
 import { CommandError } from './error';
@@ -31,4 +32,10 @@ export async function asyncExec(cmd: string):Promise<string> {
       res(stdout);
     });
   });
+}
+
+export function readJsonFileSync<T>(path: string): T {
+  const fileContent = readFileSync(path, { encoding: 'utf-8' });
+
+  return JSON.parse(fileContent) as T;
 }
