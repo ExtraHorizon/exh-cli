@@ -109,7 +109,7 @@ The team
 Run the CLI to create the template:
 
 ```bash
-exh templetes sync --template password_reset_email
+exh templates sync --template password_reset_email
 ```
 
 From those files, the CLI will build the following resulting template:
