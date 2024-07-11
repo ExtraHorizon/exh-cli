@@ -105,15 +105,27 @@ Kind regards,
 The team
 ```
 
+Run the CLI to create the template:
+
+```bash
+exh templetes sync --template password_reset_email
+```
+
 From those files, the CLI will build the following resulting template:
 
 ```
 {
-  "name": "password_changed_message",
+  "name": "password_reset_email",
   "schema": {
     "type": "object",
     "fields": {
-      "first_name": {
+      "firstname": {
+        "type": "string"
+      },
+      "reset_hash": {
+        "type": "string"
+      },
+      "tracking_hash": {
         "type": "string"
       }
     }
