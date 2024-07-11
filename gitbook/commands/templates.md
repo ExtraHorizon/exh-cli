@@ -70,6 +70,7 @@ Example:
 
 ```
 {
+  "description": "Email send to the user in the password reset flow",
   "schema": {
     "type": "object",
     "fields": {
@@ -116,6 +117,7 @@ From those files, the CLI will build the following resulting template:
 ```
 {
   "name": "password_reset_email",
+  "description": "Email send to the user in the password reset flow",
   "schema": {
     "type": "object",
     "fields": {
@@ -155,6 +157,7 @@ A simplified template to extend from: (containing a `first_name` and `message` r
 
 ```
 {
+  "description": "Basic message template with a greeting",
   "schema": {
     "type": "object",
     "fields": {
@@ -179,6 +182,7 @@ A template extending the above template: (passing along its own input `name` to 
 ```
 {
   "extends_template": "basic_template",
+  "description": "Message meant to be used after registration",
   "schema": {
     "type": "object",
     "fields": {
@@ -199,6 +203,7 @@ Will result in the following template:
 ```
 {
   "name": "registration_message",
+  "description": "Message meant to be used after registration",
   "schema": {
     "type": "object",
     "fields": {
