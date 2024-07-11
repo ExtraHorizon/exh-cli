@@ -1,6 +1,6 @@
 # Templates
 
-In the Extra Horizon cloud, you can create mail templates which the mail service can use to send well-formed emails. You can manage these templates with the Extra Horizon client as well.&#x20;
+In the Extra Horizon cloud, you can create mail templates which the mail service can use to send well-formed emails. You can manage these templates with the Extra Horizon client as well.
 
 ## Listing templates
 
@@ -36,9 +36,9 @@ This argument is used to specify the name of the template to retrieve
 
 This argument is used to specify the id of the template to retrieve
 
-## Synchronizing template
+## Synchronizing templates
 
-If you want to create a new template, you need to create a json file which defines how it should look like. See [Extra Horizon documentation](https://docs.extrahorizon.com/template-service/features/templates) to get more information on creating templates.
+If you want to create a new template, you need to create a json file which defines how it should look like.
 
 Building on that functionality, the CLI offers additional functionality to more easily manage templates and allowing templates to build upon other templates. Once you've built these templates, you can use `exh templates sync [options]` to synchronise these templates to the cloud.
 
@@ -48,13 +48,13 @@ Building on that functionality, the CLI offers additional functionality to more 
 
 This argument is used to specify the path to the JSON file or the directory that contains the single template to be synced.
 
-`--path`&#x20;
+`--path`
 
 This argument is used to specify the directory that contains all the template files to be synced.
 
 ### Creating templates <a href="#markdown-header-template-folder-vs-template-file" id="markdown-header-template-folder-vs-template-file"></a>
 
-Templates can be a single json file but in the case where you have multiple pieces of content you can also split the template up into multiple file and put those files in a folder. For example if you have an html file which you want to include in the template: it's easier to maintain if you put the html file separate instead of inlining it into a json file.&#x20;
+Templates can be a single json file but in the case where you have multiple pieces of content you can also split the template up into multiple file and put those files in a folder. For example if you have an html file which you want to include in the template: it's easier to maintain if you put the html file separate instead of inlining it into a json file.
 
 #### Single json file
 
@@ -62,36 +62,44 @@ This is the easiest case. Everything is contained in the json file. The CLI will
 
 #### Folder
 
-If you prefer to split things up, you can put everything into a single folder. The name of the folder will be the name of the resulting template. A folder should contain a  `template.json`. **Any other file** in the folder will be read as text and is added to the `fields` property of the `template.json` file.
+If you prefer to split things up, you can put everything into a single folder. The name of the folder will be the name of the resulting template. A folder should contain a `template.json`. **Any other file** in the folder will be read as text and is added to the `fields` property of the `template.json` file.
 
 Example:
 
-`password_changed_message/template.json`
+`password_reset_email/template.json`
 
 ```
 {
   "schema": {
     "type": "object",
     "fields": {
-      "first_name": {
+      "firstname": {
+        "type": "string"
+      },
+      "reset_hash": {
+        "type": "string"
+      },
+      "tracking_hash": {
         "type": "string"
       }
     }
   },
   "fields": {
-    "subject": "Your password changed"
+    "subject": "Your password reset"
   }
 }
 ```
 
-`password_changed_message/body.txt`
+`password_reset_email/body.txt`
 
 ```
 Dear $content.first_name,
 
-We are sending this message to inform you that your password was changed. If you initiated this yourself you can safely ignore this message.
+We are sending this message because you initiated a password reset. You can use the following link to complete your password reset:
 
-Was it not you who changed your password? Contact us as soon as possible!
+https://my-web-plaform-url/reset_password?hash=$content.reset_hash
+
+Was it not you who initiated resetting your password? Contact us as soon as possible!
 
 Kind regards,
 The team
@@ -111,8 +119,8 @@ From those files, the CLI will build the following resulting template:
     }
   },
   "fields": {
-    "subject": "Your password changed",
-    "body": "Dear $content.first_name,\n\nWe are sending this message to inform you that your password was changed. If you initiated this yourself you can safely ignore this message.\n\nWas it not you who changed your password? Contact us as soon as possible!\n\nKind regards,\nThe team"
+    "subject": "Your password reset",
+    "body": "<The content of `password_reset_email/body.txt`>"
   }
 }
 ```
@@ -121,7 +129,7 @@ From those files, the CLI will build the following resulting template:
 
 Once you've made a number of templates, you'll notice that there are a lot of common things between the different templates and you end up repeating the same thing. This makes management more cumbersome because a single change to those common things will affect multiple files and it's easy to make mistakes. Therefore the CLI supports extending of templates, which means that we can start to build hierarchies of templates.
 
-Templates like, for example, `base_mail` and `base_button_mail` could be extended by other templates.&#x20;
+Templates like, for example, `base_mail` and `base_button_mail` could be extended by other templates.
 
 You can extend from a template by adding an `extends_template`-property to your template.
 
