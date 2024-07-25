@@ -1,5 +1,8 @@
 # Extra Horizon CLI changelog
 
+### [Unreleased]
+* Added the `exh whoami` command, showing the currently logged in user
+
 ### v1.5.1
 * Now also publishing to the NPM registry, no longer needing to authenticate with GitHub Packages to install the CLI
 
