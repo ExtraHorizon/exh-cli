@@ -13,6 +13,7 @@ export const availableLanguagesCodes = [
 
 export const assertValidLanguageCode = (languageCode: string) => {
   if (!availableLanguagesCodes.includes(languageCode)) {
+    // TODO: Do we want to warn rather than throw? We don't to be out of sync with the service.
     throw new Error(`The language code ${languageCode} is not available! The available language codes are [${availableLanguagesCodes.join(', ')}]`);
   }
 };
