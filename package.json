@@ -11,7 +11,7 @@
     "url": "https://github.com/ExtraHorizon/exh-cli.git"
   },
   "scripts": {
-    "start": "yarn test",
+    "start": "yarn build && node ./build/index.js",
     "clean": "rimraf build",
     "build": "yarn clean && tsc",
     "test": "jest",
