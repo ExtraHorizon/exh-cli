@@ -1,6 +1,6 @@
 # Extra Horizon CLI
 
-This is the command-line interface to the Extra Horizon platform. It allows you to manage schemas & tasks for now, but
+This is the command-line interface to the Extra Horizon platform. It allows you to manage just some parts of your Extra Horizon configuration for now, but
 will be extended with additional functionality.
 
 See [changelog](CHANGELOG.md) for the latest changes.
