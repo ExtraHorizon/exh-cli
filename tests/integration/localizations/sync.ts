@@ -113,7 +113,7 @@ describe('exh localizations sync', () => {
     const promise = handler({ sdk: undefined, path: tempDirectoryManager.getPath() });
 
     await expect(promise).rejects.toThrow(
-      expect.objectContaining({ message: expect.stringContaining('Was not able to parse \'ru.json\' is not a valid JSON file') })
+      expect.objectContaining({ message: expect.stringContaining('Was not able to parse \'ru.json\', not a valid JSON file') })
     );
   });
 

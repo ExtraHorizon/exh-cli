@@ -23,6 +23,8 @@ export async function createTempDirectoryManager() {
 
       const filePath = join(dir, name);
       await writeFile(filePath, content);
+
+      return filePath;
     },
     async removeDirectory() {
       await rmdir(dir, { recursive: true });

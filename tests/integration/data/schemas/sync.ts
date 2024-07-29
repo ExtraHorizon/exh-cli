@@ -4,7 +4,7 @@ import { validSchema } from '../../../__helpers__/schemas';
 import { createTempDirectoryManager } from '../../../__helpers__/tempDirectoryManager';
 
 describe('exh data schemas sync', () => {
-  let tempDirectoryManager;
+  let tempDirectoryManager: Awaited<ReturnType<typeof createTempDirectoryManager>>;
   let repositoryMock: ReturnType<typeof schemaRepositoryMock>;
 
   beforeEach(async () => {

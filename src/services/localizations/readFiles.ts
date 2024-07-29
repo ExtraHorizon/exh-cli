@@ -27,7 +27,7 @@ export function readFiles(path: string) {
     const languageCode = parsedFileName.name.toUpperCase();
     assertValidLanguageCode(languageCode);
 
-    const localizationJson = readJsonFileSync(osPath.join(path, fileName));
+    const localizationJson = readLocalizationFileSync(path, fileName);
     assertValidFileContent(fileName, localizationJson);
 
     for (const [key, text] of Object.entries(localizationJson)) {
@@ -42,12 +42,12 @@ export function readFiles(path: string) {
   return Object.values(localizationMap);
 }
 
-function readJsonFileSync(path: string) {
-  const fileContent = readFileSync(path, { encoding: 'utf-8' });
+function readLocalizationFileSync(path: string, fileName: string) {
+  const fileContent = readFileSync(osPath.join(path, fileName), { encoding: 'utf-8' });
 
   try {
     return JSON.parse(fileContent);
   } catch (error) {
-    throw Error('TODO ...................');
+    throw Error(`Was not able to parse '${fileName}', not a valid JSON file`);
   }
 }
