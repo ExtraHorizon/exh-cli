@@ -1,6 +1,6 @@
 # Extra Horizon CLI changelog
 
-### [Unreleased]
+### v1.6.0
 * Removed the update notifier. The version of the package we used had security vulnerabilities and we're unable to migrate to the latest version right now. We'll look into this again in the future.
 * Added the `exh whoami` command, showing the currently logged in user
 
