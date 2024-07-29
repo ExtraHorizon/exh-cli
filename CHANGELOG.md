@@ -2,6 +2,7 @@
 
 ### [Unreleased]
 * Removed the update notifier. The version of the package we used had security vulnerabilities and we're unable to migrate to the latest version right now. We'll look into this again in the future.
+* Added the `exh whoami` command, showing the currently logged in user
 
 ### v1.5.1
 * Now also publishing to the NPM registry, no longer needing to authenticate with GitHub Packages to install the CLI
