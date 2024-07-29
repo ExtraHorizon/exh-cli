@@ -1,5 +1,8 @@
 # Extra Horizon CLI changelog
 
+### v1.5.1
+* Now also publishing to the NPM registry, no longer needing to authenticate with GitHub Packages to install the CLI
+
 ### v1.5.0
 * Updated the supported runtimes for task functions
 * `exh data schemas verify` and `exh tasks create-repo` no longer require you to be authenticated
