@@ -26,6 +26,16 @@ export async function createTempDirectoryManager() {
 
       return filePath;
     },
+    async createDirectory(name: string) {
+      if (!dir) {
+        throw new Error('Temp directory already removed');
+      }
+
+      const newDir = join(dir, name);
+      await mkdir(newDir);
+
+      return newDir;
+    },
     async removeDirectory() {
       await rmdir(dir, { recursive: true });
       dir = null;

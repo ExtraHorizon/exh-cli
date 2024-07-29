@@ -4,8 +4,6 @@ import { PartialLocalization } from '../../repositories/localizations';
 import { readFiles } from './readFiles';
 import { syncLocalizations } from './syncLocalizations';
 
-// TODO: integrate w/ global sync?
-
 export async function sync(sdk: OAuth1Client, path: string) {
   console.log(yellow(`Synchronizing localizations from ${path}`));
   const localizations = readFiles(path);
