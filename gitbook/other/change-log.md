@@ -1,5 +1,13 @@
 # Extra Horizon CLI changelog
 
+### v1.6.0
+* Fixed some security vulnerabilities in the dependencies (Thanks @tran-simon)
+* Removed the update notifier. The version of the package we used had security vulnerabilities and we're unable to migrate to the latest version right now. We'll look into this again in the future.
+* Added the `exh whoami` command, showing the currently logged in user
+* Added the `exh localizations sync` command, allowing you to sync localizations from a folder containing your translations (Thanks @Lroemon for the initial implementation)
+* Added localization syncing support to the `exh sync` command
+* The `exh sync` command now also supports absolute paths for the `--path` argument
+
 ### v1.5.1
 * Now also publishing to the NPM registry, no longer needing to authenticate with GitHub Packages to install the CLI
 
