@@ -11,8 +11,8 @@ export const availableLanguagesCodes = [
   'ZU',
 ];
 
-export const assertValidLanguageCode = (languageCode: string) => {
+export function assertValidLanguageCode(languageCode: string) {
   if (!availableLanguagesCodes.includes(languageCode)) {
-    throw new Error(`The language code ${languageCode} is not available! The available language codes are [${availableLanguagesCodes.join(', ')}]`);
+    throw new Error(`The language code ${languageCode} is not available! The available language codes are: ${availableLanguagesCodes.join(', ')}`);
   }
-};
+}
