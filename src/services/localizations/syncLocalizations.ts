@@ -1,4 +1,4 @@
-import { Localization, OAuth1Client } from '@extrahorizon/javascript-sdk';
+import { OAuth1Client } from '@extrahorizon/javascript-sdk';
 import * as chalk from 'chalk';
 import { chunk } from 'lodash';
 import * as localizationRepository from '../../repositories/localizations';
@@ -19,7 +19,8 @@ export const syncLocalizations = async (sdk: OAuth1Client, localizations: Partia
     console.log(`Created ${creationResult.created} localization(s).`);
 
     if (creationResult.existingIds && creationResult.existingIds.length > 0) {
-      const existingLocalizations = filterLocalizationsByKeys(localizationChunk, creationResult.existingIds);
+      const existingKeys = creationResult.existingIds;
+      const existingLocalizations = localizationChunk.filter(localization => existingKeys.includes(localization.key));
 
       const updateResult = await localizationRepository.update(sdk, existingLocalizations);
       console.log(`Updated ${updateResult.updated} localization(s).`);
@@ -28,7 +29,3 @@ export const syncLocalizations = async (sdk: OAuth1Client, localizations: Partia
 
   console.log(chalk.green('Successful!'));
 };
-
-function filterLocalizationsByKeys(localizations: Localization[], keys: string[]) {
-  return localizations.filter(localization => keys.includes(localization.key));
-}
