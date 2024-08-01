@@ -1,19 +1,21 @@
 {
   "name": "@extrahorizon/exh-cli",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "main": "build/index.js",
   "exports": "./build/index.js",
   "license": "MIT",
-  "author": "Qompium",
+  "author": "ExtraHorizon",
+  "homepage": "https://docs.extrahorizon.com/cli/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ExtraHorizon/exh-cli.git"
+  },
   "scripts": {
-    "start": "yarn test",
+    "start": "yarn build && node ./build/index.js",
     "clean": "rimraf build",
     "build": "yarn clean && tsc",
     "test": "jest",
     "lint": "eslint src tests --ext .ts"
-  },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com/"
   },
   "bin": {
     "exh": "./build/index.js"
@@ -38,13 +40,12 @@
     "typescript": "4.5.5"
   },
   "dependencies": {
-    "@extrahorizon/javascript-sdk": "^8.2.0",
+    "@extrahorizon/javascript-sdk": "^8.4.0",
     "ajv": "^8.11.0",
     "archiver": "^5.3.1",
     "chalk": "^4.0.0",
     "joi": "^17.6.0",
     "lodash": "^4.17.21",
-    "update-notifier": "^5.1.0",
     "uuid": "^8.3.2",
     "yargs": "^17.5.1"
   }

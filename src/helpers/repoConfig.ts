@@ -6,7 +6,7 @@ export const REPO_CONFIG_FILE = 'repo-config.json';
 
 async function getDefaultConfig(targetPath: string): Promise<any> {
   const config = {};
-  const sections = ['schemas', 'templates', 'tasks'];
+  const sections = ['schemas', 'templates', 'tasks', 'localizations'];
 
   for (const s of sections) {
     try {
@@ -46,7 +46,7 @@ async function validateRepoConfig(targetPath: string, config: any) {
   return newConfig;
 }
 
-export async function getRepoConfig(targetPath: string, validate: boolean): Promise<any> {
+export async function getRepoConfig(targetPath: string): Promise<any> {
   let cfg = await getDefaultConfig(targetPath);
 
   /* Read config file */
@@ -54,8 +54,5 @@ export async function getRepoConfig(targetPath: string, validate: boolean): Prom
     cfg = JSON.parse((await fs.readFile(ospath.join(targetPath, REPO_CONFIG_FILE))).toString());
   } catch (err) { /* */ }
 
-  if (validate) {
-    return await validateRepoConfig(targetPath, cfg);
-  }
-  return cfg;
+  return await validateRepoConfig(targetPath, cfg);
 }
