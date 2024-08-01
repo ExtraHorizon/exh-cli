@@ -10,6 +10,7 @@
 * [Data](commands/commands.md)
 * [Tasks](commands/tasks.md)
 * [Templates](commands/templates.md)
+* [Localizations](commands/localizations.md)
 * [Sync](commands/sync.md)
 
 ## other
