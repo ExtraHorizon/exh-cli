@@ -1,11 +1,11 @@
-import { rqlBuilder, getMockSdkOAuth1 } from '@extrahorizon/javascript-sdk';
+import { getMockSdkOAuth1 } from '@extrahorizon/javascript-sdk';
+
+export * from '@extrahorizon/javascript-sdk';
 
 export const sdkMock = getMockSdkOAuth1<jest.Mock>(jest.fn);
 
-function createClient() {
+export function createClient() {
   return sdkMock;
 }
 
-exports.createClient = createClient;
-exports.rqlBuilder = rqlBuilder;
-exports.createOAuth1Client = () => { return sdkMock; };
+export const createOAuth1Client = createClient;
