@@ -9,7 +9,7 @@ Account Credentials
 * Consumer Key and Consumer Secret: Unique identifiers provided to you during the account setup process.
 * Host: The url of your Extra Horizon cloud
 
-## Providing Credentials to the CLI
+## Providing credentials to the CLI
 
 There are three different methods to provide credentials to the exh-cli:
 
@@ -46,7 +46,7 @@ Instead of using a credentials file, it is also possible to pass your credential
 
 You can even have both the file and the environment variable! If there is a credentials file and you pass environment variables to the cli, the environment variables will override those in the credentials file. This is convenient when integrating the client in CI/CD or if you want to temporarily override a certain variable in the file.
 
-## Checking the currently configured credentials
+## Testing the credentials
 
 You can test if the credentials you configured are (still) correct by using the following command:
 
