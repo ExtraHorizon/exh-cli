@@ -50,14 +50,16 @@ this should give you the following response:
 exh <command>
 
 Commands:
-  exh completion             Install shell completion for bash & zsh
-  exh data <command>         Manage data
-  exh dispatchers <command>  Manage Dispatchers within Extra Horizon
-  exh login                  Retrieve credentials from ExH
-  exh sync                   Upload all schemas, templates & tasks to the cloud
-                             environment
-  exh tasks <command>        Manage tasks
-  exh templates <command>    Manage templates
+  exh completion               Install shell completion for bash & zsh
+  exh data <command>           Manage data
+  exh dispatchers <command>    Manage Dispatchers within Extra Horizon
+  exh localizations <command>  Manage localizations
+  exh login                    Retrieve credentials from ExH
+  exh sync                     Sync your ExH configuration to the cloud
+                               environment
+  exh tasks <command>          Manage tasks
+  exh templates <command>      Manage templates
+  exh whoami                   Shows the currently logged in user
 
 Options:
   --help     Show help                                                 [boolean]

@@ -6,9 +6,9 @@
 
 ## Commands
 
-* [Dispatchers](commands/dispatchers.md)
 * [Data](commands/commands.md)
 * [Tasks](commands/tasks.md)
+* [Dispatchers](commands/dispatchers.md)
 * [Templates](commands/templates.md)
 * [Localizations](commands/localizations.md)
 * [Sync](commands/sync.md)
