@@ -255,11 +255,13 @@ function getIdInObjectArrayErrors(properties: any, path = []) {
       }
 
       // Continue to check if the object in the items array has an array with an object with an id property
-      pathsWithIdInArray.push(...getIdInObjectArrayErrors(value.items.properties, [...path, `${name}.items.properties`]));
+      if (value.items.properties) {
+        pathsWithIdInArray.push(...getIdInObjectArrayErrors(value.items.properties, [...path, `${name}.items.properties`]));
+      }
     }
 
     // Continue to check if the object has an array with an object with an id property
-    if (value.type === 'object') {
+    if (value.type === 'object' && value.properties) {
       pathsWithIdInArray.push(...getIdInObjectArrayErrors(value.properties, [...path, `${name}.properties`]));
     }
   }
