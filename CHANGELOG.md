@@ -1,5 +1,8 @@
 # Extra Horizon CLI changelog
 
+### v1.6.1
+* No longer logging the full schemas when syncing
+
 ### v1.6.0
 * Fixed some security vulnerabilities in the dependencies (Thanks @tran-simon)
 * Removed the update notifier. The version of the package we used had security vulnerabilities and we're unable to migrate to the latest version right now. We'll look into this again in the future.
