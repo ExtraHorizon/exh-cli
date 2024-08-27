@@ -1,5 +1,19 @@
 import { Schema } from '@extrahorizon/javascript-sdk';
 
+export const minimalSchema = {
+  name: 'my-minimal-schema',
+  description: 'My minimal schema',
+  statuses: {
+    created: {},
+  },
+  creationTransition: {
+    type: 'manual',
+    toStatus: 'created',
+  },
+  transitions: [],
+  properties: {},
+};
+
 export const validSchema: any = {
   name: 'blood-pressure-measurement',
   description: 'Blood pressure measurement',

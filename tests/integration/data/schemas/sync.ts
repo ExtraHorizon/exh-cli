@@ -1,6 +1,7 @@
 import { handler } from '../../../../src/commands/data/schemas/sync';
+import { spyOnConsole } from '../../../__helpers__/logSpy';
 import { schemaRepositoryMock } from '../../../__helpers__/schemaRepositoryMock';
-import { validSchema } from '../../../__helpers__/schemas';
+import { minimalSchema, validSchema } from '../../../__helpers__/schemas';
 import { createTempDirectoryManager } from '../../../__helpers__/tempDirectoryManager';
 
 describe('exh data schemas sync', () => {
@@ -82,5 +83,129 @@ describe('exh data schemas sync', () => {
         configuration: { type: 'string' },
         name: 'newProp',
       }));
+  });
+
+  describe('Check if the schema has an array of objects with an id property', () => {
+    const { expectLogToContain } = spyOnConsole();
+
+    it('Throws for an array of objects with an id property', async () => {
+      const path = await tempDirectoryManager.createTempJsonFile({
+        ...minimalSchema,
+        properties: {
+          example: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                id: { type: 'string' }, // Not allowed to be named `id`
+              },
+            },
+          },
+        },
+      });
+
+      await expect(
+        handler({
+          sdk: undefined,
+          file: path,
+          dir: undefined,
+          dry: false,
+          ignoreVerificationErrors: false,
+        })
+      ).rejects.toThrow();
+
+      expectLogToContain('The following id property is not allowed: example.items.properties.id');
+    });
+
+    it('Traverses additionalProperties in an object', async () => {
+      const path = await tempDirectoryManager.createTempJsonFile({
+        ...minimalSchema,
+        properties: {
+          deeper: {
+            type: 'object',
+            additionalProperties: { // Special case required to traverse this
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  id: { type: 'string' }, // Not allowed to be named `id`
+                },
+              },
+            },
+          },
+        },
+      });
+
+      await expect(
+        handler({
+          sdk: undefined,
+          file: path,
+          dir: undefined,
+          dry: false,
+          ignoreVerificationErrors: false,
+        })
+      ).rejects.toThrow();
+
+      expectLogToContain('The following id property is not allowed: deeper.additionalProperties.items.properties.id');
+    });
+
+    it('Traverses additionProperties in an object array', async () => {
+      const path = await tempDirectoryManager.createTempJsonFile({
+        ...minimalSchema,
+        properties: {
+          list: {
+            type: 'array',
+            items: {
+              type: 'object',
+              additionalProperties: { // Special case required to traverse this
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    id: { type: 'string' }, // Not allowed to be named `id`
+                  },
+                },
+              },
+            },
+          },
+        },
+      });
+
+      await expect(
+        handler({
+          sdk: undefined,
+          file: path,
+          dir: undefined,
+          dry: false,
+          ignoreVerificationErrors: false,
+        })
+      ).rejects.toThrow();
+
+      expectLogToContain('The following id property is not allowed: list.items.additionalProperties.items.properties.id');
+    });
+
+    it('Supports having an object within an array with only its additionProperties set', async () => {
+      const path = await tempDirectoryManager.createTempJsonFile({
+        ...minimalSchema,
+        properties: {
+          example: {
+            type: 'array',
+            items: {
+              type: 'object',
+              additionalProperties: { type: 'string' },
+              // No `properties` key to traverse for the "array of objects with id" check
+            },
+          },
+        },
+      });
+
+      await handler({
+        sdk: undefined,
+        file: path,
+        dir: undefined,
+        dry: false,
+        ignoreVerificationErrors: false,
+      });
+    });
   });
 });

@@ -250,19 +250,29 @@ function getIdInObjectArrayErrors(properties: any, path = []) {
     // For all properties with type array of objects, check if they have an id property
     if (value.type === 'array' && value.items.type === 'object') {
       // Check if the array has an id property, if so add it to the list of paths
-      if ('id' in value.items.properties) {
-        pathsWithIdInArray.push([...path, `${name}.items.properties`, 'id'].join('.'));
+      if (value.items.properties) {
+        if ('id' in value.items.properties) {
+          pathsWithIdInArray.push([...path, `${name}.items.properties`, 'id'].join('.'));
+        }
+
+        // Continue to check if the object in the items array has an array with an object with an id property
+        pathsWithIdInArray.push(...getIdInObjectArrayErrors(value.items.properties, [...path, `${name}.items.properties`]));
       }
 
-      // Continue to check if the object in the items array has an array with an object with an id property
-      if (value.items.properties) {
-        pathsWithIdInArray.push(...getIdInObjectArrayErrors(value.items.properties, [...path, `${name}.items.properties`]));
+      if (value.items.additionalProperties) {
+        pathsWithIdInArray.push(...getIdInObjectArrayErrors({ additionalProperties: value.items.additionalProperties }, [...path, `${name}.items`]));
       }
     }
 
     // Continue to check if the object has an array with an object with an id property
-    if (value.type === 'object' && value.properties) {
-      pathsWithIdInArray.push(...getIdInObjectArrayErrors(value.properties, [...path, `${name}.properties`]));
+    if (value.type === 'object') {
+      if (value.properties) {
+        pathsWithIdInArray.push(...getIdInObjectArrayErrors(value.properties, [...path, `${name}.properties`]));
+      }
+
+      if (value.additionalProperties) {
+        pathsWithIdInArray.push(...getIdInObjectArrayErrors({ additionalProperties: value.additionalProperties }, [...path, `${name}`]));
+      }
     }
   }
 
