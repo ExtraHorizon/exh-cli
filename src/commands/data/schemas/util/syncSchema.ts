@@ -94,7 +94,6 @@ export class SyncSchema {
    * @param {object} targetSchema.properties
    */
   async #syncProperties() {
-    console.log(JSON.stringify({ local: this.localSchema, cloud: this.cloudSchema }, null, 2));
     const propertiesDiff = compareSchemaKey(this.localSchema, this.cloudSchema, 'properties');
 
     if (this.dry) {
