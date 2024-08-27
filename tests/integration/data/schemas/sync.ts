@@ -114,7 +114,7 @@ describe('exh data schemas sync', () => {
         })
       ).rejects.toThrow();
 
-      expectLogToContain('The following id property is not allowed: example.items.properties.id');
+      expectLogToContain('The following id property is not allowed: properties.example.items.properties.id');
     });
 
     it('Traverses additionalProperties in an object', async () => {
@@ -146,7 +146,7 @@ describe('exh data schemas sync', () => {
         })
       ).rejects.toThrow();
 
-      expectLogToContain('The following id property is not allowed: deeper.additionalProperties.items.properties.id');
+      expectLogToContain('The following id property is not allowed: properties.deeper.additionalProperties.items.properties.id');
     });
 
     it('Traverses additionProperties in an object array', async () => {
@@ -181,7 +181,7 @@ describe('exh data schemas sync', () => {
         })
       ).rejects.toThrow();
 
-      expectLogToContain('The following id property is not allowed: list.items.additionalProperties.items.properties.id');
+      expectLogToContain('The following id property is not allowed: properties.list.items.additionalProperties.items.properties.id');
     });
 
     it('Supports having an object within an array with only its additionProperties set', async () => {
