@@ -4,11 +4,11 @@ export const minimalSchema = {
   name: 'my-minimal-schema',
   description: 'My minimal schema',
   statuses: {
-    created: {},
+    new: {},
   },
   creationTransition: {
     type: 'manual',
-    toStatus: 'created',
+    toStatus: 'new',
   },
   transitions: [],
   properties: {},
