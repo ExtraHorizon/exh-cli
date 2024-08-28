@@ -1,6 +1,7 @@
 import Ajv from 'ajv';
 import * as metaschema from '../../../src/commands/data/schemas/util/metaschema.json';
 import { SchemaVerify, TestId } from '../../../src/commands/data/schemas/util/schemaverify';
+import { minimalSchema } from '../../__helpers__/schemas';
 
 const ajv = new Ajv();
 
@@ -34,7 +35,11 @@ test('Creation transition is mandatory', () => {
 });
 
 test('Invalid JSON schema in properties must trigger an error', () => {
-  const verify = new SchemaVerify(ajv, { name: 'test', description: 'test', statuses: { new: {} }, properties: { foo: 'bar' }, creationTransition: { type: 'manual', toStatus: 'new' } }, metaschema);
+  const schema = {
+    ...minimalSchema,
+    properties: { foo: 'bar' },
+  };
+  const verify = new SchemaVerify(ajv, schema, metaschema);
   for (const check of verify.RunChecks()) {
     if (check.id === TestId.PROPERTY_VERIFY) {
       expect(check.ok).toBe(false);
@@ -46,9 +51,7 @@ test('Invalid JSON schema in properties must trigger an error', () => {
 
 test('Invalid JSON schema in creationTransition input condition must trigger an error', () => {
   const schema = {
-    name: 'test',
-    description: 'test',
-    statuses: { new: {} },
+    ...minimalSchema,
     creationTransition: {
       type: 'manual',
       toStatus: 'new',
@@ -61,7 +64,6 @@ test('Invalid JSON schema in creationTransition input condition must trigger an 
         },
       ],
     },
-    properties: {},
   };
   const verify = ajv.compile(metaschema);
   expect(verify(schema)).toBe(false);
@@ -69,9 +71,7 @@ test('Invalid JSON schema in creationTransition input condition must trigger an 
 
 test('Valid JSON schema in creationTransition input condition must not trigger an error', () => {
   const verify = new SchemaVerify(ajv, {
-    name: 'test',
-    description: 'test',
-    statuses: { new: {} },
+    ...minimalSchema,
     creationTransition: {
       type: 'manual',
       toStatus: 'new',
@@ -99,10 +99,7 @@ test('Valid JSON schema in creationTransition input condition must not trigger a
 
 test('An item of an array with an id should error', () => {
   const verify = new SchemaVerify(ajv, {
-    name: 'test',
-    description: 'test',
-    statuses: { new: {} },
-    creationTransition: { },
+    ...minimalSchema,
     properties: {
       name: {
         type: 'array',
@@ -121,7 +118,7 @@ test('An item of an array with an id should error', () => {
   for (const check of verify.RunChecks()) {
     if (check.id === TestId.PROPERTY_VERIFY) {
       expect(check.ok).toBe(false);
-      expect(check.errors).toStrictEqual(['The following id property is not allowed: name.items.properties.id']);
+      expect(check.errors).toStrictEqual(['The following id property is not allowed: properties.name.items.properties.id']);
     }
   }
 
@@ -130,10 +127,7 @@ test('An item of an array with an id should error', () => {
 
 test('An item of a nested array with an id should error', () => {
   const verify = new SchemaVerify(ajv, {
-    name: 'test',
-    description: 'test',
-    statuses: { new: {} },
-    creationTransition: { },
+    ...minimalSchema,
     properties: {
       name: {
         type: 'array',
@@ -154,7 +148,7 @@ test('An item of a nested array with an id should error', () => {
   for (const check of verify.RunChecks()) {
     if (check.id === TestId.PROPERTY_VERIFY) {
       expect(check.ok).toBe(false);
-      expect(check.errors).toStrictEqual(['The following id property is not allowed: name.items.items.items.properties.id']);
+      expect(check.errors).toStrictEqual(['The following id property is not allowed: properties.name.items.items.items.properties.id']);
     }
   }
 
@@ -163,10 +157,7 @@ test('An item of a nested array with an id should error', () => {
 
 test('An item of an array in a sub property with an id should error', () => {
   const verify = new SchemaVerify(ajv, {
-    name: 'test',
-    description: 'test',
-    statuses: { new: {} },
-    creationTransition: { },
+    ...minimalSchema,
     properties: {
       name: {
         type: 'object',
@@ -190,7 +181,7 @@ test('An item of an array in a sub property with an id should error', () => {
   for (const check of verify.RunChecks()) {
     if (check.id === TestId.PROPERTY_VERIFY) {
       expect(check.ok).toBe(false);
-      expect(check.errors).toStrictEqual(['The following id property is not allowed: name.properties.subname.items.properties.id']);
+      expect(check.errors).toStrictEqual(['The following id property is not allowed: properties.name.properties.subname.items.properties.id']);
     }
   }
 
@@ -199,10 +190,7 @@ test('An item of an array in a sub property with an id should error', () => {
 
 test('A deeply nested item in array property with an id should error', () => {
   const verify = new SchemaVerify(ajv, {
-    name: 'test',
-    description: 'test',
-    statuses: { new: {} },
-    creationTransition: { },
+    ...minimalSchema,
     properties: {
       name: {
         type: 'array',
@@ -229,7 +217,7 @@ test('A deeply nested item in array property with an id should error', () => {
   for (const check of verify.RunChecks()) {
     if (check.id === TestId.PROPERTY_VERIFY) {
       expect(check.ok).toBe(false);
-      expect(check.errors).toStrictEqual(['The following id property is not allowed: name.items.properties.subname.items.properties.id']);
+      expect(check.errors).toStrictEqual(['The following id property is not allowed: properties.name.items.properties.subname.items.properties.id']);
     }
   }
 
@@ -238,10 +226,7 @@ test('A deeply nested item in array property with an id should error', () => {
 
 test('An item of an array with an id should error for all properties', () => {
   const verify = new SchemaVerify(ajv, {
-    name: 'test',
-    description: 'test',
-    statuses: { new: {} },
-    creationTransition: { },
+    ...minimalSchema,
     properties: {
       firstProperty: {
         type: 'array',
@@ -278,8 +263,8 @@ test('An item of an array with an id should error for all properties', () => {
     if (check.id === TestId.PROPERTY_VERIFY) {
       expect(check.ok).toBe(false);
       expect(check.errors).toStrictEqual([
-        'The following id property is not allowed: firstProperty.items.properties.id',
-        'The following id property is not allowed: thirdProperty.items.properties.id',
+        'The following id property is not allowed: properties.firstProperty.items.properties.id',
+        'The following id property is not allowed: properties.thirdProperty.items.properties.id',
       ]);
     }
   }
@@ -287,11 +272,91 @@ test('An item of an array with an id should error for all properties', () => {
   expect.assertions(2);
 });
 
+it('An item in array property with an id within an object w/ additionalProperties should error', async () => {
+  const verify = new SchemaVerify(ajv, {
+    ...minimalSchema,
+    properties: {
+      deeper: {
+        type: 'object',
+        additionalProperties: { // Special case required to traverse this
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              id: { type: 'string' }, // Not allowed to be named `id`
+            },
+          },
+        },
+      },
+    },
+  }, metaschema);
+
+  for (const check of verify.RunChecks()) {
+    if (check.id === TestId.PROPERTY_VERIFY) {
+      expect(check.ok).toBe(false);
+      expect(check.errors).toStrictEqual(['The following id property is not allowed: properties.deeper.additionalProperties.items.properties.id']);
+    }
+  }
+
+  expect.assertions(2);
+});
+
+it('An item in array property with an id within an object w/ additionalProperties within an array should error', async () => {
+  const verify = new SchemaVerify(ajv, {
+    ...minimalSchema,
+    properties: {
+      list: {
+        type: 'array',
+        items: {
+          type: 'object',
+          additionalProperties: { // Special case required to traverse this
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                id: { type: 'string' }, // Not allowed to be named `id`
+              },
+            },
+          },
+        },
+      },
+    },
+  }, metaschema);
+
+  for (const check of verify.RunChecks()) {
+    if (check.id === TestId.PROPERTY_VERIFY) {
+      expect(check.ok).toBe(false);
+      expect(check.errors).toStrictEqual(['The following id property is not allowed: properties.list.items.additionalProperties.items.properties.id']);
+    }
+  }
+
+  expect.assertions(2);
+});
+
+it('Supports having an object within an array with only its additionProperties set', async () => {
+  const verify = new SchemaVerify(ajv, {
+    ...minimalSchema,
+    properties: {
+      example: {
+        type: 'array',
+        items: {
+          type: 'object',
+          additionalProperties: { type: 'string' },
+          // No `properties` key to traverse for the "array of objects with id" check
+        },
+      },
+    },
+  }, metaschema);
+
+  for (const check of verify.RunChecks()) {
+    expect(check.ok).toBe(true);
+  }
+});
+
 test('Valid JSON schema in transition condition must not trigger an error', () => {
-  const verify = new SchemaVerify(ajv, { name: 'test',
-    description: 'test',
+  const verify = new SchemaVerify(ajv, {
+    ...minimalSchema,
     statuses: { new: {}, processed: {} },
-    creationTransition: { type: 'manual', toStatus: 'new' },
     transitions: [
       {
         name: 'toProcessed',
@@ -314,7 +379,8 @@ test('Valid JSON schema in transition condition must not trigger an error', () =
     ],
     properties: {
       name: { type: 'string' },
-    } }, metaschema);
+    },
+  }, metaschema);
   for (const check of verify.RunChecks()) {
     expect(check.ok).toBe(true);
   }
@@ -322,10 +388,8 @@ test('Valid JSON schema in transition condition must not trigger an error', () =
 
 test('Invalid JSON schema in transition input condition must trigger an error', () => {
   const schema = {
-    name: 'test',
-    description: 'test',
+    ...minimalSchema,
     statuses: { new: {}, processed: {} },
-    creationTransition: { type: 'manual', toStatus: 'new' },
     transitions: [
       {
         name: 'toProcessed',
@@ -342,7 +406,6 @@ test('Invalid JSON schema in transition input condition must trigger an error', 
         ],
       },
     ],
-    properties: {},
   };
 
   const verify = new SchemaVerify(ajv, schema, metaschema);
@@ -356,10 +419,8 @@ test('Invalid JSON schema in transition input condition must trigger an error', 
 test('Using a status which is not defined in a transition should trigger an error', () => {
   /* Test for normal transition */
   const verify = new SchemaVerify(ajv, {
-    name: 'test',
-    description: 'test',
+    ...minimalSchema,
     statuses: { new: {}, dazed: {}, confused: {} },
-    creationTransition: { type: 'manual', toStatus: 'new' },
     transitions: [
       {
         name: 'toDazed',
@@ -369,7 +430,6 @@ test('Using a status which is not defined in a transition should trigger an erro
         conditions: [],
       },
     ],
-    properties: {},
   }, metaschema);
 
   for (const check of verify.RunChecks()) {
@@ -383,10 +443,7 @@ test('Using a status which is not defined in a transition should trigger an erro
 test('Using a status which is not defined should trigger an error', () => {
   /* Test for normal transition */
   const verify = new SchemaVerify(ajv, {
-    name: 'test',
-    description: 'test',
-    statuses: { new: {} },
-    creationTransition: { type: 'manual', toStatus: 'new' },
+    ...minimalSchema,
     transitions: [
       {
         name: 'toProcessed',
@@ -407,22 +464,14 @@ test('Using a status which is not defined should trigger an error', () => {
   }
 
   /* Test in creation transition */
-  const verifySecond = new SchemaVerify(
-    ajv,
-    {
-      name: 'test',
-      description: 'test',
-      statuses: { new: {} },
-      creationTransition: {
-        type: 'manual',
-        toStatus: 'processed',
-        conditions: [],
-      },
-      transitions: [],
-      properties: {},
+  const verifySecond = new SchemaVerify(ajv, {
+    ...minimalSchema,
+    creationTransition: {
+      type: 'manual',
+      toStatus: 'processed',
+      conditions: [],
     },
-    metaschema
-  );
+  }, metaschema);
   for (const check of verifySecond.RunChecks()) {
     if (check.id === TestId.STATUS_CHECK) {
       expect(check.ok).toBe(false);
@@ -434,10 +483,9 @@ test('Using a status which is not defined should trigger an error', () => {
 
 test('Using two or more transitions with the same name should throw an error', () => {
   /* Test for normal transition */
-  const verify = new SchemaVerify(ajv, { name: 'test',
-    description: 'test',
+  const verify = new SchemaVerify(ajv, {
+    ...minimalSchema,
     statuses: { new: {}, manual: {}, processed: {} },
-    creationTransition: { type: 'manual', toStatus: 'new' },
     transitions: [
       {
         name: 'toProcessed',
@@ -468,7 +516,7 @@ test('Using two or more transitions with the same name should throw an error', (
         conditions: [],
       },
     ],
-    properties: {} }, metaschema);
+  }, metaschema);
 
   for (const check of verify.RunChecks()) {
     if (check.id === TestId.TRANSITION_NAMES) {
@@ -482,10 +530,8 @@ test('Using two or more transitions with the same name should throw an error', (
 
 test('Using input conditions in non-manual transitions must give an error', () => {
   const verify = new SchemaVerify(ajv, {
-    name: 'test',
-    description: 'test',
+    ...minimalSchema,
     statuses: { new: {}, processed: {} },
-    creationTransition: { type: 'manual', toStatus: 'new' },
     transitions: [
       {
         name: 'toProcessed',
@@ -502,7 +548,6 @@ test('Using input conditions in non-manual transitions must give an error', () =
         ],
       },
     ],
-    properties: {},
   }, metaschema);
   for (const check of verify.RunChecks()) {
     if (check.id === TestId.CONDITION_TYPES) {
