@@ -2,6 +2,7 @@
 
 ### v1.6.1
 * No longer logging the full schemas when syncing
+* Fixed `exh data schemas sync` not being able to traverse an object definition with only `additionalProperties` set 
 
 ### v1.6.0
 * Fixed some security vulnerabilities in the dependencies (Thanks @tran-simon)

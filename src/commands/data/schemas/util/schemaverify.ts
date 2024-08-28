@@ -88,7 +88,7 @@ export class SchemaVerify {
       if (!this.ajv.validateSchema(tmpSchema)) {
         return { ok: false, errors: transformAjvErrors('', this.ajv.errors) };
       }
-      const errors = getIdInObjectArrayErrors(this.schema.properties);
+      const errors = getIdInObjectArrayErrors(this.schema);
       if (errors.length > 0) {
         return { ok: false, errors: errors.map(path => `The following id property is not allowed: ${path}`) };
       }
@@ -235,34 +235,38 @@ export class SchemaVerify {
 
 // The data service automatically assigns an id to all objects in an array
 // This function checks if the schema has an array of objects with an id property conflicting the one from the data service
-function getIdInObjectArrayErrors(properties: any, path = []) {
+function getIdInObjectArrayErrors(configuration: any, pathPrefix = '') {
+  if (!configuration) {
+    return [];
+  }
+
   const pathsWithIdInArray = [];
-  let name;
-  let value;
 
-  for ([name, value] of Object.entries<any>(properties)) {
-    // Keep going deeper into the schema until the next value is no longer an array
-    while (value.type === 'array' && value.items.type === 'array') {
-      value = value.items;
-      name = `${name}.items`;
-    }
-
-    // For all properties with type array of objects, check if they have an id property
-    if (value.type === 'array' && value.items.type === 'object') {
-      // Check if the array has an id property, if so add it to the list of paths
-      if ('id' in value.items.properties) {
-        pathsWithIdInArray.push([...path, `${name}.items.properties`, 'id'].join('.'));
+  // Schema or object configuration
+  if (configuration.type === 'object' || isSchemaConfiguration(configuration)) {
+    if (configuration.properties) {
+      for (const [name, value] of Object.entries(configuration.properties)) {
+        pathsWithIdInArray.push(...getIdInObjectArrayErrors(value, `${pathPrefix}properties.${name}.`));
       }
-
-      // Continue to check if the object in the items array has an array with an object with an id property
-      pathsWithIdInArray.push(...getIdInObjectArrayErrors(value.items.properties, [...path, `${name}.items.properties`]));
     }
 
-    // Continue to check if the object has an array with an object with an id property
-    if (value.type === 'object') {
-      pathsWithIdInArray.push(...getIdInObjectArrayErrors(value.properties, [...path, `${name}.properties`]));
+    if (configuration.additionalProperties) {
+      pathsWithIdInArray.push(...getIdInObjectArrayErrors(configuration.additionalProperties, `${pathPrefix}additionalProperties.`));
     }
   }
 
+  if (configuration.type === 'array') {
+    // The actual check we are looking for
+    if (configuration.items.type === 'object' && configuration.items.properties?.id) {
+      pathsWithIdInArray.push(`${pathPrefix}items.properties.id`);
+    }
+
+    pathsWithIdInArray.push(...getIdInObjectArrayErrors(configuration.items, `${pathPrefix}items.`));
+  }
+
   return pathsWithIdInArray;
+}
+
+function isSchemaConfiguration(configuration: any) {
+  return configuration && configuration.properties;
 }
