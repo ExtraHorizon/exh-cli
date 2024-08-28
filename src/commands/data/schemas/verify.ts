@@ -4,8 +4,8 @@ import Ajv from 'ajv';
 import * as chalk from 'chalk';
 import { CommandError } from '../../../helpers/error';
 import { epilogue } from '../../../helpers/util';
+import * as metaschema from '../../../json-schemas/dataService/Schema.json';
 import { flatListFiles } from './util/listFilesInDir';
-import * as metaschema from './util/metaschema.json';
 import { SchemaVerify } from './util/schemaverify';
 
 export const command = 'verify';

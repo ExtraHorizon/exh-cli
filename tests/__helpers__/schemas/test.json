@@ -1,0 +1,199 @@
+{
+  "$schema": "../../../src/json-schemas/dataService/Schema.json",
+  
+  "name": "my-test-schema",
+  "description": "This is a test schema",
+
+  "createMode": "default",
+  "readMode": "default",
+  "updateMode": "default",
+  "deleteMode": "permissionRequired",
+
+  "statuses": {
+    "active": {
+      "description": "The item is active"
+    },
+    "inactive": {
+      "description": "The item is inactive"
+    }
+  },
+
+  "creationTransition": {
+    "type": "manual",
+    "toStatus": "active",
+    "conditions": [
+      {
+        "type": "input",
+        "configuration": {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string" }
+          }
+        },
+        "description": "aaa"
+      },
+      {
+        "type": "input",
+        "configuration": {
+          "type": "object",
+          "properties": {
+            "test": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    ],
+    "actions": [
+      {
+        "type": "task",
+        "functionName": "myFunction"
+      },
+      {
+        "type": "task",
+        "description": "Do some extra stuff",
+        "functionName": "myFunction",
+        "data": {
+          "anyThingGoes": true
+        }
+      },
+      {
+        "type": "set",
+        "description": "Set the is initialized flag",
+        "field": "initialized",
+        "value": false
+      },
+      {
+        "type": "unset",
+        "description": "Removes the is initialized flag",
+        "fields": ["initialized"]
+      },
+      {
+        "type": "addItems",
+        "description": "Removes the is initialized flag",
+        "field": "initialized",
+        "items": [{ "a": 1 }]
+      },
+      {
+        "type": "removeItems",
+        "description": "Removes the is initialized flag",
+        "field": "initialized",
+        "items": [{ "a": 1 }]
+      },
+      {
+        "type": "removeItems",
+        "field": "initialized",
+        "items": [{ "a": 1 }]
+      },
+      {
+        "type": "linkCreator",
+        "description": "adada"
+      },
+      {
+        "type": "linkCreator"
+      },
+      {
+        "type": "linkUserFromData",
+        "description": "fsefse",
+        "userIdField": "wdawda"
+      },
+      {
+        "type": "linkUserFromData",
+        "userIdField": "wdawda"
+      },
+      {
+        "type": "linkEnlistedGroups",
+        "description": "A description",
+        "onlyActive": true
+      },
+      {
+        "type": "linkEnlistedGroups"
+      },
+      {
+        "type": "linkGroupFromData",
+        "groupIdField": "aaaa"
+      },
+      {
+        "type": "linkGroupFromData",
+        "description": "aaaaaaaaa",
+        "groupIdField": "aaaa"
+      },
+      {
+        "type": "measurementReviewedNotification"
+      },
+      {
+        "type": "measurementReviewedNotification",
+        "description": "dwadawdwa"
+      }
+    ]
+  },
+
+  "transitions": [
+    {
+      "type": "manual",
+      "name": "deactivate",
+      "fromStatuses": ["active"],
+      "toStatus": "inactive",
+      "conditions": [
+        {
+          "type": "input",
+          "configuration": {
+            "type": "object",
+            "properties": {
+              "deactivationReason": { "type": "string" }
+            },
+            "required": ["deactivationReason"]
+          }
+        },
+        {
+          "type": "initiatorHasRelationToUserInData",
+          "userIdField": "initiatorId",
+          "relation": "isStaffOfTargetPatient"
+        },
+        {
+          "type": "initiatorHasRelationToGroupInData",
+          "groupIdField": "initiatorGroupId",
+          "relation": "staff",
+          "requiredPermission": "deactivate"
+        }
+      ]
+    },
+    {
+      "type": "automatic",
+      "name": "deactivate",
+      "fromStatuses": ["active"],
+      "toStatus": "inactive",
+      "conditions": [
+        {
+          "type": "document",
+          "configuration": {
+            "type": "object",
+            "properties": {
+              "deactivationTimestamp": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "required": ["deactivationTime"]
+          }
+        }
+      ]
+    }
+  ],
+
+  "properties": {
+    "name": { "type": "string", "description": "AAAAAAAA" },
+    "deactivationReason": { "type": "string" },
+    "test": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" }
+      }
+    }
+  }
+
+  
+}
