@@ -243,7 +243,7 @@ function getIdInObjectArrayErrors(configuration: any, pathPrefix = '') {
   const pathsWithIdInArray = [];
 
   // Schema or object configuration
-  if (configuration.properties || configuration.type === 'object') {
+  if (configuration.type === 'object' || isSchemaConfiguration(configuration)) {
     if (configuration.properties) {
       for (const [name, value] of Object.entries(configuration.properties)) {
         pathsWithIdInArray.push(...getIdInObjectArrayErrors(value, `${pathPrefix}properties.${name}.`));
@@ -265,4 +265,8 @@ function getIdInObjectArrayErrors(configuration: any, pathPrefix = '') {
   }
 
   return pathsWithIdInArray;
+}
+
+function isSchemaConfiguration(configuration: any) {
+  return configuration && configuration.properties;
 }
