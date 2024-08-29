@@ -26,6 +26,9 @@ export const schemaRepositoryMock = () => {
   const createTransitionSpy = jest.spyOn(schemaRepository, 'createTransition')
     .mockImplementation((_sdk, _id, data) => Promise.resolve(data));
 
+  const createIndexSpy = jest.spyOn(schemaRepository, 'createIndex')
+    .mockImplementation((_sdk, _id, data) => Promise.resolve(data));
+
   const deleteStatusSpy = jest.spyOn(schemaRepository, 'deleteStatus')
     .mockImplementation(() => Promise.resolve({ affectedRecords: 1 }));
 
@@ -41,6 +44,7 @@ export const schemaRepositoryMock = () => {
     createStatusSpy,
     updateCreationTransitionSpy,
     createTransitionSpy,
+    createIndexSpy,
     deleteStatusSpy,
     updateSchemaSpy,
   };

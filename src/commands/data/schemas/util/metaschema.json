@@ -81,6 +81,9 @@
         },
         "type": {
           "const": "manual"
+        },
+        "description": {
+          "type": "string"
         }
       },
       "additionalProperties": false,
@@ -96,6 +99,9 @@
         "type": "object",
         "properties": {
           "name": {
+            "type": "string"
+          },
+          "description": {
             "type": "string"
           },
           "type": {
@@ -140,6 +146,9 @@
         "type": "object",
         "properties": {
           "name": {
+            "type": "string"
+          },
+          "description": {
             "type": "string"
           },
           "fields": {
@@ -252,6 +261,9 @@
           "type": "string",
           "enum": ["input"]
         },
+        "description": {
+          "type": "string"
+        },
         "required": {
           "type": "array",
           "items": { "type": "string" }
@@ -264,7 +276,10 @@
         "configuration": { "$ref": "#/definitions/configurations" },
         "type": {
           "type": "string",
-          "enum": ["input"]
+          "enum": ["document"]
+        },
+        "description": {
+          "type": "string"
         },
         "required": {
           "type": "array",
@@ -280,6 +295,9 @@
           "enum": [
             "initiatorHasRelationToUserInData"
           ]
+        },
+        "description": {
+          "type": "string"
         },
         "userIdField": {
           "type": "string"
@@ -301,6 +319,9 @@
           "enum": [
             "initiatorHasRelationToGroupInData"
           ]
+        },
+        "description": {
+          "type": "string"
         },
         "groupIdField": {
           "type": "string"
@@ -324,6 +345,9 @@
           "type": "string",
           "enum": ["object"]
         },
+        "description": {
+          "type": "string"
+        },
         "required": {
           "type": "array",
           "items": {
@@ -343,6 +367,9 @@
         "type": {
           "type": "string",
           "enum": ["array"]
+        },
+        "description": {
+          "type": "string"
         },
         "items": {
           "type": "object"
@@ -367,6 +394,9 @@
         "type": {
           "type": "string",
           "enum": ["string"]
+        },
+        "description": {
+          "type": "string"
         },
         "minLength": {
           "type": "number"
@@ -402,6 +432,9 @@
           "type": "string",
           "enum": ["string"]
         },
+        "description": {
+          "type": "string"
+        },
         "minimum": {
           "type": "number"
         },
@@ -428,6 +461,9 @@
         "type": {
           "type": "string",
           "enum": ["boolean"]
+        },
+        "description": {
+          "type": "string"
         },
         "enum": {
           "type": "array",
