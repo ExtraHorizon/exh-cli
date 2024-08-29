@@ -83,4 +83,24 @@ describe('exh data schemas sync', () => {
         name: 'newProp',
       }));
   });
+
+  it('Ignores the $schema property', async () => {
+    const schemaConfiguration = {
+      $schema: 'https://swagger.extrahorizon.com/cli/1.7.0/configuration-files/Schema.json',
+      ...validSchema,
+    };
+
+    const path = await tempDirectoryManager.createTempJsonFile(schemaConfiguration);
+
+    await expect(handler({
+      sdk: undefined,
+      file: path,
+      dir: undefined,
+      dry: false,
+      ignoreVerificationErrors: false,
+    })).resolves.not.toThrow();
+
+    expect(repositoryMock.createSchemaSpy).toHaveBeenCalledWith(undefined, schemaConfiguration.name, schemaConfiguration.description);
+    expect(repositoryMock.updateSchemaSpy).not.toHaveBeenCalled();
+  });
 });
