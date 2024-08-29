@@ -1,5 +1,7 @@
 # Extra Horizon CLI changelog
 
+### v1.7.0
+
 ### v1.6.1
 * `exh data schemas sync` no longer logs the full schema definition json
 * Fixed `exh data schemas sync` not being able to traverse an object definition with only `additionalProperties` set
