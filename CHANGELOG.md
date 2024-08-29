@@ -1,6 +1,8 @@
 # Extra Horizon CLI changelog
 
 ### v1.7.0
+* `exh data schemas sync` now allows schema `.json` files to contain a `$schema` property
+  * This allows you to specify a json-schema for the schema files themselves, providing hints and validation in your editor
 
 ### v1.6.1
 * `exh data schemas sync` no longer logs the full schema definition json
