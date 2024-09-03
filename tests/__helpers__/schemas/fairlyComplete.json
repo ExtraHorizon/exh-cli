@@ -1,5 +1,5 @@
 {
-  "$schema": "../../../src/json-schemas/dataService/Schema.json",
+  "$schema": "../../../src/json-schemas/Schema.json",
   
   "name": "my-test-schema",
   "description": "This is a test schema",
@@ -75,7 +75,7 @@
         "type": "addItems",
         "description": "Removes the is initialized flag",
         "field": "initialized",
-        "items": [{ "a": 1 }]
+        "values": [{ "a": 1 }]
       },
       {
         "type": "removeItems",
@@ -163,7 +163,7 @@
     },
     {
       "type": "automatic",
-      "name": "deactivate",
+      "name": "auto-deactivate",
       "fromStatuses": ["active"],
       "toStatus": "inactive",
       "conditions": [
@@ -185,7 +185,10 @@
   ],
 
   "properties": {
-    "name": { "type": "string", "description": "AAAAAAAA" },
+    "name": {
+      "type": "string",
+      "description": "AAAAAAAA"
+    },
     "deactivationReason": { "type": "string" },
     "test": {
       "type": "object",
