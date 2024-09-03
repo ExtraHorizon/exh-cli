@@ -1,6 +1,6 @@
 import Ajv from 'ajv';
-import * as metaschema from '../../../src/commands/data/schemas/util/metaschema.json';
 import { SchemaVerify, TestId } from '../../../src/commands/data/schemas/util/schemaverify';
+import * as metaschema from '../../../src/config-json-schemas/Schema.json';
 import { minimalSchema } from '../../__helpers__/schemas';
 
 const ajv = new Ajv();
@@ -41,7 +41,7 @@ test('Invalid JSON schema in properties must trigger an error', () => {
   };
   const verify = new SchemaVerify(ajv, schema, metaschema);
   for (const check of verify.RunChecks()) {
-    if (check.id === TestId.PROPERTY_VERIFY) {
+    if (check.id === TestId.META_SCHEMA) {
       expect(check.ok).toBe(false);
     } else {
       expect(check.ok).toBe(true);
@@ -550,9 +550,10 @@ test('Using input conditions in non-manual transitions must give an error', () =
     ],
   }, metaschema);
   for (const check of verify.RunChecks()) {
-    if (check.id === TestId.CONDITION_TYPES) {
+    if (check.id === TestId.META_SCHEMA) {
       expect(check.ok).toBe(false);
     } else {
+      expect(check.errors).toStrictEqual([]);
       expect(check.ok).toBe(true);
     }
   }

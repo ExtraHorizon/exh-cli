@@ -5,7 +5,6 @@ export enum TestId {
   PROPERTY_VERIFY= 2,
   INPUT_CONDITIONS= 3,
   STATUS_CHECK = 4,
-  CONDITION_TYPES = 5,
   TRANSITION_NAMES = 6,
 }
 
@@ -49,7 +48,6 @@ export class SchemaVerify {
     yield { id: TestId.PROPERTY_VERIFY, test: 'Check if the properties object is valid JSON schema', ...this.#verifyProperties() };
     yield { id: TestId.INPUT_CONDITIONS, test: 'Check if all input conditions of transitions are valid JSON schema', ...this.#verifyInputConditions() };
     yield { id: TestId.STATUS_CHECK, test: 'Check if all statuses are accounted for', ...this.#verifyStatuses() };
-    yield { id: TestId.CONDITION_TYPES, test: 'Check if all condition types are used in the correct transitions', ...this.#verifyConditionTypes() };
     yield { id: TestId.TRANSITION_NAMES, test: 'Check if all transition names are unique', ...this.#verifyTransitionNames() };
   }
 
@@ -80,14 +78,6 @@ export class SchemaVerify {
 
   #verifyProperties(): InternalTestResult {
     if (this.schema.properties) {
-      const tmpSchema = {
-        $schema: 'http://json-schema.org/draft-07/schema#',
-        type: 'object',
-        properties: this.schema.properties,
-      };
-      if (!this.ajv.validateSchema(tmpSchema)) {
-        return { ok: false, errors: transformAjvErrors('', this.ajv.errors) };
-      }
       const errors = getIdInObjectArrayErrors(this.schema);
       if (errors.length > 0) {
         return { ok: false, errors: errors.map(path => `The following id property is not allowed: ${path}`) };
@@ -210,26 +200,6 @@ export class SchemaVerify {
     }
 
     return invalidPaths;
-  }
-
-  #verifyConditionTypes(): InternalTestResult {
-    let ok = true;
-    const errors = [];
-    /* input & initiator conditions can only be used in either the creationTransition or manual transitions */
-    if (this.schema.transitions) {
-      for (const [tIndex, transition] of this.schema.transitions.entries()) {
-        if (transition.type === 'manual' || !transition.conditions) {
-          continue;
-        }
-        for (const [cIndex, condition] of transition.conditions.entries()) {
-          if (['input', 'initiator'].includes(condition.type)) {
-            ok = false;
-            errors.push(`/transitions[${tIndex}]/conditions[${cIndex}] type cannot be ${condition.type} in a non-manual transition`);
-          }
-        }
-      }
-    }
-    return { ok, errors };
   }
 }
 

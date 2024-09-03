@@ -51,7 +51,7 @@ export const validSchema: any = {
                     type: 'array',
                     items: {
                       type: 'string',
-                      minimum: 1,
+                      minLength: 1,
                     },
                   },
                 },
