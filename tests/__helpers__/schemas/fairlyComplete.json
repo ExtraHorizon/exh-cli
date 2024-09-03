@@ -1,5 +1,5 @@
 {
-  "$schema": "../../../src/json-schemas/Schema.json",
+  "$schema": "../../../src/config-json-schemas/Schema.json",
   
   "name": "my-test-schema",
   "description": "This is a test schema",
@@ -8,6 +8,11 @@
   "readMode": "default",
   "updateMode": "default",
   "deleteMode": "permissionRequired",
+  
+  "groupSyncMode": "linkedUsersPatientEnlistments",
+
+  "defaultLimit": 20,
+  "maximumLimit": 100,
 
   "statuses": {
     "active": {
@@ -27,7 +32,7 @@
         "configuration": {
           "type": "object",
           "properties": {
-            "name": { "type": "string" }
+            "minimalString": { "type": "string" }
           }
         },
         "description": "aaa"
@@ -37,7 +42,7 @@
         "configuration": {
           "type": "object",
           "properties": {
-            "test": {
+            "minimalObject": {
               "type": "object",
               "properties": {
                 "name": { "type": "string" }
@@ -54,7 +59,7 @@
       },
       {
         "type": "task",
-        "description": "Do some extra stuff",
+        "description": "A task action with all options",
         "functionName": "myFunction",
         "data": {
           "anyThingGoes": true
@@ -62,71 +67,85 @@
       },
       {
         "type": "set",
-        "description": "Set the is initialized flag",
+        "field": "initialized",
+        "value": false
+      },
+      {
+        "type": "set",
+        "description": "A set action with all options",
         "field": "initialized",
         "value": false
       },
       {
         "type": "unset",
-        "description": "Removes the is initialized flag",
+        "fields": ["initialized"]
+      },
+      {
+        "type": "unset",
+        "description": "A unset action with all options",
         "fields": ["initialized"]
       },
       {
         "type": "addItems",
-        "description": "Removes the is initialized flag",
+        "field": "initialized",
+        "values": [{ "a": 1 }]
+      },
+      {
+        "type": "addItems",
+        "description": "A addItems action with all options",
         "field": "initialized",
         "values": [{ "a": 1 }]
       },
       {
         "type": "removeItems",
-        "description": "Removes the is initialized flag",
         "field": "initialized",
-        "items": [{ "a": 1 }]
+        "values": [{ "a": 1 }]
       },
       {
         "type": "removeItems",
+        "description": "A removeItems action with all options",
         "field": "initialized",
-        "items": [{ "a": 1 }]
-      },
-      {
-        "type": "linkCreator",
-        "description": "adada"
+        "values": [{ "a": 1 }]
       },
       {
         "type": "linkCreator"
       },
       {
-        "type": "linkUserFromData",
-        "description": "fsefse",
-        "userIdField": "wdawda"
+        "type": "linkCreator",
+        "description": "A linkCreator action with all options"
       },
       {
         "type": "linkUserFromData",
-        "userIdField": "wdawda"
+        "userIdField": "myUserId"
       },
       {
-        "type": "linkEnlistedGroups",
-        "description": "A description",
-        "onlyActive": true
+        "type": "linkUserFromData",
+        "description": "A linkUserFromData action with all options",
+        "userIdField": "myUserId"
       },
       {
         "type": "linkEnlistedGroups"
       },
       {
-        "type": "linkGroupFromData",
-        "groupIdField": "aaaa"
+        "type": "linkEnlistedGroups",
+        "description": "A linkEnlistedGroups action with all options",
+        "onlyActive": true
       },
       {
         "type": "linkGroupFromData",
-        "description": "aaaaaaaaa",
-        "groupIdField": "aaaa"
+        "groupIdField": "myGroupId"
+      },
+      {
+        "type": "linkGroupFromData",
+        "description": "A linkGroupFromData action with all options",
+        "groupIdField": "myGroupId"
       },
       {
         "type": "measurementReviewedNotification"
       },
       {
         "type": "measurementReviewedNotification",
-        "description": "dwadawdwa"
+        "description": "A measurementReviewedNotification action with all options"
       }
     ]
   },
@@ -143,9 +162,20 @@
           "configuration": {
             "type": "object",
             "properties": {
-              "deactivationReason": { "type": "string" }
+              "fullString": { "type": "string" }
             },
-            "required": ["deactivationReason"]
+            "required": ["fullString"]
+          }
+        },
+        {
+          "type": "input",
+          "description": "An input condition with all options",
+          "configuration": {
+            "type": "object",
+            "properties": {
+              "fullString": { "type": "string" }
+            },
+            "required": ["fullString"]
           }
         },
         {
@@ -154,7 +184,19 @@
           "relation": "isStaffOfTargetPatient"
         },
         {
+          "type": "initiatorHasRelationToUserInData",
+          "description": "An initiatorHasRelationToUserInData condition with all options",
+          "userIdField": "initiatorId",
+          "relation": "isStaffOfTargetPatient"
+        },
+        {
           "type": "initiatorHasRelationToGroupInData",
+          "groupIdField": "initiatorGroupId",
+          "relation": "staff"
+        },
+        {
+          "type": "initiatorHasRelationToGroupInData",
+          "description": "An initiatorHasRelationToGroupInData condition with all options",
           "groupIdField": "initiatorGroupId",
           "relation": "staff",
           "requiredPermission": "deactivate"
@@ -179,24 +221,124 @@
             },
             "required": ["deactivationTime"]
           }
+        },
+        {
+          "type": "document",
+          "description": "A document condition with all options",
+          "configuration": {
+            "type": "object",
+            "properties": {
+              "deactivationTimestamp": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "required": ["deactivationTime"]
+          }
         }
       ]
     }
   ],
 
   "properties": {
-    "name": {
+    "minimalString": { "type": "string" },
+    
+    "fullString": {
       "type": "string",
-      "description": "AAAAAAAA"
+      "description": "A string with all the options",
+      "const": "test",
+      "enum": ["test"],
+      "minLength": 1,
+      "maxLength": 4,
+      "pattern": "^[a-z]+$",
+      "queryable": true
     },
-    "deactivationReason": { "type": "string" },
-    "test": {
+    
+    "date": {
+      "type": "string",
+      "format": "date-time"
+    },
+
+    "minimalNumber": { "type": "number" },
+
+    "fullNumber": {
+      "type": "number",
+      "description": "A number with all the options",
+      "const": 1,
+      "enum": [1],
+      "minimum": 0,
+      "maximum": 10,
+      "queryable": true
+    },
+
+    "minimalBoolean": { "type": "boolean" },
+
+    "fullBoolean": {
+      "type": "boolean",
+      "description": "A boolean with all the options",
+      "const": true,
+      "enum": [true],
+      "queryable": true
+    },
+
+    "minimalObject": {
       "type": "object",
       "properties": {
         "name": { "type": "string" }
       }
-    }
-  }
+    },
 
+    "fullObject": {
+      "type": "object",
+      "description": "An object with all the options",
+      "properties": {
+        "name": { "type": "string" }
+      },
+      "required": ["name"],
+      "additionalProperties": { "type": "string" },
+      "queryable": true
+    },
+
+    "minimalArray": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+
+    "fullArray": {
+      "type": "array",
+      "description": "An array with all the options",
+      "items": { "type": "string" },
+      "minItems": 1,
+      "maxItems": 3,
+      "contains": { "type": "string" },
+      "queryable": true
+    }
+  },
+
+  "indexes": [
+    {
+      "name": "minimalIndex",
+      "fields": [
+        {
+          "name": "creatorId",
+          "type": "asc"
+        }
+      ]
+    },
+    {
+      "name": "fullIndex",
+      "description": "An index with all the options",
+      "fields": [
+        {
+          "name": "userIds",
+          "type": "asc"
+        }
+      ],
+      "options": {
+        "sparse": true,
+        "unique": true
+      }
+    }
+  ]
   
 }
