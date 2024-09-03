@@ -5,6 +5,7 @@
   * This allows you to specify a json-schema for the schema files themselves, providing hints and validation in your editor
 * `exh data schemas sync` now allows all components in a schema to have a `description` property
   * These descriptions are not synced, but allow you to provide inline documentation for the components in your schema
+* Fixed some output inconsistencies in the sync commands
 
 ### v1.6.1
 * `exh data schemas sync` no longer logs the full schema definition json
