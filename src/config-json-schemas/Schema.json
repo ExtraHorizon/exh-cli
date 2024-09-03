@@ -317,7 +317,7 @@
         "type": { "const": "removeItems" },
         "description": { "type": "string" },
         "field": { "type": "string" },
-        "items": {
+        "values": {
           "type": "array",
           "items": { "$ref": "#/definitions/Any" }
         }
@@ -325,7 +325,7 @@
       "required": [
         "type",
         "field",
-        "items"
+        "values"
       ],
       "additionalProperties": false
     },
