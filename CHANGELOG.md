@@ -8,6 +8,7 @@
 * Revamped the schema validation to use the more complete json-schema definition
   * This affects `exh data schemas verify` as well as `exh data schemas sync` and more accurately reports errors in your schemas
   * The `--ignoreSchemaVerificationErrors` flag can always be used to sync while you might be working on a schema with errors
+* Fixed some output inconsistencies in the sync commands
 
 ### v1.6.1
 * `exh data schemas sync` no longer logs the full schema definition json
