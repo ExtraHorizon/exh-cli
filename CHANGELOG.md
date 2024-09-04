@@ -5,6 +5,11 @@
   * This allows you to specify a json-schema for the schema files themselves, providing hints and validation in your editor
 * `exh data schemas sync` now allows all components in a schema to have a `description` property
   * These descriptions are not synced, but allow you to provide inline documentation for the components in your schema
+* Revamped the schema validation to use the more complete json-schema definition
+  * This affects `exh data schemas verify` as well as `exh data schemas sync` and more accurately reports errors in your schemas
+  * This also means that some errors that were previously not reported might now be reported
+  * We believe this is a good thing moving forward and we're happy to help you resolve any issues you might encounter
+  * The `--ignoreSchemaVerificationErrors` flag can always be used to sync while you might be working on a schema with errors
 * Fixed some output inconsistencies in the sync commands
 
 ### v1.6.1
