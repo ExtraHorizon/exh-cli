@@ -71,9 +71,6 @@ export async function syncTargetFile(sdk: any, targetFile: string, dry?: boolean
  * @param {boolean} ignoreVerificationErrors when set, the verification of the schema will be skipped
  */
 export async function syncTargetDir(sdk: any, targetDir: string, dry?: boolean, ignoreVerificationErrors?: boolean) {
-  /* Do a verification of the schema before syncing it */
-  await verifyHandler({ dir: targetDir, file: null, ignoreVerificationErrors });
-
   // list all the target files inside of the directory
   const targetFiles = flatListFiles(targetDir, '.json');
 

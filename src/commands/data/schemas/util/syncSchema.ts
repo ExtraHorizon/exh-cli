@@ -316,6 +316,7 @@ function reportRootAttributesChanges(cloudSchema: any, updatedValues: any) {
 
   if (changedKeys.length < 1) {
     console.log('No update required.');
+    console.groupEnd();
     return;
   }
 
@@ -335,6 +336,7 @@ function reportSchemaChanges(group: string, changes: Changes) {
 
   if (!toAdd.length && !toRemove.length && !toUpdate.length) {
     console.log('No update required');
+    console.groupEnd();
     return;
   }
 
