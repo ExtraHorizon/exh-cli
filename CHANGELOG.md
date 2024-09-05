@@ -1,7 +1,7 @@
 # Extra Horizon CLI changelog
 
 ### v1.7.0
-* `exh data schemas sync` now allows the schema `.json` files to contain a `$schema` property
+* `exh data schemas sync` now allows your schema `.json` files to contain a `$schema` property
   * This allows you to specify a json-schema for the schema files themselves, providing hints and validation in your editor
   * Add `"$schema": "https://swagger.extrahorizon.com/cli/1.7.0/config-json-schemas/Schema.json"` to the top of your schemas to use the same json-schema as the CLI does internally
 * `exh data schemas sync` now allows all components in a schema to have a `description` property
