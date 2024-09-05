@@ -92,3 +92,4 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{secrets.CLI_SWAGGER_DOCS_DEPLOYER_AWS_ACCESS_KEY_ID}}
           AWS_SECRET_ACCESS_KEY: ${{secrets.CLI_SWAGGER_DOCS_DEPLOYER_AWS_SECRET_ACCESS_KEY}}
+          AWS_REGION: eu-central-1
