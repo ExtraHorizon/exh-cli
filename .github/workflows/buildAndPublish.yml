@@ -7,6 +7,7 @@ on:
     branches:
       - master
       - dev
+      - feature/*
 
 jobs:
   build-and-publish:
@@ -49,6 +50,7 @@ jobs:
             version_tag=$package_version-$branch_tag-${{github.run_number}}-$short_commit_hash
           fi
 
+          echo "PROJECT_VERSION=$package_version" >> $GITHUB_ENV
           echo "VERSION_TAG=$version_tag" >> $GITHUB_ENV
           echo "BRANCH_TAG=$branch_tag" >> $GITHUB_ENV
 
@@ -59,7 +61,6 @@ jobs:
           # Tag the commit with the correct version
           git tag -a $VERSION_TAG -m "Tagging $VERSION_TAG"
           git push origin $VERSION_TAG
-
 
       - name: Publish to the GitHub Packages registry
         run: yarn publish --new-version $VERSION_TAG --tag=$BRANCH_TAG
@@ -76,3 +77,18 @@ jobs:
         run: yarn publish --new-version $VERSION_TAG --tag=$BRANCH_TAG
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_EXH_PUBLISH_TOKEN}}
+
+      - name: Publish the json-schemas of the configuration files
+        run:
+          if [ "${{github.ref}}" == "refs/heads/master" ]
+          then
+            documentation_version="cli/${PROJECT_VERSION}"
+          else
+            documentation_version="cli/${PROJECT_VERSION}-dev"
+          fi
+
+          aws s3 sync --delete ./src/config-json-schemas s3://swagger.extrahorizon.com/cli/${documentation_version}
+          aws cloudfront create-invalidation --distribution-id E7MY46MSBV6S4 --paths /cli/${documentation_version}/*
+        env:
+          AWS_ACCESS_KEY_ID: ${{secrets.CLI_SWAGGER_DOCS_DEPLOYER_AWS_ACCESS_KEY_ID}}
+          AWS_SECRET_ACCESS_KEY: ${{secrets.CLI_SWAGGER_DOCS_DEPLOYER_AWS_SECRET_ACCESS_KEY}}
