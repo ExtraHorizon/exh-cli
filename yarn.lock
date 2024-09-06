@@ -402,10 +402,10 @@
     "@extrahorizon/eslint-config-base" "^1.6.0"
     eslint-plugin-jest "^26.4.5"
 
-"@extrahorizon/javascript-sdk@^8.4.0":
-  version "8.4.0"
-  resolved "https://npm.pkg.github.com/download/@ExtraHorizon/javascript-sdk/8.4.0/9665952d5da896f23d7a3cbc527e10b730217137#9665952d5da896f23d7a3cbc527e10b730217137"
-  integrity sha512-9xD8KsXTOxFC/vHqV8ioW15pgLqRXi8NSlolQrWZVaAYb5ZDk2CiSlOQi0S9K687RK/exVZF0dL9KQUWDqrZ3Q==
+"@extrahorizon/javascript-sdk@^8.4.1":
+  version "8.4.1"
+  resolved "https://npm.pkg.github.com/download/@ExtraHorizon/javascript-sdk/8.4.1/b09db1f1d247418dc5b210e060ecf16f8bccca05#b09db1f1d247418dc5b210e060ecf16f8bccca05"
+  integrity sha512-xfXvz/rEZGp50u4vdxay8/9BjTZ1MKrLLX09KfLlJ3Hn1x04i+XXg/gfIt3qrODDJvfUpNxmqBNH4LXb76CKuQ==
   dependencies:
     axios "0.28.1"
     buffer "6.0.3"

@@ -40,7 +40,7 @@
     "typescript": "4.5.5"
   },
   "dependencies": {
-    "@extrahorizon/javascript-sdk": "^8.4.0",
+    "@extrahorizon/javascript-sdk": "^8.4.1",
     "ajv": "^8.11.0",
     "archiver": "^5.3.1",
     "chalk": "^4.0.0",
