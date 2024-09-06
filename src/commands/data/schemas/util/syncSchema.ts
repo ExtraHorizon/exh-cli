@@ -3,6 +3,7 @@ import chalk = require('chalk');
 import * as _ from 'lodash';
 import * as schemaRepository from '../../../../repositories/schemas';
 import { compareStatuses, calculateStatusUpdateData } from '../sync/statusHelpers';
+import { stripUnsupportedDescriptionFields } from './stripUnsupportedDescriptionFields';
 
 export class SyncSchema {
   private sdk: any;
@@ -20,7 +21,7 @@ export class SyncSchema {
   }
 
   async sync(target: any) {
-    this.localSchema = target;
+    this.localSchema = stripUnsupportedDescriptionFields(target);
 
     if (!this.localSchema.name) {
       console.log('No schema name defined, skipping this file');
@@ -315,6 +316,7 @@ function reportRootAttributesChanges(cloudSchema: any, updatedValues: any) {
 
   if (changedKeys.length < 1) {
     console.log('No update required.');
+    console.groupEnd();
     return;
   }
 
@@ -334,6 +336,7 @@ function reportSchemaChanges(group: string, changes: Changes) {
 
   if (!toAdd.length && !toRemove.length && !toUpdate.length) {
     console.log('No update required');
+    console.groupEnd();
     return;
   }
 

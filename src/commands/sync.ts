@@ -134,9 +134,13 @@ export const handler = async ({
     const dispatchersPath = ospath.join(targetPath, 'dispatchers.json');
     const isValidPath = existsSync(dispatchersPath);
 
+    // Simulate a similar behavior as the `cfg = getRepoConfig(..)` does for the other configurations
+    // Only mention a warning if the user explicitly wanted to sync dispatchers
     if (isValidPath) {
+      console.log(chalk.green('\n ⚙️  Syncing dispatchers...'));
+
       await syncDispatchers(sdk, dispatchersPath, cleanDispatchers);
-    } else {
+    } else if (dispatchers) {
       console.log(chalk.yellow('Warning: dispatchers.json not found'));
     }
   }

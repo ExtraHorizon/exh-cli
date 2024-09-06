@@ -1,5 +1,7 @@
 import { Schema } from '@extrahorizon/javascript-sdk';
 
+export const defaultSchemaReturnId = '65b2291d9bfa72b8fdc6a7b2';
+
 export const minimalSchema = {
   name: 'my-minimal-schema',
   description: 'My minimal schema',
@@ -51,7 +53,7 @@ export const validSchema: any = {
                     type: 'array',
                     items: {
                       type: 'string',
-                      minimum: 1,
+                      minLength: 1,
                     },
                   },
                 },
@@ -131,24 +133,19 @@ export const validSchema: any = {
   properties: {
     systolic: {
       type: 'number',
-      description: 'Systolic pressure in mmHg',
     },
     diastolic: {
       type: 'number',
-      description: 'Diastolic pressure in mmHg',
     },
     timestamp: {
       type: 'string',
       format: 'date-time',
-      description: 'Timestamp when the measurement was taken',
     },
     category: {
       type: 'string',
-      description: 'Category of the result',
     },
     report: {
       type: 'string',
-      description: 'File-token of the report',
     },
     comments: {
       type: 'array',

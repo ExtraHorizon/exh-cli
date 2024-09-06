@@ -1,5 +1,18 @@
 # Extra Horizon CLI changelog
 
+### v1.7.0
+* `exh data schemas sync` now allows your schema `.json` files to contain a `$schema` property
+  * This allows you to specify a json-schema for the schema files themselves, providing hints and validation in your editor
+  * Add `"$schema": "https://swagger.extrahorizon.com/cli/1.7.0/config-json-schemas/Schema.json"` to the top of your schemas to use the same json-schema as the CLI does internally
+* `exh data schemas sync` now allows all components in a schema to have a `description` property
+  * These descriptions are not synced, but allow you to provide inline documentation for the components in your schema
+* Revamped the schema validation to use the more complete json-schema definition
+  * This affects `exh data schemas verify` as well as `exh data schemas sync` and more accurately reports errors in your schemas
+  * This also means that some errors that were previously not reported might now be reported
+  * We believe this is a good thing moving forward and we're happy to help you resolve any issues you might encounter
+  * The `--ignoreSchemaVerificationErrors` flag can always be used to sync while you might be working on a schema with errors
+* Fixed some output inconsistencies in the sync commands
+
 ### v1.6.1
 * `exh data schemas sync` no longer logs the full schema definition json
 * Fixed `exh data schemas sync` not being able to traverse an object definition with only `additionalProperties` set
