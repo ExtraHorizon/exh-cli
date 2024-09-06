@@ -22,8 +22,7 @@ When creating a data schema, you'll typically make a JSON file containing a spec
   
   "statuses": {
     "created": {},
-    "active": {},
-    "done": {}
+    "active": {}
   },
   
   "creationTransition": {
@@ -33,7 +32,7 @@ When creating a data schema, you'll typically make a JSON file containing a spec
     "conditions": [
       {
         "type": "input",
-        "description": "Making sure only firstProperty can and must be supplied",
+        "description": "Making sure only 'firstProperty' can (and must) be supplied",
         "configuration": {
           "type": "object",
           "properties": {
@@ -57,7 +56,7 @@ When creating a data schema, you'll typically make a JSON file containing a spec
     {
       "type": "manual",
       "name": "activate",
-      "description": "Allow move from the created to the active status",
+      "description": "Allow moving from the 'created' to the 'active' status",
       "fromStatuses": [
         "created"
       ],
