@@ -10,23 +10,30 @@ When creating a data schema, you'll typically make a JSON file containing a spec
 
 ```json
 {
+  "$schema": "https://swagger.extrahorizon.com/cli/1.7.0/config-json-schemas/Schema.json",
+
   "name": "MyFirstSchema",
   "description": "Example of a schema",
+  
   "createMode": "default",
   "readMode": "default",
   "updateMode": "default",
   "deleteMode": "permissionRequired",
+  
   "statuses": {
     "created": {},
     "active": {},
     "done": {}
   },
+  
   "creationTransition": {
     "type": "manual",
+    "description": "The transition triggered while a document is created",
     "toStatus": "created",
     "conditions": [
       {
         "type": "input",
+        "description": "Making sure only firstProperty can and must be supplied",
         "configuration": {
           "type": "object",
           "properties": {
@@ -40,23 +47,28 @@ When creating a data schema, you'll typically make a JSON file containing a spec
     ],
     "actions": [
       {
-        "type": "linkCreator"
+        "type": "linkCreator",
+        "description": "Link the creator of the document so they can access it"
       }
     ]
   },
+  
   "transitions": [
     {
-      "name": "activate",
       "type": "manual",
+      "name": "activate",
+      "description": "Allow move from the created to the active status",
       "fromStatuses": [
         "created"
       ],
       "toStatus": "active"
     }
   ],
+  
   "properties": {
     "firstProperty": {
-      "type": "string"
+      "type": "string",
+      "description": "Your explanation about the property here"
     },
     "secondProperty": {
       "type": "number"
@@ -64,6 +76,10 @@ When creating a data schema, you'll typically make a JSON file containing a spec
   }
 }
 ```
+
+{% hint style="info" %}
+The `$schema` field allows most editors to help you with type information and autocompletion in your schema configuration. Does your editor not support this? You might have some luck looking for a plugin providing [JSON schema](https://json-schema.org/) support.
+{% endhint %}
 
 ### Schema list
 
