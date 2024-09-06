@@ -1,0 +1,629 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "$schema": { "type": "string" },
+    "name": { "type": "string" },
+    "description": { "type": "string" },
+    "createMode": {
+      "type": "string",
+      "enum": [
+        "default",
+        "permissionRequired"
+      ]
+    },
+    "deleteMode": {
+      "type": "string",
+      "enum": [
+        "permissionRequired",
+        "linkedUsersOnly"
+      ]
+    },
+    "readMode": {
+      "type": "string",
+      "enum": [
+        "default",
+        "allUsers",
+        "enlistedInLinkedGroups"
+      ]
+    },
+    "updateMode": {
+      "type": "string",
+      "enum": [
+        "default",
+        "creatorOnly",
+        "disabled",
+        "linkedGroupsStaffOnly"
+      ]
+    },
+    "groupSyncMode": {
+      "type": "string",
+      "enum": [
+        "disabled",
+        "creatorPatientEnlistments",
+        "linkedUsersPatientEnlistments"
+      ]
+    },
+    "defaultLimit": { "type": "integer" },
+    "maximumLimit": { "type": "integer" },
+    "statuses": {
+      "type": "object",
+      "patternProperties": {
+        "^[A-Za-z][A-Za-z0-9_-]{0,49}$": {
+          "type": "object",
+          "patternProperties": {
+            "^[A-Za-z][A-Za-z0-9_-]{0,49}$": { "type": "string" }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "creationTransition": { "$ref": "#/definitions/CreationTransition" },
+    "transitions": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          { "$ref": "#/definitions/ManualTransition" },
+          { "$ref": "#/definitions/AutomaticTransition" }
+        ]
+      }
+    },
+    "indexes": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/Index" }
+    },
+    "properties": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/definitions/TypeConfiguration" }
+    }
+  },
+  "required": [
+    "name",
+    "description",
+    "statuses",
+    "creationTransition",
+    "properties"
+  ],
+  "additionalProperties": false,
+
+  "definitions": {
+
+    "CreationTransition": {
+      "type": "object",
+      "properties": {
+        "type": { "const": "manual" },
+        "description": { "type": "string" },
+        "toStatus": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,49}$"
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              { "$ref": "#/definitions/InputCondition" },
+              { "$ref": "#/definitions/InitiatorHasRelationToUserInDataCondition" },
+              { "$ref": "#/definitions/InitiatorHasRelationToGroupInDataCondition" }
+            ]
+          }
+        },
+        "actions": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/Action" }
+        },
+        "afterActions": { "type": "array" }
+      },
+      "required": [
+        "type",
+        "toStatus"
+      ],
+      "additionalProperties": false
+    },
+
+    "ManualTransition": {
+      "type": "object",
+      "properties": {
+        "type": { "const": "manual" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "fromStatuses": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,49}$"
+          },
+          "minItems": 1
+        },
+        "toStatus": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,49}$"
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              { "$ref": "#/definitions/InputCondition" },
+              { "$ref": "#/definitions/DocumentCondition" },
+              { "$ref": "#/definitions/InitiatorHasRelationToUserInDataCondition" },
+              { "$ref": "#/definitions/InitiatorHasRelationToGroupInDataCondition" }
+            ]
+          }
+        },
+        "actions": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/Action" }
+        },
+        "afterActions": { "type": "array" }
+      },
+      "required": [
+        "type",
+        "name",
+        "fromStatuses",
+        "toStatus"
+      ],
+      "additionalProperties": false
+    },
+
+    "AutomaticTransition": {
+      "type": "object",
+      "properties": {
+        "type": { "const": "automatic" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "fromStatuses": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,49}$"
+          },
+          "minItems": 1
+        },
+        "toStatus": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,49}$"
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              { "$ref": "#/definitions/DocumentCondition" }
+            ]
+          }
+        },
+        "actions": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/Action" }
+        },
+        "afterActions": { "type": "array" }
+      },
+      "required": [
+        "type",
+        "name",
+        "fromStatuses",
+        "toStatus"
+      ],
+      "additionalProperties": false
+    },
+
+    "Action": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "task",
+            "set",
+            "unset",
+            "addItems",
+            "removeItems",
+            "linkCreator",
+            "linkUserFromData",
+            "linkEnlistedGroups",
+            "linkGroupFromData",
+            "measurementReviewedNotification"
+          ]
+        }
+      },
+      "anyOf": [
+        { "$ref": "#/definitions/TaskAction" },
+        { "$ref": "#/definitions/SetAction" },
+        { "$ref": "#/definitions/UnsetAction" },
+        { "$ref": "#/definitions/AddItemsAction" },
+        { "$ref": "#/definitions/RemoveItemsAction" },
+        { "$ref": "#/definitions/LinkCreatorAction" },
+        { "$ref": "#/definitions/LinkUserFromDataAction" },
+        { "$ref": "#/definitions/LinkEnlistedGroupsAction" },
+        { "$ref": "#/definitions/LinkGroupFromDataAction" },
+        { "$ref": "#/definitions/MeasurementReviewedNotificationAction" }
+      ]
+    },
+
+    "TaskAction": {
+      "type": "object",
+      "properties": {
+        "type": { "const": "task" },
+        "description": { "type": "string" },
+        "functionName": { "type": "string" },
+        "data": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "required": [
+        "type",
+        "functionName"
+      ],
+      "additionalProperties": false
+    },
+
+    "SetAction": {
+      "type": "object",
+      "properties": {
+        "type": { "const": "set" },
+        "description": { "type": "string" },
+        "field": { "type": "string" },
+        "value": { "$ref": "#/definitions/Any" }
+      },
+      "required": [
+        "type",
+        "field",
+        "value"
+      ],
+      "additionalProperties": false
+    },
+
+    "UnsetAction": {
+      "type": "object",
+      "properties": {
+        "type": { "const": "unset" },
+        "description": { "type": "string" },
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "type",
+        "fields"
+      ],
+      "additionalProperties": false
+    },
+
+    "AddItemsAction": {
+      "type": "object",
+      "properties": {
+        "type": { "const": "addItems" },
+        "description": { "type": "string" },
+        "field": { "type": "string" },
+        "values": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/Any" }
+        }
+      },
+      "required": [
+        "type",
+        "field",
+        "values"
+      ],
+      "additionalProperties": false
+    },
+
+    "RemoveItemsAction": {
+      "type": "object",
+      "properties": {
+        "type": { "const": "removeItems" },
+        "description": { "type": "string" },
+        "field": { "type": "string" },
+        "values": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/Any" }
+        }
+      },
+      "required": [
+        "type",
+        "field",
+        "values"
+      ],
+      "additionalProperties": false
+    },
+
+    "LinkCreatorAction": {
+      "type": "object",
+      "properties": {
+        "type": { "const": "linkCreator" },
+        "description": { "type": "string" }
+      },
+      "required": ["type"],
+      "additionalProperties": false
+    },
+
+    "LinkUserFromDataAction": {
+      "type": "object",
+      "properties": {
+        "type": { "const": "linkUserFromData" },
+        "description": { "type": "string" },
+        "userIdField": { "type": "string" }
+      },
+      "required": [
+        "type",
+        "userIdField"
+      ],
+      "additionalProperties": false
+    },
+
+    "LinkEnlistedGroupsAction": {
+      "type": "object",
+      "properties": {
+        "type": { "const": "linkEnlistedGroups" },
+        "description": { "type": "string" },
+        "onlyActive": { "type": "boolean" }
+      },
+      "required": ["type"],
+      "additionalProperties": false
+    },
+
+    "LinkGroupFromDataAction": {
+      "type": "object",
+      "properties": {
+        "type": { "const": "linkGroupFromData" },
+        "description": { "type": "string" },
+        "groupIdField": { "type": "string" }
+      },
+      "required": [
+        "type",
+        "groupIdField"
+      ],
+      "additionalProperties": false
+    },
+
+    "MeasurementReviewedNotificationAction": {
+      "type": "object",
+      "description": "Deprecated! The measurementReviewedNotification action is deprecated and should not be used.",
+      "properties": {
+        "type": {
+          "const": "measurementReviewedNotification",
+          "description": "Deprecated! The measurementReviewedNotification action is deprecated and should not be used."
+        },
+        "description": { "type": "string" }
+      },
+      "required": ["type"],
+      "additionalProperties": false
+    },
+
+    "InputCondition": {
+      "type": "object",
+      "properties": {
+        "type": { "const": "input" },
+        "configuration": { "$ref": "#/definitions/TypeConfiguration" },
+        "description": { "type": "string" }
+      },
+      "required": [
+        "type",
+        "configuration"
+      ],
+      "additionalProperties": false
+    },
+
+    "DocumentCondition": {
+      "type": "object",
+      "properties": {
+        "type": { "const": "document" },
+        "configuration": { "$ref": "#/definitions/TypeConfiguration" },
+        "description": { "type": "string" }
+      },
+      "required": [
+        "type",
+        "configuration"
+      ],
+      "additionalProperties": false
+    },
+
+    "InitiatorHasRelationToUserInDataCondition": {
+      "type": "object",
+      "properties": {
+        "type": { "const": "initiatorHasRelationToUserInData" },
+        "description": { "type": "string" },
+        "userIdField": { "type": "string" },
+        "relation": {
+          "type": "string",
+          "enum": [
+            "isStaffOfTargetPatient"
+          ]
+        }
+      },
+      "required": [
+        "type",
+        "userIdField",
+        "relation"
+      ],
+      "additionalProperties": false
+    },
+
+    "InitiatorHasRelationToGroupInDataCondition": {
+      "type": "object",
+      "properties": {
+        "type": { "const": "initiatorHasRelationToGroupInData" },
+        "description": { "type": "string" },
+        "groupIdField": { "type": "string" },
+        "relation": {
+          "type": "string",
+          "enum": [
+            "staff",
+            "patient"
+          ]
+        },
+        "requiredPermission": { "type": "string" }
+      },
+      "required": [
+        "type",
+        "groupIdField",
+        "relation"
+      ],
+      "additionalProperties": false
+    },
+
+    "TypeConfiguration": {
+      "anyOf": [
+        { "$ref": "#/definitions/ObjectConfiguration" },
+        { "$ref": "#/definitions/ArrayConfiguration" },
+        { "$ref": "#/definitions/StringConfiguration" },
+        { "$ref": "#/definitions/NumberConfiguration" },
+        { "$ref": "#/definitions/BooleanConfiguration" }
+      ]
+    },
+
+    "ObjectConfiguration": {
+      "type": "object",
+      "properties": {
+        "type": { "const": "object" },
+        "description": { "type": "string" },
+        "properties": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/definitions/TypeConfiguration" }
+        },
+        "additionalProperties": { "$ref": "#/definitions/TypeConfiguration" },
+        "required": {
+          "type": "array",
+          "items": { "type": "string"}
+        },
+        "queryable": { "type": "boolean" }
+      },
+      "required": ["type"],
+      "additionalProperties": false
+    },
+
+    "ArrayConfiguration": {
+      "type": "object",
+      "properties": {
+        "type": { "const": "array"},
+        "description": { "type": "string" },
+        "items": { "$ref": "#/definitions/TypeConfiguration" },
+        "minItems": { "type": "number" },
+        "maxItems": { "type": "number" },
+        "contains": { "$ref": "#/definitions/TypeConfiguration" },
+        "queryable": { "type": "boolean" }
+      },
+      "required": ["type"],
+      "additionalProperties": false
+    },
+
+    "StringConfiguration": {
+      "type": "object",
+      "properties": {
+        "type": { "const": "string" },
+        "description": { "type": "string" },
+        "minLength": { "type": "number" },
+        "maxLength": { "type": "number" },
+        "enum": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "const": { "type": "string" },
+        "pattern": { "type": "string" },
+        "format": {
+          "type": "string",
+          "enum": ["date-time"]
+        },
+        "queryable": { "type": "boolean" }
+      },
+      "required": ["type"],
+      "additionalProperties": false
+    },
+
+    "NumberConfiguration": {
+      "type": "object",
+      "properties": {
+        "type": { "const": "number" },
+        "description": { "type": "string" },
+        "minimum": { "type": "number" },
+        "maximum": { "type": "number" },
+        "enum": {
+          "type": "array",
+          "items": { "type": "number" }
+        },
+        "const": { "type": "number" },
+        "queryable": { "type": "boolean" }
+      },
+      "required": ["type"],
+      "additionalProperties": false
+    },
+
+    "BooleanConfiguration": {
+      "type": "object",
+      "properties": {
+        "type": { "const": "boolean" },
+        "description": { "type": "string" },
+        "enum": {
+          "type": "array",
+          "items": { "type": "boolean" }
+        },
+        "const": { "type": "boolean" },
+        "queryable": { "type": "boolean" }
+      },
+      "required": ["type"],
+      "additionalProperties": false
+    },
+
+    "Index": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "asc",
+                  "desc",
+                  "text"
+                ]
+              }
+            },
+            "required": [
+              "name",
+              "type"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "options": {
+          "type": "object",
+          "properties": {
+            "unique": { "type": "boolean" },
+            "sparse": { "type": "boolean" }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "fields"
+      ]
+    },
+
+    "Any": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": true
+        },
+        {
+          "type": "array",
+          "items": true
+        },
+        { "type": "string" },
+        { "type": "number" },
+        { "type": "boolean" }
+      ]
+    }
+  }
+}

@@ -2,10 +2,10 @@ import * as fs from 'fs';
 import * as path from 'path';
 import Ajv from 'ajv';
 import * as chalk from 'chalk';
+import * as metaschema from '../../../config-json-schemas/Schema.json';
 import { CommandError } from '../../../helpers/error';
 import { epilogue } from '../../../helpers/util';
 import { flatListFiles } from './util/listFilesInDir';
-import * as metaschema from './util/metaschema.json';
 import { SchemaVerify } from './util/schemaverify';
 
 export const command = 'verify';
@@ -52,12 +52,11 @@ export const handler = async ({ file, dir, ignoreVerificationErrors }) => {
     }
 
     /* Following checks are done on the schema
-   * 1. Check if the schema complies to ExH data schema format ('metaschema.json')
-   * 2. Check if the properties object, if present, is valid JSON schema
-   * 3. Check if the configuration object of all input conditions, is valid JSON schema
-   * 4. Check if all statuses mentioned in transitions are present in the statuses object
-   * 5. Check if the correct conditions are used in the transitions
-   */
+     * 1. Check if the schema complies to ExH data schema format ('config-json-schemas/Schema.json')
+     * 2. Check if the properties object, if present, is valid JSON schema
+     * 3. Check if the configuration object of all input conditions, is valid JSON schema
+     * 4. Check if all statuses mentioned in transitions are present in the statuses object
+     */
 
     const ajv = new Ajv();
     for (const result of (new SchemaVerify(ajv, schema, metaschema)).RunChecks()) {
