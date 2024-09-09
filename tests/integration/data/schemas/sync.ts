@@ -111,6 +111,24 @@ describe('exh data schemas sync', () => {
         type: 'manual',
         toStatus: 'new',
         description: 'This is a transition description, which should be ignored',
+        conditions: [
+          {
+            type: 'initiatorHasRelationToUserInData',
+            description: 'This is a condition description, which should be ignored',
+            relation: 'isStaffOfTargetPatient',
+            userIdField: 'myUserId',
+          },
+        ],
+        actions: [
+          {
+            type: 'task',
+            description: 'This is an action description, which should be ignored',
+            functionName: 'on-document-creation',
+          },
+        ],
+      },
+      properties: {
+        myUserId: { type: 'string' },
       },
     };
 
@@ -128,6 +146,21 @@ describe('exh data schemas sync', () => {
       type: 'manual',
       toStatus: 'new',
       // No description property
+      conditions: [
+        {
+          type: 'initiatorHasRelationToUserInData',
+          // No description property
+          relation: 'isStaffOfTargetPatient',
+          userIdField: 'myUserId',
+        },
+      ],
+      actions: [
+        {
+          type: 'task',
+          // No description property
+          functionName: 'on-document-creation',
+        },
+      ],
     });
   });
 
