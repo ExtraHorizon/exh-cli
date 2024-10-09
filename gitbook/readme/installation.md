@@ -1,8 +1,12 @@
 # Installation
 
-## Installation <a href="#installation" id="installation"></a>
+## Install Node.js
 
-#### Install CLI
+The CLI is available as [a JavaScript package](https://www.npmjs.com/package/@extrahorizon/exh-cli) and requires [Node.js](https://nodejs.org/) to run. If you have Node.js installed you can install the CLI using a JavaScript package manager. For instance, you can use [NPM](https://docs.npmjs.com/about-npm), which comes with Node.js, or alternative package managers like [Yarn](https://yarnpkg.com/).
+
+[Installation instructions for Node.js and NPM can be found here.](https://nodejs.org/en/download)
+
+## Install the CLI
 
 We recommend installing the CLI globally. Installing the CLI globally makes sure it can be used in all your projects. For that reason all examples in this documentation will assume a global installation.
 
@@ -88,7 +92,7 @@ yarn exh --help
 {% endtab %}
 {% endtabs %}
 
-#### Completion
+## Completion
 
 Enable auto-complete for shell commands with:
 
