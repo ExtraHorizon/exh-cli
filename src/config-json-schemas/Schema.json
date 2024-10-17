@@ -285,8 +285,12 @@
 
     "NotifyAlgoQueueManagerAction": {
       "type": "object",
+      "description": "Deprecated! The notifyAlgoQueueManager action is deprecated and should not be used.",
       "properties": {
-        "type": { "const": "notifyAlgoQueueManager" },
+        "type": {
+          "const": "notifyAlgoQueueManager",
+          "description": "Deprecated! The notifyAlgoQueueManager action is deprecated and should not be used."
+        },
         "description": { "type": "string" },
         "id": { "type": "string" },
         "version": { "type": "string" }
