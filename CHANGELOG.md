@@ -1,6 +1,6 @@
 # Extra Horizon CLI changelog
 
-### Unreleased
+### v1.8.0
 * `exh data schemas sync` now also strips the description fields for conditions and actions in the creation transition
 * Added priority to the transition task action in the schema validator
 * Improved typing for the afterActions in the schema validator
