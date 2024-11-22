@@ -4,9 +4,9 @@
   "name": "my-test-schema",
   "description": "This is a test schema",
 
-  "createMode": "default",
-  "readMode": "default",
-  "updateMode": "default",
+  "createMode": "allUsers",
+  "readMode": ["linkedUsers","linkedGroupStaff"],
+  "updateMode": ["linkedUsers","linkedGroupStaff"],
   "deleteMode": "permissionRequired",
   
   "groupSyncMode": "linkedUsersPatientEnlistments",
