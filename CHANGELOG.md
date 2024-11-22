@@ -1,6 +1,7 @@
 # Extra Horizon CLI changelog
 
 ### v1.8.0
+* Schemas: Updated the available access mode options to match data service 1.4.0 changes
 * `exh data schemas sync` now also strips the description fields for conditions and actions in the creation transition
 * Added priority to the transition task action in the schema validator
 * Improved typing for the afterActions in the schema validator
