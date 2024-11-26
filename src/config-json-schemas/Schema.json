@@ -335,14 +335,10 @@
           "const": "notifyAlgoQueueManager",
           "description": "Deprecated! The notifyAlgoQueueManager action is deprecated and should not be used."
         },
-        "description": { "type": "string" },
-        "id": { "type": "string" },
-        "version": { "type": "string" }
+        "description": { "type": "string" }
       },
       "required": [
-        "type",
-        "id",
-        "version"
+        "type"
       ],
       "additionalProperties": false
     },
