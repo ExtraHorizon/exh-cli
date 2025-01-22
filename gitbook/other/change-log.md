@@ -1,5 +1,12 @@
 # Extra Horizon CLI changelog
 
+### v1.8.0
+* Schemas:
+  * `createMode`, `readMode`, `updateMode` and `deleteMode` have been updated to accept multiple granular options, matching the revamped access mode changes in Data Service `1.4.0`
+  * Transition Action `type: "task"` now supports the `priority` field
+  * Transition `afterActions` now supports the `type: "task"` Action 
+  * `exh data schemas sync` now doesn't try to sync `description` fields for Conditions and Actions in the `creationTransition`
+
 ### v1.7.0
 * `exh data schemas sync` now allows your schema `.json` files to contain a `$schema` property
   * This allows you to specify a json-schema for the schema files themselves, providing hints and validation in your editor
