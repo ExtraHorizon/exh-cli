@@ -3,7 +3,7 @@
   "description": "Test data for updating schema statuses",
   "createMode": "permissionRequired",
   "readMode": "allUsers",
-  "updateMode": "default",
+  "updateMode": ["linkedUsers","linkedGroupStaff"],
   "deleteMode": "permissionRequired",
   "statuses": {
     "created": {},

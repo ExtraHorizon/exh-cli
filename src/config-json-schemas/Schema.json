@@ -6,34 +6,78 @@
     "name": { "type": "string" },
     "description": { "type": "string" },
     "createMode": {
-      "type": "string",
-      "enum": [
-        "default",
-        "permissionRequired"
+      "oneOf": [
+        {
+          "$ref": "#/definitions/PermissionRequiredAccessMode"
+        },
+        {
+          "$ref": "#/definitions/AllUsersAccessMode"
+        },
+        {
+          "const": "default",
+          "description": "Deprecated! Use \"allUsers\" instead."
+        }
       ]
     },
     "deleteMode": {
-      "type": "string",
-      "enum": [
-        "permissionRequired",
-        "linkedUsersOnly"
+      "oneOf": [
+        {
+          "$ref": "#/definitions/PermissionRequiredAccessMode"
+        },
+        {
+          "$ref": "#/definitions/RelationalAccessModes"
+        },
+        {
+          "const": "linkedUsersOnly",
+          "description": "Deprecated! Use [\"linkedUsers\",\"linkedGroupStaff\"] instead."
+        }
       ]
     },
     "readMode": {
-      "type": "string",
-      "enum": [
-        "default",
-        "allUsers",
-        "enlistedInLinkedGroups"
+      "oneOf": [
+        {
+          "$ref": "#/definitions/PermissionRequiredAccessMode"
+        },
+        {
+          "$ref": "#/definitions/AllUsersAccessMode"
+        },
+        {
+          "$ref": "#/definitions/RelationalAccessModes"
+        },
+        {
+          "const": "default",
+          "description": "Deprecated! Use [\"linkedUsers\",\"linkedGroupStaff\"] instead."
+        },
+        {
+          "const": "enlistedInLinkedGroups",
+          "description": "Deprecated! Use [\"linkedGroupPatients\",\"linkedGroupStaff\"] instead."
+        }
       ]
     },
     "updateMode": {
-      "type": "string",
-      "enum": [
-        "default",
-        "creatorOnly",
-        "disabled",
-        "linkedGroupsStaffOnly"
+      "oneOf": [
+        {
+          "$ref": "#/definitions/PermissionRequiredAccessMode"
+        },
+        {
+          "$ref": "#/definitions/RelationalAccessModes"
+        },
+        {
+          "const": "default",
+          "description": "Deprecated! Use [\"linkedUsers\",\"linkedGroupStaff\"] instead."
+        },
+        {
+          "const": "creatorOnly",
+          "description": "Deprecated! Use [\"creator\"] instead."
+        },
+        {
+          "const": "disabled",
+          "description": "Deprecated! Use \"permissionRequired\" instead."
+        },
+        {
+          "const": "linkedGroupsStaffOnly",
+          "description": "Deprecated! Use [\"linkedGroupStaff\"] instead."
+        }
       ]
     },
     "groupSyncMode": {
@@ -112,7 +156,10 @@
           "type": "array",
           "items": { "$ref": "#/definitions/Action" }
         },
-        "afterActions": { "type": "array" }
+        "afterActions": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/AfterAction" }
+        }
       },
       "required": [
         "type",
@@ -124,9 +171,15 @@
     "ManualTransition": {
       "type": "object",
       "properties": {
-        "type": { "const": "manual" },
-        "name": { "type": "string" },
-        "description": { "type": "string" },
+        "type": {
+          "const": "manual"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
         "fromStatuses": {
           "type": "array",
           "items": {
@@ -143,18 +196,33 @@
           "type": "array",
           "items": {
             "anyOf": [
-              { "$ref": "#/definitions/InputCondition" },
-              { "$ref": "#/definitions/DocumentCondition" },
-              { "$ref": "#/definitions/InitiatorHasRelationToUserInDataCondition" },
-              { "$ref": "#/definitions/InitiatorHasRelationToGroupInDataCondition" }
+              {
+                "$ref": "#/definitions/InputCondition"
+              },
+              {
+                "$ref": "#/definitions/DocumentCondition"
+              },
+              {
+                "$ref": "#/definitions/InitiatorHasRelationToUserInDataCondition"
+              },
+              {
+                "$ref": "#/definitions/InitiatorHasRelationToGroupInDataCondition"
+              }
             ]
           }
         },
         "actions": {
           "type": "array",
-          "items": { "$ref": "#/definitions/Action" }
+          "items": {
+            "$ref": "#/definitions/Action"
+          }
         },
-        "afterActions": { "type": "array" }
+        "afterActions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AfterAction"
+          }
+        }
       },
       "required": [
         "type",
@@ -195,7 +263,10 @@
           "type": "array",
           "items": { "$ref": "#/definitions/Action" }
         },
-        "afterActions": { "type": "array" }
+        "afterActions": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/AfterAction" }
+        }
       },
       "required": [
         "type",
@@ -239,12 +310,46 @@
       ]
     },
 
+    "AfterAction": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "task",
+            "notifyAlgoQueueManager"
+          ]
+        }
+      },
+      "anyOf": [
+        { "$ref": "#/definitions/TaskAction" },
+        { "$ref": "#/definitions/NotifyAlgoQueueManagerAction" }
+      ]
+    },
+
+    "NotifyAlgoQueueManagerAction": {
+      "type": "object",
+      "description": "Deprecated! The notifyAlgoQueueManager action is deprecated and should not be used.",
+      "properties": {
+        "type": {
+          "const": "notifyAlgoQueueManager",
+          "description": "Deprecated! The notifyAlgoQueueManager action is deprecated and should not be used."
+        },
+        "description": { "type": "string" }
+      },
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false
+    },
+
     "TaskAction": {
       "type": "object",
       "properties": {
         "type": { "const": "task" },
         "description": { "type": "string" },
         "functionName": { "type": "string" },
+        "priority": { "type": "number" },
         "data": {
           "type": "object",
           "additionalProperties": true
@@ -608,6 +713,40 @@
         "name",
         "fields"
       ]
+    },
+
+    "PermissionRequiredAccessMode": {
+      "const": "permissionRequired",
+      "description": "Only users with the correct permission have the ability to perform the action."
+    },
+
+    "AllUsersAccessMode": {
+      "const": "allUsers",
+      "description": "All users will have the permission to perform the action on the documents in the schema collection. Regardless of their role or their permissions."
+    },
+
+    "RelationalAccessModes": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "const": "creator",
+            "description": "The user that created the document can perform the action."
+          },
+          {
+            "const": "linkedUsers",
+            "description": "All users where their user id is in the list of `userIds` of the document can perform the action."
+          },
+          {
+            "const": "linkedGroupStaff",
+            "description": "All users that have a staff enlistment in a group that is in the list of `groupIds` of the document can perform the action."
+          },
+          {
+            "const": "linkedGroupPatients",
+            "description": "All users that have a patient enlistment in a group that is in the list of `groupIds` of the document can perform the action."
+          }
+        ]
+      }
     },
 
     "Any": {
