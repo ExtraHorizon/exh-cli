@@ -558,3 +558,32 @@ test('Using input conditions in non-manual transitions must give an error', () =
     }
   }
 });
+
+test('Using arrays for readMode, updateMode and deleteMode is allowed', () => {
+  const verify = new SchemaVerify(ajv, {
+    ...minimalSchema,
+    readMode: ['linkedGroupStaff', 'linkedGroupPatients'],
+    updateMode: ['linkedUsers'],
+    deleteMode: ['creator'],
+  }, metaschema);
+
+  for (const check of verify.RunChecks()) {
+    expect(check.ok).toBe(true);
+  }
+});
+
+test('Using an array for the createMode is not allowed', () => {
+  const verify = new SchemaVerify(ajv, {
+    ...minimalSchema,
+    createMode: ['creator'],
+  }, metaschema);
+
+  for (const check of verify.RunChecks()) {
+    if (check.id === TestId.META_SCHEMA) {
+      expect(check.ok).toBe(false);
+    } else {
+      expect(check.errors).toStrictEqual([]);
+      expect(check.ok).toBe(true);
+    }
+  }
+});

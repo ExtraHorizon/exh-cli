@@ -1,10 +1,10 @@
-import { Condition, Schema, Transition, TransitionAction } from '@extrahorizon/javascript-sdk';
+import { Condition, CreationTransition, Schema, TransitionAction, TypeConfiguration } from '@extrahorizon/javascript-sdk';
 import * as _ from 'lodash';
 
 export function stripUnsupportedDescriptionFields(schema: Schema) {
   const newSchema = { ...schema };
   if (schema.creationTransition) {
-    newSchema.creationTransition = _.omit(schema.creationTransition, 'description');
+    newSchema.creationTransition = stripDescriptionsFromTransition(schema.creationTransition);
   }
 
   if (schema.transitions) {
@@ -22,8 +22,8 @@ export function stripUnsupportedDescriptionFields(schema: Schema) {
   return newSchema;
 }
 
-function stripDescriptionsFromTransition(transition: Transition) {
-  const newTransition = _.omit(transition, 'description');
+function stripDescriptionsFromTransition<T extends CreationTransition>(transition: T): T {
+  const newTransition = _.omit(transition, 'description') as T;
 
   if (newTransition.conditions) {
     newTransition.conditions = newTransition.conditions.map(condition => {
@@ -46,8 +46,8 @@ function stripDescriptionsFromTransition(transition: Transition) {
   return newTransition;
 }
 
-function stripDescriptionsFromTypeConfiguration(configuration: any) {
-  const newConfiguration = _.omit(configuration, 'description');
+function stripDescriptionsFromTypeConfiguration(configuration: TypeConfiguration): TypeConfiguration {
+  const newConfiguration = _.omit(configuration, 'description') as TypeConfiguration;
 
   if (newConfiguration.type === 'object') {
     if (newConfiguration.properties) {

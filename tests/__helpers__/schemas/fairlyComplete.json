@@ -4,9 +4,9 @@
   "name": "my-test-schema",
   "description": "This is a test schema",
 
-  "createMode": "default",
-  "readMode": "default",
-  "updateMode": "default",
+  "createMode": "allUsers",
+  "readMode": ["linkedUsers","linkedGroupStaff"],
+  "updateMode": ["linkedUsers","linkedGroupStaff"],
   "deleteMode": "permissionRequired",
   
   "groupSyncMode": "linkedUsersPatientEnlistments",
@@ -61,6 +61,7 @@
         "type": "task",
         "description": "A task action with all options",
         "functionName": "myFunction",
+        "priority": 0,
         "data": {
           "anyThingGoes": true
         }
@@ -146,6 +147,28 @@
       {
         "type": "measurementReviewedNotification",
         "description": "A measurementReviewedNotification action with all options"
+      }
+    ],
+    "afterActions": [
+      {
+        "type": "task",
+        "functionName": "myFunction"
+      },
+      {
+        "type": "task",
+        "description": "A task after action with all options",
+        "functionName": "myFunction",
+        "priority": 0,
+        "data": {
+          "anyThingGoes": true
+        }
+      },
+      {
+        "type": "notifyAlgoQueueManager"
+      },
+      {
+        "type": "notifyAlgoQueueManager",
+        "description": "A notifyAlgoQueueManager after action with all options"
       }
     ]
   },
