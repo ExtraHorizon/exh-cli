@@ -10,15 +10,15 @@ When creating a data schema, you'll typically make a JSON file containing a spec
 
 ```json
 {
-  "$schema": "https://swagger.extrahorizon.com/cli/1.7.0/config-json-schemas/Schema.json",
+  "$schema": "https://swagger.extrahorizon.com/cli/1.8.0/config-json-schemas/Schema.json",
 
   "name": "MyFirstSchema",
   "description": "Example of a schema",
   
-  "createMode": "default",
-  "readMode": "default",
-  "updateMode": "default",
-  "deleteMode": "permissionRequired",
+  "createMode": "allUsers",
+  "readMode": ["creator", "linkedUsers", "linkedGroupStaff"],
+  "updateMode": ["creator"],
+  "deleteMode": ["creator"],
   
   "statuses": {
     "created": {},
@@ -42,12 +42,6 @@ When creating a data schema, you'll typically make a JSON file containing a spec
           },
           "required": ["firstProperty"]
         }
-      }
-    ],
-    "actions": [
-      {
-        "type": "linkCreator",
-        "description": "Link the creator of the document so they can access it"
       }
     ]
   },
