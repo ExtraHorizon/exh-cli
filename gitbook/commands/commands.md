@@ -6,65 +6,34 @@
 This section assumes some basic familiarity with the data service and the concept of schemas. To get more information on those topics, please read through [Data service](https://docs.extrahorizon.com/extrahorizon/for-developers/manage-data/data-service) in the ExtraHorizon documentation.
 {% endhint %}
 
-When creating a data schema, you'll typically make a JSON file containing a specification of how your data should look like and how it should behave in transitions. This JSON file can then be easily managed through version control. The exh-cli will help you to verify and synchronise the schema with the ExtraHorizon cloud. An example schema JSON file looks as follows:
+When creating a data schema, you'll typically make a JSON file containing a specification of how your data should look like and how it should behave in transitions. This JSON file can then be easily managed through version control. The exh-cli will help you to verify and synchronise the schema with the ExtraHorizon cloud. A minimal example of a schema JSON file looks as follows:
 
 ```json
 {
   "$schema": "https://swagger.extrahorizon.com/cli/1.8.0/config-json-schemas/Schema.json",
 
   "name": "MyFirstSchema",
-  "description": "Example of a schema",
+  "description": "Minimal schema example",
   
   "createMode": "allUsers",
-  "readMode": ["creator", "linkedUsers", "linkedGroupStaff"],
+  "readMode": ["creator"],
   "updateMode": ["creator"],
   "deleteMode": ["creator"],
   
   "statuses": {
-    "created": {},
-    "active": {}
+    "new": {}
   },
   
   "creationTransition": {
     "type": "manual",
-    "description": "The transition triggered while a document is created",
-    "toStatus": "created",
-    "conditions": [
-      {
-        "type": "input",
-        "description": "Making sure only 'firstProperty' can (and must) be supplied",
-        "configuration": {
-          "type": "object",
-          "properties": {
-            "firstProperty": {
-              "type": "string"
-            }
-          },
-          "required": ["firstProperty"]
-        }
-      }
-    ]
+    "toStatus": "new"
   },
   
-  "transitions": [
-    {
-      "type": "manual",
-      "name": "activate",
-      "description": "Allow moving from the 'created' to the 'active' status",
-      "fromStatuses": [
-        "created"
-      ],
-      "toStatus": "active"
-    }
-  ],
+  "transitions": [],
   
   "properties": {
     "firstProperty": {
-      "type": "string",
-      "description": "Your explanation about the property here"
-    },
-    "secondProperty": {
-      "type": "number"
+      "type": "string"
     }
   }
 }
@@ -156,3 +125,69 @@ You'll need the ID of the schema you want to delete. This is _not_ the name of t
 `--id`
 
 This argument is used to specify the id of the schema to be deleted.
+
+### Schema example
+
+An example of a schema making use of some of the features of the Data Service:
+
+```json
+{
+  "$schema": "https://swagger.extrahorizon.com/cli/1.8.0/config-json-schemas/Schema.json",
+
+  "name": "MyExampleSchema",
+  "description": "Example of a schema",
+  
+  "createMode": "allUsers",
+  "readMode": ["creator", "linkedUsers", "linkedGroupStaff"],
+  "updateMode": ["creator"],
+  "deleteMode": ["creator"],
+  
+  "statuses": {
+    "created": {},
+    "active": {}
+  },
+  
+  "creationTransition": {
+    "type": "manual",
+    "description": "The transition triggered while a document is created",
+    "toStatus": "created",
+    "conditions": [
+      {
+        "type": "input",
+        "description": "Making sure only 'firstProperty' can (and must) be supplied",
+        "configuration": {
+          "type": "object",
+          "properties": {
+            "firstProperty": {
+              "type": "string"
+            }
+          },
+          "required": ["firstProperty"]
+        }
+      }
+    ]
+  },
+  
+  "transitions": [
+    {
+      "type": "manual",
+      "name": "activate",
+      "description": "Allow moving from the 'created' to the 'active' status",
+      "fromStatuses": [
+        "created"
+      ],
+      "toStatus": "active"
+    }
+  ],
+  
+  "properties": {
+    "firstProperty": {
+      "type": "string",
+      "description": "Your explanation about the property here"
+    },
+    "secondProperty": {
+      "type": "number"
+    }
+  }
+}
+```
