@@ -10,7 +10,7 @@ When creating a data schema, you'll typically make a JSON file containing a spec
 
 ```json
 {
-  "$schema": "https://swagger.extrahorizon.com/cli/1.8.0/config-json-schemas/Schema.json",
+  "$schema": "https://swagger.extrahorizon.com/cli/1.8.1/config-json-schemas/Schema.json",
 
   "name": "MyFirstSchema",
   "description": "Minimal schema example",

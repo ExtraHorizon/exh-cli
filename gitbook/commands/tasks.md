@@ -66,7 +66,7 @@ but this can be very tedious to use. Instead you can create a `task-config.json`
   "description": "My sample task",
   "path": "build",
   "entryPoint": "build/index.handler",
-  "runtime": "nodejs18.x",
+  "runtime": "nodejs22.x",
   "timeLimit": 60,
   "memoryLimit": 128,
   "environment": {
