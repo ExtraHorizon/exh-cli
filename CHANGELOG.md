@@ -1,5 +1,8 @@
 # Extra Horizon CLI changelog
 
+### v1.8.1
+* Updated the supported Task Service runtime options
+
 ### v1.8.0
 * Schemas:
   * `createMode`, `readMode`, `updateMode` and `deleteMode` have been updated to accept multiple granular options, matching the revamped access mode changes in Data Service `1.4.0`
