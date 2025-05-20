@@ -1,5 +1,8 @@
 # Extra Horizon CLI changelog
 
+### v1.8.2
+* Updated the ExH SDK to `8.6.0` to fix a security warning from `axios`
+
 ### v1.8.1
 * Updated the supported Task Service runtime options
 
