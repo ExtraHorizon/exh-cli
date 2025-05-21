@@ -444,12 +444,12 @@
     "@extrahorizon/eslint-config-base" "^1.6.0"
     eslint-plugin-jest "^26.4.5"
 
-"@extrahorizon/javascript-sdk@^8.4.1":
-  version "8.4.1"
-  resolved "https://npm.pkg.github.com/download/@ExtraHorizon/javascript-sdk/8.4.1/b09db1f1d247418dc5b210e060ecf16f8bccca05#b09db1f1d247418dc5b210e060ecf16f8bccca05"
-  integrity sha512-xfXvz/rEZGp50u4vdxay8/9BjTZ1MKrLLX09KfLlJ3Hn1x04i+XXg/gfIt3qrODDJvfUpNxmqBNH4LXb76CKuQ==
+"@extrahorizon/javascript-sdk@^8.6.0":
+  version "8.6.0"
+  resolved "https://npm.pkg.github.com/download/@ExtraHorizon/javascript-sdk/8.6.0/6466eba758f46b5d3903a085261acd5e58ebe07b#6466eba758f46b5d3903a085261acd5e58ebe07b"
+  integrity sha512-pRBDLkLaUs5TGs1YH9TecNW6YZpg/qZZJ5qsd6c8i5SaeinmuHbtJ8i4DascgzCSnllYtWXHCWac4/62KFj8FA==
   dependencies:
-    axios "0.28.1"
+    axios "0.30.0"
     buffer "6.0.3"
     fflate "0.8.2"
     form-data "4.0.0"
@@ -1203,12 +1203,12 @@ asynckit@^0.4.0:
   resolved "https://registry.yarnpkg.com/asynckit/-/asynckit-0.4.0.tgz#c79ed97f7f34cb8f2ba1bc9790bcc366474b4b79"
   integrity sha1-x57Zf380y48robyXkLzDZkdLS3k=
 
-axios@0.28.1:
-  version "0.28.1"
-  resolved "https://registry.yarnpkg.com/axios/-/axios-0.28.1.tgz#2a7bcd34a3837b71ee1a5ca3762214b86b703e70"
-  integrity sha512-iUcGA5a7p0mVb4Gm/sy+FSECNkPFT4y7wt6OM/CDpO/OnNCvSs3PoMG8ibrC9jRoGYU0gUK5pXVC4NPXq6lHRQ==
+axios@0.30.0:
+  version "0.30.0"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-0.30.0.tgz#026ae2c0ae6ac35d564056690683fb77c991d0d3"
+  integrity sha512-Z4F3LjCgfjZz8BMYalWdMgAQUnEtKDmpwNHjh/C8pQZWde32TF64cqnSeyL3xD/aTIASRU30RHTNzRiV/NpGMg==
   dependencies:
-    follow-redirects "^1.15.0"
+    follow-redirects "^1.15.4"
     form-data "^4.0.0"
     proxy-from-env "^1.1.0"
 
@@ -2049,10 +2049,10 @@ flatted@^3.1.0:
   resolved "https://registry.yarnpkg.com/flatted/-/flatted-3.2.5.tgz#76c8584f4fc843db64702a6bd04ab7a8bd666da3"
   integrity sha512-WIWGi2L3DyTUvUrwRKgGi9TwxQMUEqPOPQBVi71R96jZXJdFskXEmf54BoZaS1kknGODoIGASGEzBUYdyMCBJg==
 
-follow-redirects@^1.15.0:
-  version "1.15.6"
-  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.15.6.tgz#7f815c0cda4249c74ff09e95ef97c23b5fd0399b"
-  integrity sha512-wWN62YITEaOpSK584EZXJafH1AGpO8RVgElfkuXbTOrPX4fIfOyEpW/CsiNd8JdYrAoOvafRTOEnvsO++qCqFA==
+follow-redirects@^1.15.4:
+  version "1.15.9"
+  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.15.9.tgz#a604fa10e443bf98ca94228d9eebcc2e8a2c8ee1"
+  integrity sha512-gew4GsXizNgdoRyqmyfMHyAmXsZDk6mHkSxZFCzW9gwlbtOW44CDtYavM+y+72qD/Vq2l550kMF52DT8fOLJqQ==
 
 form-data@4.0.0, form-data@^4.0.0:
   version "4.0.0"
