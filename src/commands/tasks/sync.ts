@@ -2,10 +2,11 @@ import * as fs from 'fs/promises';
 import * as chalk from 'chalk';
 import { runtimeChoices } from '../../constants';
 import { epilogue } from '../../helpers/util';
+import * as authRepository from '../../repositories/auth';
 import * as functionRepository from '../../repositories/functions';
 import { FunctionCreation } from '../../repositories/functions';
 import { assertExecutionPermission, getValidatedConfigIterator, TaskConfig } from './taskConfig';
-import { zipFileFromDirectory } from './util';
+import { createFunctionUser, zipFileFromDirectory } from './util';
 
 export const command = 'sync';
 export const desc = 'Sync a task. Will create the task first if it doesn\'t exist yet';
@@ -75,7 +76,7 @@ export const handler = async ({ sdk, ...cmdLineParams }) => {
   }
 };
 
-async function syncSingleTask(sdk:any, config: TaskConfig) {
+async function syncSingleTask(sdk: any, config: TaskConfig) {
   /* load configuration & overload parameters passed through command line */
 
   const uploadFilePath = await zipFileFromDirectory(config.path);
@@ -83,7 +84,7 @@ async function syncSingleTask(sdk:any, config: TaskConfig) {
 
   /* Check if the function already exists */
   const allFunctions = await functionRepository.find(sdk);
-  const myFunction = allFunctions.find((f:any) => f.name === config.name);
+  const myFunction = allFunctions.find((f: any) => f.name === config.name);
 
   /* Construct a request object to send to the API */
   const request: FunctionCreation = {
@@ -98,18 +99,48 @@ async function syncSingleTask(sdk:any, config: TaskConfig) {
   if (config.executionPermission) {
     request.executionOptions = { permissionMode: config.executionPermission };
   }
+
   if (config.timeLimit) {
     request.timeLimit = config.timeLimit;
   }
+
   if (config.memoryLimit) {
     request.memoryLimit = config.memoryLimit;
   }
-  if (config.environment) {
-    request.environmentVariables =
-      Object.entries(config.environment).reduce((prev:any, curr:any) => ({ ...prev, [curr[0]]: { value: curr[1] } }), {});
-  }
+
   if (config.retryPolicy) {
     request.retryPolicy = config.retryPolicy;
+  }
+
+  if (config.executionCredentials) {
+    const credentials = await createFunctionUser(
+      sdk,
+      {
+        taskName: config.name,
+        targetEmail: config.executionCredentials.email,
+        targetPermissions: config.executionCredentials.permissions,
+      }
+    );
+
+    // eslint-disable-next-line no-param-reassign
+    config.environment = {
+      ...config.environment,
+      API_HOST: authRepository.getHost(sdk),
+      // TODO: Get these from the SDK
+      API_OAUTH_CONSUMER_KEY: 'FILL_ME_IN',
+      API_OAUTH_CONSUMER_SECRET: 'FILL_ME_IN',
+      API_OAUTH_TOKEN: credentials.token,
+      API_OAUTH_TOKEN_SECRET: credentials.tokenSecret,
+    };
+  }
+
+  if (config.environment) {
+    const environmentVariables: Record<string, { value: string; }> = {};
+    for (const [key, value] of Object.entries(config.environment)) {
+      environmentVariables[key] = { value };
+    }
+
+    request.environmentVariables = environmentVariables;
   }
 
   if (myFunction === undefined) {

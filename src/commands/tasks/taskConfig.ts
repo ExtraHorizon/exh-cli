@@ -24,6 +24,10 @@ export interface TaskConfig {
     enabled: boolean;
     errorsToRetry: string[];
   };
+  executionCredentials?: {
+    email?: string;
+    permissions: string[];
+  };
 }
 
 const taskConfigSchema = Joi.object({
@@ -40,6 +44,10 @@ const taskConfigSchema = Joi.object({
   }),
   environment: Joi.object().pattern(/.*/, Joi.string()),
   executionPermission: Joi.string().valid(...Object.values(permissionModes)),
+  executionCredentials: Joi.object({
+    email: Joi.string(),
+    permissions: Joi.array().items(Joi.string()).required(),
+  }),
 });
 
 export function assertExecutionPermission(mode: string): asserts mode is permissionModes | undefined {
@@ -106,7 +114,7 @@ export async function validateConfig(config: TaskConfig) {
   return true;
 }
 
-export async function loadSingleConfigFile(path:string): Promise<TaskConfig> {
+export async function loadSingleConfigFile(path: string): Promise<TaskConfig> {
   let taskConfig: TaskConfig;
   try {
     /* load config file */

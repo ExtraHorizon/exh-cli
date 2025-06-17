@@ -25,7 +25,7 @@ export async function find(sdk: OAuth1Client) {
 }
 
 export async function findByName(sdk: OAuth1Client, name: string) {
-  const response = await sdk.raw.get(`/tasks/v1/functions/${name}`);
+  const response = await sdk.raw.get(`/tasks/v1/functions/${name}`, { customResponseKeys: ['*'] });
   return response.data;
 }
 
