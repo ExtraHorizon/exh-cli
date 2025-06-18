@@ -35,52 +35,37 @@ export async function asyncExec(cmd: string): Promise<string> {
   });
 }
 
-interface ExHCredentials {
-  API_HOST: string;
-  API_OAUTH_CONSUMER_KEY: string;
-  API_OAUTH_CONSUMER_SECRET: string;
-  API_OAUTH_TOKEN: string;
-  API_OAUTH_TOKEN_SECRET: string;
-}
-
-const requiredEnvironmentVariables = ['API_HOST', 'API_OAUTH_CONSUMER_KEY', 'API_OAUTH_CONSUMER_SECRET', 'API_OAUTH_TOKEN', 'API_OAUTH_TOKEN_SECRET'];
-
-export function extractLocalCredentials() {
+export function loadAndAssertCredentials() {
   const credentials = {};
+  let credentialsFile: string;
   let errorMessage = '';
 
   try {
-    const credentialsFile = fs.readFileSync(EXH_CONFIG_FILE, 'utf-8');
-    const credentialFileLines = credentialsFile.split(/\r?\n/);
-
-    for (const credentialFileLine of credentialFileLines) {
-      const [key, value] = credentialFileLine.split('=');
-
-      if (key && value) {
-        credentials[key.trim()] = value.trim();
-      }
-    }
-
-    for (const key of requiredEnvironmentVariables) {
-      // Set the environment variable if it's present in the credentials file, but not in the environment variables
-      if (credentials[key] && !process.env[key]) {
-        process.env[key] = credentials[key];
-      }
-
-      // Set the credentials value if it's present in the environment
-      if (process.env[key]) {
-        credentials[key] = process.env[key];
-      }
-    }
+    credentialsFile = fs.readFileSync(EXH_CONFIG_FILE, 'utf-8');
   } catch (e) {
     errorMessage += 'Couldn\'t open ~/.exh/credentials. ';
   }
 
-  const missingEnvironmentVariables = requiredEnvironmentVariables.filter(key => !process.env[key]);
+  const credentialFileLines = credentialsFile.split(/\r?\n/);
+  for (const credentialFileLine of credentialFileLines) {
+    const [key, value] = credentialFileLine.split('=');
+
+    if (key && value) {
+      credentials[key.trim()] = value.trim();
+    }
+  }
+
+  const requiredEnvVariables = ['API_HOST', 'API_OAUTH_CONSUMER_KEY', 'API_OAUTH_CONSUMER_SECRET', 'API_OAUTH_TOKEN', 'API_OAUTH_TOKEN_SECRET'];
+  for (const key of requiredEnvVariables) {
+    // Set the environment variable if it's present in the credentials file, but not in the environment variables
+    if (credentials[key] && !process.env[key]) {
+      process.env[key] = credentials[key];
+    }
+  }
+
+  const missingEnvironmentVariables = requiredEnvVariables.filter(key => !process.env[key]);
   if (missingEnvironmentVariables.length > 0) {
     errorMessage += `Missing environment variables: ${missingEnvironmentVariables.join(',')}`;
     throw new Error(`Failed to retrieve all credentials. ${errorMessage}`);
   }
-
-  return credentials as ExHCredentials;
 }

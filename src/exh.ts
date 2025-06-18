@@ -1,5 +1,5 @@
 import { createOAuth1Client, OAuth1Client } from '@extrahorizon/javascript-sdk';
-import { extractLocalCredentials } from './helpers/util';
+import { loadAndAssertCredentials } from './helpers/util';
 
 let sdk: OAuth1Client = null;
 
@@ -13,19 +13,19 @@ export function sdkInitOnly(apiHost: string, consumerKey: string, consumerSecret
 }
 
 export async function sdkAuth() {
-  const credentials = extractLocalCredentials();
+  loadAndAssertCredentials();
 
   sdk = createOAuth1Client({
-    consumerKey: credentials.API_OAUTH_CONSUMER_KEY,
-    consumerSecret: credentials.API_OAUTH_CONSUMER_SECRET,
-    host: credentials.API_HOST,
+    host: process.env.API_HOST,
+    consumerKey: process.env.API_OAUTH_CONSUMER_KEY,
+    consumerSecret: process.env.API_OAUTH_CONSUMER_SECRET,
   });
 
   try {
     // authenticate
     await sdk.auth.authenticate({
-      token: credentials.API_OAUTH_TOKEN,
-      tokenSecret: credentials.API_OAUTH_TOKEN_SECRET,
+      token: process.env.API_OAUTH_TOKEN,
+      tokenSecret: process.env.API_OAUTH_TOKEN_SECRET,
     });
   } catch (err) {
     throw new Error(`Failed to authenticate. All credentials found but some might be wrong or no longer valid.\nError was: "${err}"`);
