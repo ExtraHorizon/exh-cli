@@ -48,6 +48,11 @@ export async function createFunctionUser(sdk: OAuth1Client, data: { taskName: st
   if (!user) {
     console.log(chalk.white('⚙️  Creating a user for the task'));
 
+    const isEmailAvailable = await sdk.users.isEmailAvailable(email);
+    if (!isEmailAvailable) {
+      throw new Error('❌ The user could not be created as the email address is already in use');
+    }
+
     user = await sdk.users.createAccount({
       firstName: `${taskName}`,
       lastName: 'exh.tasks',
@@ -78,13 +83,7 @@ export async function createFunctionUser(sdk: OAuth1Client, data: { taskName: st
 
   // If there are no existing credentials, remove the user and create a new one
   if (!hasExistingCredentials) {
-    console.log(chalk.white('⚙️  No existing credentials found for the user, removing the user'));
-
-    await sdk.users.remove(user.id);
-
-    console.log(chalk.green('✅ Successfully removed the user'));
-
-    return await createFunctionUser(sdk, data);
+    throw new Error('❌ No credentials were found for the existing user');
   }
 
   // Ensure the role is assigned to the user
