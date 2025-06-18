@@ -27,7 +27,7 @@ jobs:
       
       - run: yarn lint
       - run: yarn build
-      - run: yarn test
+      - run: yarn test:ci
       
       - name: Determine version number and branch tag
         run: |
