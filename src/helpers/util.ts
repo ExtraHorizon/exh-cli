@@ -43,8 +43,10 @@ interface ExHCredentials {
   API_OAUTH_TOKEN_SECRET: string;
 }
 
+const requiredEnvironmentVariables = ['API_HOST', 'API_OAUTH_CONSUMER_KEY', 'API_OAUTH_CONSUMER_SECRET', 'API_OAUTH_TOKEN', 'API_OAUTH_TOKEN_SECRET'];
+
 export function extractLocalCredentials() {
-  let credentials: ExHCredentials;
+  const credentials = {};
   let errorMessage = '';
 
   try {
@@ -59,26 +61,26 @@ export function extractLocalCredentials() {
       }
     }
 
-    // Set the credentials as environment variables if they're not present already
-    for (const key of Object.keys(credentials)) {
-      if (!process.env[key]) {
+    for (const key of requiredEnvironmentVariables) {
+      // Set the environment variable if it's present in the credentials file, but not in the environment variables
+      if (credentials[key] && !process.env[key]) {
         process.env[key] = credentials[key];
+      }
+
+      // Set the credentials value if it's present in the environment
+      if (process.env[key]) {
+        credentials[key] = process.env[key];
       }
     }
   } catch (e) {
     errorMessage += 'Couldn\'t open ~/.exh/credentials. ';
   }
 
-  const requiredEnvironmentVariables = ['API_HOST', 'API_OAUTH_CONSUMER_KEY', 'API_OAUTH_CONSUMER_SECRET', 'API_OAUTH_TOKEN', 'API_OAUTH_TOKEN_SECRET'];
   const missingEnvironmentVariables = requiredEnvironmentVariables.filter(key => !process.env[key]);
-
   if (missingEnvironmentVariables.length > 0) {
     errorMessage += `Missing environment variables: ${missingEnvironmentVariables.join(',')}`;
-  }
-
-  if (errorMessage) {
     throw new Error(`Failed to retrieve all credentials. ${errorMessage}`);
   }
 
-  return credentials;
+  return credentials as ExHCredentials;
 }
