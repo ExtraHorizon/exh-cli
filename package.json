@@ -14,7 +14,8 @@
     "start": "yarn build && node ./build/index.js",
     "clean": "rimraf build",
     "build": "yarn clean && tsc",
-    "test": "jest --silent",
+    "test": "jest",
+    "test:ci": "jest --silent",
     "lint": "eslint src tests --ext .ts"
   },
   "bin": {
