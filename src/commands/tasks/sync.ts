@@ -126,9 +126,8 @@ async function syncSingleTask(sdk: any, config: TaskConfig) {
     config.environment = {
       ...config.environment,
       API_HOST: authRepository.getHost(sdk),
-      // TODO: Get these from the SDK
-      API_OAUTH_CONSUMER_KEY: 'FILL_ME_IN',
-      API_OAUTH_CONSUMER_SECRET: 'FILL_ME_IN',
+      API_OAUTH_CONSUMER_KEY: process.env.API_OAUTH_CONSUMER_KEY,
+      API_OAUTH_CONSUMER_SECRET: process.env.API_OAUTH_CONSUMER_SECRET,
       API_OAUTH_TOKEN: credentials.token,
       API_OAUTH_TOKEN_SECRET: credentials.tokenSecret,
     };
