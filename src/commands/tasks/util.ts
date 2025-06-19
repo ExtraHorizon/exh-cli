@@ -49,8 +49,8 @@ export async function syncFunctionUser(sdk: OAuth1Client, data: { taskName: stri
   if (!user) {
     console.log(chalk.white('⚙️  Creating a user for the task'));
 
-    const isEmailAvailable = await sdk.users.isEmailAvailable(email);
-    if (!isEmailAvailable) {
+    const { emailAvailable } = await sdk.users.isEmailAvailable(email);
+    if (!emailAvailable) {
       throw new Error('❌ The user could not be created as the email address is already in use');
     }
 
