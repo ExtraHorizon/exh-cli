@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import * as authRepository from '../../repositories/auth';
 import * as functionRepository from '../../repositories/functions';
 import * as userRepository from '../../repositories/user';
+import { addPermissionsToGlobalRole } from '../../repositories/user';
 
 export async function zipFileFromDirectory(path: string): Promise<string> {
   return new Promise((res, rej) => {
@@ -49,19 +50,20 @@ export async function syncFunctionUser(sdk: OAuth1Client, data: { taskName: stri
   if (!user) {
     console.log(chalk.white('⚙️  Creating a user for the task'));
 
-    const { emailAvailable } = await sdk.users.isEmailAvailable(email);
-    if (!emailAvailable) {
+    const isEmailAvailable = await userRepository.isEmailAvailable(sdk, email);
+    if (!isEmailAvailable) {
       throw new Error('❌ The user could not be created as the email address is already in use');
     }
 
-    user = await sdk.users.createAccount({
+    const registerUserData = {
       firstName: `${taskName}`,
       lastName: 'exh.tasks',
       email,
       password,
       phoneNumber: '0000000000',
       language: 'EN',
-    });
+    };
+    user = await userRepository.createUser(sdk, registerUserData);
 
     console.log(chalk.green('✅ Successfully created a user for task'));
 
@@ -104,24 +106,19 @@ export async function syncFunctionUser(sdk: OAuth1Client, data: { taskName: stri
 
 async function syncRoleWithPermissions(sdk: OAuth1Client, taskName: string, roleName: string, targetPermissions: string[]) {
   console.log(chalk.white('⚙️  Checking if the role exists'));
-  let role = await sdk.users.globalRoles.findByName(roleName);
+  let role = await userRepository.findGlobalRoleByName(sdk, roleName);
 
   if (!role) {
     console.log(chalk.white('⚙️  Role does not exist, creating a new role'));
 
     // Create the role
-    role = await sdk.users.globalRoles.create({
-      name: roleName,
-      description: `A role created by the CLI for the execution of the task ${taskName}`,
-    });
+    const roleDescription = `A role created by the CLI for the execution of the task ${taskName}`;
+    role = await userRepository.createGlobalRole(sdk, roleName, roleDescription);
 
     // Assign permissions to the role
     console.log(chalk.white('⚙️  Assigning permissions to the role'));
 
-    await sdk.users.globalRoles.addPermissions(
-      rqlBuilder().eq('name', roleName).build(),
-      { permissions: targetPermissions }
-    );
+    await userRepository.addPermissionsToGlobalRole(sdk, roleName, targetPermissions);
 
     console.log(chalk.green('✅ Successfully assigned permissions to the role'));
     return role;
@@ -135,7 +132,7 @@ async function syncRoleWithPermissions(sdk: OAuth1Client, taskName: string, role
   if (permissionsToAdd.length > 0) {
     console.log(chalk.white('⚙️  Adding missing permissions to the role'));
 
-    await sdk.users.globalRoles.addPermissions(rqlBuilder().eq('name', roleName).build(), { permissions: permissionsToAdd });
+    await userRepository.addPermissionsToGlobalRole(sdk, roleName, permissionsToAdd);
 
     console.log(chalk.green('✅ Successfully added missing permissions to the role'));
   }
@@ -143,7 +140,7 @@ async function syncRoleWithPermissions(sdk: OAuth1Client, taskName: string, role
   if (permissionsToRemove.length > 0) {
     console.log(chalk.white('⚙️  Removing excess permissions from the role'));
 
-    await sdk.users.globalRoles.removePermissions(rqlBuilder().eq('name', roleName).build(), { permissions: permissionsToRemove });
+    await userRepository.removePermissionsFromGlobalRole(sdk, roleName, permissionsToRemove);
 
     console.log(chalk.green('✅ Successfully removed excess permissions from the role'));
   }
@@ -154,21 +151,9 @@ async function syncRoleWithPermissions(sdk: OAuth1Client, taskName: string, role
 async function assignRoleToUser(sdk: OAuth1Client, userId: string, roleId: string) {
   console.log(chalk.white('⚙️  Assigning the role to the user'));
 
-  await sdk.users.globalRoles.addToUsers(
-    rqlBuilder().eq('id', userId).build(),
-    { roles: [roleId] }
-  );
+  await userRepository.addGlobalRoleToUser(sdk, userId, roleId);
 
   console.log(chalk.green('✅ Successfully assigned the role to the user'));
-}
-
-function validateEmail(email: string) {
-  // Regex validation matching the user service
-  const emailRegex = /.+@.+\..+/;
-
-  if (email.length < 3 || email.length > 256 || !emailRegex.test(email)) {
-    throw new Error('Invalid email address');
-  }
 }
 
 async function createOAuth1Tokens(sdk: OAuth1Client, email: string, password: string) {
@@ -180,4 +165,13 @@ async function createOAuth1Tokens(sdk: OAuth1Client, email: string, password: st
   console.log(chalk.green('✅ Successfully created OAuth1 tokens for the user', email));
 
   return { token, tokenSecret };
+}
+
+function validateEmail(email: string) {
+  // Regex validation matching the user service
+  const emailRegex = /.+@.+\..+/;
+
+  if (email.length < 3 || email.length > 256 || !emailRegex.test(email)) {
+    throw new Error('Invalid email address');
+  }
 }
