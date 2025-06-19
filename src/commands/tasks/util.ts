@@ -31,7 +31,7 @@ export async function zipFileFromDirectory(path: string): Promise<string> {
   });
 }
 
-export async function createFunctionUser(sdk: OAuth1Client, data: { taskName: string; targetEmail?: string; targetPermissions: string[]; }) {
+export async function syncFunctionUser(sdk: OAuth1Client, data: { taskName: string; targetEmail?: string; targetPermissions: string[]; }) {
   const { taskName, targetEmail, targetPermissions } = data;
 
   const email = targetEmail || `exh.tasks+${taskName}@extrahorizon.com`;
@@ -41,7 +41,7 @@ export async function createFunctionUser(sdk: OAuth1Client, data: { taskName: st
   const password = `0Oo-${uuidv4()}`;
 
   const roleName = `exh.tasks.${taskName}`;
-  const role = await createRoleWithPermissions(sdk, taskName, roleName, targetPermissions);
+  const role = await syncRoleWithPermissions(sdk, taskName, roleName, targetPermissions);
 
   // Create a user for the task if the user does not exist
   let user = await userRepository.findUserByEmail(sdk, email);
@@ -102,7 +102,7 @@ export async function createFunctionUser(sdk: OAuth1Client, data: { taskName: st
   };
 }
 
-async function createRoleWithPermissions(sdk: OAuth1Client, taskName: string, roleName: string, targetPermissions: string[]) {
+async function syncRoleWithPermissions(sdk: OAuth1Client, taskName: string, roleName: string, targetPermissions: string[]) {
   console.log(chalk.white('⚙️  Checking if the role exists'));
   let role = await sdk.users.globalRoles.findByName(roleName);
 

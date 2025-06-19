@@ -6,7 +6,7 @@ import * as authRepository from '../../repositories/auth';
 import * as functionRepository from '../../repositories/functions';
 import { FunctionCreation } from '../../repositories/functions';
 import { assertExecutionPermission, getValidatedConfigIterator, TaskConfig } from './taskConfig';
-import { createFunctionUser, zipFileFromDirectory } from './util';
+import { syncFunctionUser, zipFileFromDirectory } from './util';
 
 export const command = 'sync';
 export const desc = 'Sync a task. Will create the task first if it doesn\'t exist yet';
@@ -113,7 +113,7 @@ async function syncSingleTask(sdk: any, config: TaskConfig) {
   }
 
   if (config.executionCredentials) {
-    const credentials = await createFunctionUser(
+    const credentials = await syncFunctionUser(
       sdk,
       {
         taskName: config.name,
