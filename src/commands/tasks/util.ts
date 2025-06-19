@@ -1,13 +1,12 @@
 import { createWriteStream, unlink } from 'fs';
 import { tmpdir } from 'os';
-import { OAuth1Client, rqlBuilder } from '@extrahorizon/javascript-sdk';
+import { OAuth1Client } from '@extrahorizon/javascript-sdk';
 import * as archiver from 'archiver';
 import * as chalk from 'chalk';
 import { v4 as uuidv4 } from 'uuid';
 import * as authRepository from '../../repositories/auth';
 import * as functionRepository from '../../repositories/functions';
 import * as userRepository from '../../repositories/user';
-import { addPermissionsToGlobalRole } from '../../repositories/user';
 
 export async function zipFileFromDirectory(path: string): Promise<string> {
   return new Promise((res, rej) => {
