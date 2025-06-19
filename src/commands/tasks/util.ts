@@ -37,7 +37,8 @@ export async function createFunctionUser(sdk: OAuth1Client, data: { taskName: st
   const email = targetEmail || `exh.tasks+${taskName}@extrahorizon.com`;
   validateEmail(email);
 
-  const password = `A-${uuidv4()}-z`;
+  // The password policy requires one number as well as one uppercase and lowercase letter
+  const password = `0Oo-${uuidv4()}`;
 
   const roleName = `exh.tasks.${taskName}`;
   const role = await createRoleWithPermissions(sdk, taskName, roleName, targetPermissions);
