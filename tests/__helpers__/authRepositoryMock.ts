@@ -25,7 +25,7 @@ export const mockAuthRepository = () => {
     .mockImplementation(() => exampleHost);
 
   const createOAuth1TokensSpy = jest.spyOn(authRepository, 'createOAuth1Tokens')
-    .mockImplementationOnce(() => Promise.resolve({ data: generateOAuth1Tokens() }));
+    .mockImplementationOnce(() => Promise.resolve(generateOAuth1Tokens()));
 
   return {
     oAuth1Tokens,
