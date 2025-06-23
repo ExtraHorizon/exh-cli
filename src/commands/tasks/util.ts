@@ -117,8 +117,12 @@ async function syncRoleWithPermissions(sdk: OAuth1Client, taskName: string, role
     // Assign permissions to the role
     console.log(chalk.white('⚙️  Assigning permissions to the role'));
 
-    await userRepository.addPermissionsToGlobalRole(sdk, roleName, targetPermissions);
+    if (targetPermissions.length === 0) {
+      console.log(chalk.yellow('⚠️ No permissions defined for the role'));
+      return role;
+    }
 
+    await userRepository.addPermissionsToGlobalRole(sdk, roleName, targetPermissions);
     console.log(chalk.green('✅ Successfully assigned permissions to the role'));
     return role;
   }
@@ -159,7 +163,7 @@ async function createOAuth1Tokens(sdk: OAuth1Client, email: string, password: st
   console.log(chalk.white('⚙️  Creating OAuth1 tokens for the user', email));
 
   const response = await authRepository.createOAuth1Tokens(sdk, email, password);
-  const { token, tokenSecret } = response.data;
+  const { token, tokenSecret } = response;
 
   console.log(chalk.green('✅ Successfully created OAuth1 tokens for the user', email));
 
