@@ -25,7 +25,13 @@ export async function find(sdk: OAuth1Client) {
 }
 
 export async function findByName(sdk: OAuth1Client, name: string) {
-  const response = await sdk.raw.get(`/tasks/v1/functions/${name}`, { customResponseKeys: ['*'] });
+  const response = await sdk.raw.get(`/tasks/v1/functions/${name}`, { customResponseKeys: ['*'] })
+    .catch(e => e);
+
+  if (response.status === 404) {
+    return undefined;
+  }
+
   return response.data;
 }
 
