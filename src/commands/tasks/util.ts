@@ -1,6 +1,6 @@
 import { createWriteStream, unlink } from 'fs';
 import { tmpdir } from 'os';
-import { OAuth1Client, rqlBuilder } from '@extrahorizon/javascript-sdk';
+import { OAuth1Client } from '@extrahorizon/javascript-sdk';
 import * as archiver from 'archiver';
 import * as chalk from 'chalk';
 import { v4 as uuidv4 } from 'uuid';
@@ -46,15 +46,12 @@ export async function syncFunctionUser(sdk: OAuth1Client, data: { taskName: stri
   // Create a user for the task if the user does not exist
   let user = await userRepository.findUserByEmail(sdk, email);
 
+  console.group(chalk.white(`🔄  Syncing user: ${email}`));
+
   if (!user) {
-    console.log(chalk.white('⚙️  Creating a user for the task'));
+    console.log(chalk.white('⚙️  Creating the user...'));
 
-    const { emailAvailable } = await sdk.users.isEmailAvailable(email);
-    if (!emailAvailable) {
-      throw new Error('❌ The user could not be created as the email address is already in use');
-    }
-
-    user = await sdk.users.createAccount({
+    user = await userRepository.createUser(sdk, {
       firstName: `${taskName}`,
       lastName: 'exh.tasks',
       email,
@@ -63,15 +60,17 @@ export async function syncFunctionUser(sdk: OAuth1Client, data: { taskName: stri
       language: 'EN',
     });
 
-    console.log(chalk.green('✅ Successfully created a user for task'));
-
     await assignRoleToUser(sdk, user.id, role.id);
-    return await createOAuth1Tokens(sdk, email, password);
+    const oAuth1Tokens = await createOAuth1Tokens(sdk, email, password);
+
+    console.groupEnd();
+    console.log(chalk.green('✅  Successfully synced user'));
+    console.log('');
+
+    return oAuth1Tokens;
   }
 
   // Check if the there are existing user credentials in the Function's environment variables
-  console.log(chalk.white('⚙️  Checking for the existing users credentials'));
-
   const currentFunction = await functionRepository.findByName(sdk, taskName);
 
   const hasExistingCredentials = (
@@ -82,10 +81,11 @@ export async function syncFunctionUser(sdk: OAuth1Client, data: { taskName: stri
     currentFunction?.environmentVariables?.API_OAUTH_CONSUMER_SECRET?.value
   );
 
-  // If there are no existing credentials, remove the user and create a new one
   if (!hasExistingCredentials) {
     throw new Error('❌ No credentials were found for the existing user');
   }
+
+  console.log(chalk.white('⚙️  Reusing existing user credentials...'));
 
   // Ensure the role is assigned to the user
   const userRole = user.roles.find(({ name }) => name === roleName);
@@ -93,9 +93,12 @@ export async function syncFunctionUser(sdk: OAuth1Client, data: { taskName: stri
     await assignRoleToUser(sdk, user.id, role.id);
   }
 
-  // Return the existing credentials
-  console.log(chalk.green('✅ Using existing credentials for the user'));
+  console.groupEnd();
+  console.log(chalk.green('✅  Successfully synced user'));
 
+  console.log('');
+
+  // Return the existing credentials
   return {
     token: currentFunction.environmentVariables.API_OAUTH_TOKEN.value,
     tokenSecret: currentFunction.environmentVariables.API_OAUTH_TOKEN_SECRET.value,
@@ -103,29 +106,35 @@ export async function syncFunctionUser(sdk: OAuth1Client, data: { taskName: stri
 }
 
 async function syncRoleWithPermissions(sdk: OAuth1Client, taskName: string, roleName: string, targetPermissions: string[]) {
-  console.log(chalk.white('⚙️  Checking if the role exists'));
-  let role = await sdk.users.globalRoles.findByName(roleName);
+  console.group(chalk.white(`🔄  Syncing role: ${roleName}`));
+
+  if (targetPermissions.length === 0) {
+    console.log(chalk.yellow('⚠️  The executionCredentials.permissions field has no permissions defined'));
+  }
+
+  let role = await userRepository.findGlobalRoleByName(sdk, roleName);
 
   if (!role) {
-    console.log(chalk.white('⚙️  Role does not exist, creating a new role'));
+    console.log(chalk.white('⚙️  Creating the role...'));
 
     // Create the role
-    role = await sdk.users.globalRoles.create({
-      name: roleName,
-      description: `A role created by the CLI for the execution of the task ${taskName}`,
-    });
+    const roleDescription = `A role created by the CLI for the execution of the task ${taskName}`;
+    role = await userRepository.createGlobalRole(sdk, roleName, roleDescription);
 
-    // Assign permissions to the role
-    console.log(chalk.white('⚙️  Assigning permissions to the role'));
+    // Throws a `Some fields have the wrong format` error if the permissions array is empty
+    if (targetPermissions.length !== 0) {
+      await userRepository.addPermissionsToGlobalRole(sdk, roleName, targetPermissions);
+    }
 
-    await sdk.users.globalRoles.addPermissions(
-      rqlBuilder().eq('name', roleName).build(),
-      { permissions: targetPermissions }
-    );
+    console.log(chalk.white(`🔐  Permissions added: [${targetPermissions.join(', ')}]`));
+    console.groupEnd();
+    console.log(chalk.green('✅  Successfully synced role'));
+    console.log('');
 
-    console.log(chalk.green('✅ Successfully assigned permissions to the role'));
     return role;
   }
+
+  console.log(chalk.white('⚙️  Updating the role...'));
 
   // If the role exists, but the permissions do not match, update the role
   const currentPermissions = role.permissions?.flatMap(permission => permission.name) || [];
@@ -133,33 +142,34 @@ async function syncRoleWithPermissions(sdk: OAuth1Client, taskName: string, role
   const permissionsToRemove = currentPermissions.filter(currentPermission => !targetPermissions.includes(currentPermission));
 
   if (permissionsToAdd.length > 0) {
-    console.log(chalk.white('⚙️  Adding missing permissions to the role'));
-
-    await sdk.users.globalRoles.addPermissions(rqlBuilder().eq('name', roleName).build(), { permissions: permissionsToAdd });
-
-    console.log(chalk.green('✅ Successfully added missing permissions to the role'));
+    await userRepository.addPermissionsToGlobalRole(sdk, roleName, permissionsToAdd);
+    console.log(chalk.white(`🔐  Permissions added: [${permissionsToAdd.join(',')}]`));
   }
 
   if (permissionsToRemove.length > 0) {
-    console.log(chalk.white('⚙️  Removing excess permissions from the role'));
-
-    await sdk.users.globalRoles.removePermissions(rqlBuilder().eq('name', roleName).build(), { permissions: permissionsToRemove });
-
-    console.log(chalk.green('✅ Successfully removed excess permissions from the role'));
+    await userRepository.removePermissionsFromGlobalRole(sdk, roleName, permissionsToRemove);
+    console.log(chalk.white(`🔐  Permissions removed: [${permissionsToRemove.join(',')}]`));
   }
 
+  console.groupEnd();
+  console.log(chalk.green('✅  Successfully synced role'));
+  console.log('');
   return role;
 }
 
 async function assignRoleToUser(sdk: OAuth1Client, userId: string, roleId: string) {
-  console.log(chalk.white('⚙️  Assigning the role to the user'));
+  console.log(chalk.white('⚙️  Assigning the role to the user...'));
 
-  await sdk.users.globalRoles.addToUsers(
-    rqlBuilder().eq('id', userId).build(),
-    { roles: [roleId] }
-  );
+  await userRepository.addGlobalRoleToUser(sdk, userId, roleId);
+}
 
-  console.log(chalk.green('✅ Successfully assigned the role to the user'));
+async function createOAuth1Tokens(sdk: OAuth1Client, email: string, password: string) {
+  console.log(chalk.white('⚙️  Creating credentials...'));
+
+  const response = await authRepository.createOAuth1Tokens(sdk, email, password);
+  const { token, tokenSecret } = response;
+
+  return { token, tokenSecret };
 }
 
 function validateEmail(email: string) {
@@ -169,15 +179,4 @@ function validateEmail(email: string) {
   if (email.length < 3 || email.length > 256 || !emailRegex.test(email)) {
     throw new Error('Invalid email address');
   }
-}
-
-async function createOAuth1Tokens(sdk: OAuth1Client, email: string, password: string) {
-  console.log(chalk.white('⚙️  Creating OAuth1 tokens for the user', email));
-
-  const response = await authRepository.createOAuth1Tokens(sdk, email, password);
-  const { token, tokenSecret } = response.data;
-
-  console.log(chalk.green('✅ Successfully created OAuth1 tokens for the user', email));
-
-  return { token, tokenSecret };
 }

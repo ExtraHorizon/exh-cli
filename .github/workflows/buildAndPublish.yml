@@ -24,11 +24,11 @@ jobs:
       - run: yarn
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
-      
+
       - run: yarn lint
       - run: yarn build
       - run: yarn test:ci
-      
+
       - name: Determine version number and branch tag
         run: |
           package_version=$(node -p "require('./package.json').version")

@@ -2,7 +2,6 @@ import * as fs from 'fs/promises';
 import * as chalk from 'chalk';
 import { runtimeChoices } from '../../constants';
 import { epilogue } from '../../helpers/util';
-import * as authRepository from '../../repositories/auth';
 import * as functionRepository from '../../repositories/functions';
 import { FunctionCreation } from '../../repositories/functions';
 import { assertExecutionPermission, getValidatedConfigIterator, TaskConfig } from './taskConfig';
@@ -125,7 +124,7 @@ async function syncSingleTask(sdk: any, config: TaskConfig) {
     // eslint-disable-next-line no-param-reassign
     config.environment = {
       ...config.environment,
-      API_HOST: authRepository.getHost(sdk),
+      API_HOST: process.env.API_HOST,
       API_OAUTH_CONSUMER_KEY: process.env.API_OAUTH_CONSUMER_KEY,
       API_OAUTH_CONSUMER_SECRET: process.env.API_OAUTH_CONSUMER_SECRET,
       API_OAUTH_TOKEN: credentials.token,
