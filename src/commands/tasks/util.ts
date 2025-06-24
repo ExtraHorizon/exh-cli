@@ -99,26 +99,26 @@ export async function syncFunctionUser(sdk: OAuth1Client, data: { taskName: stri
 }
 
 async function syncRoleWithPermissions(sdk: OAuth1Client, taskName: string, roleName: string, targetPermissions: string[]) {
-  console.log(chalk.white('⚙️  Checking if the role exists'));
+  console.group(chalk.white(`🔄  Syncing role: ${roleName}`));
+
+  if (targetPermissions.length === 0) {
+    console.log(chalk.yellow('⚠️  No permissions have been defined for the role'));
+  }
+
   let role = await userRepository.findGlobalRoleByName(sdk, roleName);
 
   if (!role) {
-    console.log(chalk.white('⚙️  Role does not exist, creating a new role'));
+    console.log(chalk.white('⚙️  Creating the new role...'));
 
     // Create the role
     const roleDescription = `A role created by the CLI for the execution of the task ${taskName}`;
     role = await userRepository.createGlobalRole(sdk, roleName, roleDescription);
-
-    // Assign permissions to the role
-    console.log(chalk.white('⚙️  Assigning permissions to the role'));
-
-    if (targetPermissions.length === 0) {
-      console.log(chalk.yellow('⚠️ No permissions defined for the role'));
-      return role;
-    }
+    console.log(chalk.white('✅  Successfully created the role'));
 
     await userRepository.addPermissionsToGlobalRole(sdk, roleName, targetPermissions);
-    console.log(chalk.green('✅ Successfully assigned permissions to the role'));
+    console.log(chalk.white(`🔐  Permissions added: [${targetPermissions.join(',')}]`));
+    console.groupEnd();
+
     return role;
   }
 
@@ -128,21 +128,17 @@ async function syncRoleWithPermissions(sdk: OAuth1Client, taskName: string, role
   const permissionsToRemove = currentPermissions.filter(currentPermission => !targetPermissions.includes(currentPermission));
 
   if (permissionsToAdd.length > 0) {
-    console.log(chalk.white('⚙️  Adding missing permissions to the role'));
-
     await userRepository.addPermissionsToGlobalRole(sdk, roleName, permissionsToAdd);
-
-    console.log(chalk.green('✅ Successfully added missing permissions to the role'));
+    console.log(chalk.green(`+ Added permissions to the role: [${permissionsToAdd.join(',')}]`));
   }
 
   if (permissionsToRemove.length > 0) {
-    console.log(chalk.white('⚙️  Removing excess permissions from the role'));
-
     await userRepository.removePermissionsFromGlobalRole(sdk, roleName, permissionsToRemove);
-
-    console.log(chalk.green('✅ Successfully removed excess permissions from the role'));
+    console.log(chalk.white(`🔐  Permissions removed: [${permissionsToRemove.join(',')}]`));
   }
 
+  console.groupEnd();
+  console.log(chalk.green('✅  Successfully synced role'));
   return role;
 }
 
