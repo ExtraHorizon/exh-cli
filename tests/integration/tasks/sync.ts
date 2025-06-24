@@ -48,7 +48,9 @@ describe('exh tasks sync', () => {
     const functionConfig = {
       ...functionMock.functionConfig,
       executionCredentials: {
-        permissions,
+        permissions: [
+          'VIEW_DOCUMENTS:{schemaName}',
+        ],
       },
     };
 
@@ -56,6 +58,7 @@ describe('exh tasks sync', () => {
     await tempDirectoryManager.createTempJsFile('index', functionCode);
 
     const logSpy = jest.spyOn(global.console, 'log');
+    const groupSpy = jest.spyOn(global.console, 'group');
 
     await handler({ sdk: null, path: taskConfigPath });
 
@@ -66,6 +69,7 @@ describe('exh tasks sync', () => {
     expect(functionMock.createSpy).toHaveBeenCalledTimes(1);
     expect(functionMock.createSpy).toHaveBeenCalledWith(null, expect.objectContaining({
       environmentVariables: expect.objectContaining({
+        // The undefined values are retrieved from process.env, the fact that the variables are set should be evidence enough
         API_HOST: { value: undefined },
         API_OAUTH_CONSUMER_KEY: { value: undefined },
         API_OAUTH_CONSUMER_SECRET: { value: undefined },
@@ -73,7 +77,11 @@ describe('exh tasks sync', () => {
         API_OAUTH_TOKEN_SECRET: { value: authMock.oAuth1Tokens.tokenSecret },
       }),
     }));
-    expect(logSpy).toHaveBeenCalledWith(chalk.green(`✅ Successfully created OAuth1 tokens for the user ${userMock.user.email}`));
+    expect(groupSpy).toHaveBeenCalledWith(chalk.white(`🔄  Syncing role: exh.tasks.${functionConfig.name}`));
+    expect(logSpy).toHaveBeenCalledWith(chalk.green('✅  Successfully synced role'));
+
+    expect(groupSpy).toHaveBeenCalledWith(chalk.white(`🔄  Syncing user: ${userMock.user.email}`));
+    expect(logSpy).toHaveBeenCalledWith(chalk.green('✅  Successfully synced user'));
   });
 
   it('Updates a Function', async () => {
