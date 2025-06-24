@@ -81,7 +81,6 @@ export async function syncFunctionUser(sdk: OAuth1Client, data: { taskName: stri
     currentFunction?.environmentVariables?.API_OAUTH_CONSUMER_SECRET?.value
   );
 
-  // If there are no existing credentials, remove the user and create a new one
   if (!hasExistingCredentials) {
     throw new Error('❌ No credentials were found for the existing user');
   }
@@ -110,7 +109,7 @@ async function syncRoleWithPermissions(sdk: OAuth1Client, taskName: string, role
   console.group(chalk.white(`🔄  Syncing role: ${roleName}`));
 
   if (targetPermissions.length === 0) {
-    console.log(chalk.yellow('⚠️  No permissions have been defined for the role'));
+    console.log(chalk.yellow('⚠️  The executionCredentials.permissions field has no permissions defined'));
   }
 
   let role = await userRepository.findGlobalRoleByName(sdk, roleName);

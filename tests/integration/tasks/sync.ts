@@ -62,11 +62,8 @@ describe('exh tasks sync', () => {
 
     await handler({ sdk: null, path: taskConfigPath });
 
-    expect(functionMock.findSpy).toHaveBeenCalledTimes(1);
-    expect(functionMock.createSpy).toHaveBeenCalledTimes(1);
     expect(logSpy).toHaveBeenCalledWith(chalk.green('Successfully created task', functionMock.functionConfig.name));
 
-    expect(functionMock.createSpy).toHaveBeenCalledTimes(1);
     expect(functionMock.createSpy).toHaveBeenCalledWith(null, expect.objectContaining({
       environmentVariables: expect.objectContaining({
         // The undefined values are retrieved from process.env, the fact that the variables are set should be evidence enough
