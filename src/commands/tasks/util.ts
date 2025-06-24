@@ -115,7 +115,11 @@ async function syncRoleWithPermissions(sdk: OAuth1Client, taskName: string, role
     role = await userRepository.createGlobalRole(sdk, roleName, roleDescription);
     console.log(chalk.white('✅  Successfully created the role'));
 
+    // Throws a `Some fields have the wrong format` error if the permissions array is empty
+    if (targetPermissions.length !== 0) {
     await userRepository.addPermissionsToGlobalRole(sdk, roleName, targetPermissions);
+    }
+
     console.log(chalk.white(`🔐  Permissions added: [${targetPermissions.join(',')}]`));
     console.groupEnd();
 
@@ -139,6 +143,7 @@ async function syncRoleWithPermissions(sdk: OAuth1Client, taskName: string, role
 
   console.groupEnd();
   console.log(chalk.green('✅  Successfully synced role'));
+  console.log('');
   return role;
 }
 
