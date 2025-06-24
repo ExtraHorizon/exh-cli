@@ -51,15 +51,14 @@ export async function syncFunctionUser(sdk: OAuth1Client, data: { taskName: stri
   if (!user) {
     console.log(chalk.white('⚙️  Creating the user...'));
 
-    const registerUserData = {
+    user = await userRepository.createUser(sdk, {
       firstName: `${taskName}`,
       lastName: 'exh.tasks',
       email,
       password,
       phoneNumber: '0000000000',
       language: 'EN',
-    };
-    user = await userRepository.createUser(sdk, registerUserData);
+    });
 
     await assignRoleToUser(sdk, user.id, role.id);
     const oAuth1Tokens = await createOAuth1Tokens(sdk, email, password);
