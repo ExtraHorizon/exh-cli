@@ -37,13 +37,12 @@ export async function asyncExec(cmd: string): Promise<string> {
 
 export function loadAndAssertCredentials() {
   const credentials = {};
-  let credentialsFile: string;
   let errorMessage = '';
 
   try {
-    credentialsFile = fs.readFileSync(EXH_CONFIG_FILE, 'utf-8');
-
+    const credentialsFile = fs.readFileSync(EXH_CONFIG_FILE, 'utf-8');
     const credentialFileLines = credentialsFile.split(/\r?\n/);
+
     for (const credentialFileLine of credentialFileLines) {
       const [key, value] = credentialFileLine.split('=');
 
