@@ -77,7 +77,7 @@ describe('exh tasks sync', () => {
     expect(groupSpy).toHaveBeenCalledWith(chalk.white(`🔄  Syncing role: exh.tasks.${functionConfig.name}`));
     expect(logSpy).toHaveBeenCalledWith(chalk.green('✅  Successfully synced role'));
 
-    expect(groupSpy).toHaveBeenCalledWith(chalk.white(`🔄  Syncing user: ${userMock.user.email}`));
+    expect(groupSpy).toHaveBeenCalledWith(chalk.white(`🔄  Syncing user: ${userMock.user.email.toLowerCase()}`));
     expect(logSpy).toHaveBeenCalledWith(chalk.green('✅  Successfully synced user'));
   });
 
