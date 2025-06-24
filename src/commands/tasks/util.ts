@@ -34,7 +34,7 @@ export async function zipFileFromDirectory(path: string): Promise<string> {
 export async function syncFunctionUser(sdk: OAuth1Client, data: { taskName: string; targetEmail?: string; targetPermissions: string[]; }) {
   const { taskName, targetEmail, targetPermissions } = data;
 
-  const email = targetEmail || `exh.tasks+${taskName}@extrahorizon.com`;
+  const email = (targetEmail || `exh.tasks+${taskName}@extrahorizon.com`).toLowerCase();
   validateEmail(email);
 
   // The password policy requires one number as well as one uppercase and lowercase letter
