@@ -119,10 +119,13 @@ describe('exh tasks sync', () => {
     functionMock.functionConfig = {
       ...functionMock.functionConfig,
       environment: {
-        API_HOST: 'Test',
+        API_OAUTH_TOKEN: '68594baa4cae07be6fe802e268594bb17845e89590e0ee36',
+        API_OAUTH_TOKEN_SECRET: '68594bb838a0e90b884a7ed968594bbf25432027ec6f0167',
       },
       executionCredentials: {
-        permissions: [],
+        permissions: [
+          'VIEW_DOCUMENTS',
+        ],
       },
     };
 
@@ -130,7 +133,7 @@ describe('exh tasks sync', () => {
     const error = await handler({ sdk: null, path: taskConfigPath })
       .catch(e => e);
 
-    expect(error.message).toBe('❌  Environment variables [API_HOST] may not be provided when using executionCredentials');
+    expect(error.message).toBe('❌  Environment variables [API_OAUTH_TOKEN, API_OAUTH_TOKEN_SECRET] may not be provided when using executionCredentials');
   });
 
   it('Throws an invalid runtime error when provided an invalid runtime argument', async () => {
