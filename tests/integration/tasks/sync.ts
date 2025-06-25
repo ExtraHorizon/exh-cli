@@ -113,6 +113,29 @@ describe('exh tasks sync', () => {
     expect(error.message).toBe(`Please provide a valid directory path for your code, ${codePath} not found`);
   });
 
+  it('Throws an error when restricted environment variables are set with executionCredentials', async () => {
+    functionMock = functionRepositoryMock();
+
+    functionMock.functionConfig = {
+      ...functionMock.functionConfig,
+      environment: {
+        API_OAUTH_TOKEN: '68594baa4cae07be6fe802e268594bb17845e89590e0ee36',
+        API_OAUTH_TOKEN_SECRET: '68594bb838a0e90b884a7ed968594bbf25432027ec6f0167',
+      },
+      executionCredentials: {
+        permissions: [
+          'VIEW_DOCUMENTS',
+        ],
+      },
+    };
+
+    const taskConfigPath = await tempDirectoryManager.createTempJsonFile(functionMock.functionConfig);
+    const error = await handler({ sdk: null, path: taskConfigPath })
+      .catch(e => e);
+
+    expect(error.message).toBe('❌  Environment variables [API_OAUTH_TOKEN, API_OAUTH_TOKEN_SECRET] may not be provided when using executionCredentials');
+  });
+
   it('Throws an invalid runtime error when provided an invalid runtime argument', async () => {
     const error = await handler({ sdk: null, name: 'test', entryPoint: 'index.js', runtime: 'nodejs8.x' })
       .catch(e => e);
