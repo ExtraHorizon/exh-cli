@@ -113,6 +113,26 @@ describe('exh tasks sync', () => {
     expect(error.message).toBe(`Please provide a valid directory path for your code, ${codePath} not found`);
   });
 
+  it('Throws an error when restricted environment variables are set with executionCredentials', async () => {
+    functionMock = functionRepositoryMock();
+
+    functionMock.functionConfig = {
+      ...functionMock.functionConfig,
+      environment: {
+        API_HOST: 'Test',
+      },
+      executionCredentials: {
+        permissions: [],
+      },
+    };
+
+    const taskConfigPath = await tempDirectoryManager.createTempJsonFile(functionMock.functionConfig);
+    const error = await handler({ sdk: null, path: taskConfigPath })
+      .catch(e => e);
+
+    expect(error.message).toBe('❌  Environment variables [API_HOST] may not be provided when using executionCredentials');
+  });
+
   it('Throws an invalid runtime error when provided an invalid runtime argument', async () => {
     const error = await handler({ sdk: null, name: 'test', entryPoint: 'index.js', runtime: 'nodejs8.x' })
       .catch(e => e);

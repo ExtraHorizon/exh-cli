@@ -109,6 +109,15 @@ export async function validateConfig(config: TaskConfig) {
     throw new Error('Code path not specified');
   }
 
+  if (config.executionCredentials) {
+    const restrictedProperties = ['API_HOST', 'API_OAUTH_CONSUMER_KEY', 'API_OAUTH_CONSUMER_SECRET', 'API_OAUTH_TOKEN', 'API_OAUTH_TOKEN_SECRET'];
+    const foundProperties = Object.keys(config.environment).filter(key => restrictedProperties.includes(key));
+
+    if (foundProperties.length > 0) {
+      throw new Error(`❌  Environment variables [${foundProperties.join(', ')}] may not be provided when using executionCredentials`);
+    }
+  }
+
   assertExecutionPermission(config.executionPermission);
 
   return true;
