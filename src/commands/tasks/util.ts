@@ -1,6 +1,6 @@
 import { createWriteStream, unlink } from 'fs';
 import { tmpdir } from 'os';
-import { OAuth1Client } from '@extrahorizon/javascript-sdk';
+import { createOAuth1Client, OAuth1Client } from '@extrahorizon/javascript-sdk';
 import * as archiver from 'archiver';
 import * as chalk from 'chalk';
 import { v4 as uuidv4 } from 'uuid';
@@ -82,13 +82,26 @@ export async function syncFunctionUser(sdk: OAuth1Client, data: { taskName: stri
   );
 
   if (!hasExistingCredentials) {
-    throw new Error('❌ No credentials were found for the existing user');
+    throw new Error('❌ The user for the task-config.json executionCredentials exists, but no credentials were found in the Function environmentVariables');
+  }
+
+  const taskUserSdk = createOAuth1Client({
+    host: currentFunction.environmentVariables.API_HOST.value,
+    tokenSecret: currentFunction.environmentVariables.API_OAUTH_TOKEN_SECRET.value,
+    token: currentFunction.environmentVariables.API_OAUTH_TOKEN.value,
+    consumerKey: currentFunction.environmentVariables.API_OAUTH_CONSUMER_KEY.value,
+    consumerSecret: currentFunction.environmentVariables.API_OAUTH_CONSUMER_SECRET.value,
+  });
+
+  const taskUser = await taskUserSdk.users.me();
+  if (taskUser.id !== user.id) {
+    throw new Error(`❌  The credentials found in the Function (${taskUser.email}) do not match the user found for the task-config.json executionCredentials (${user.email})`);
   }
 
   console.log(chalk.white('⚙️  Reusing existing user credentials...'));
 
   // Ensure the role is assigned to the user
-  const userRole = user.roles.find(({ name }) => name === roleName);
+  const userRole = user.roles?.find(({ name }) => name === roleName);
   if (!userRole) {
     await assignRoleToUser(sdk, user.id, role.id);
   }
