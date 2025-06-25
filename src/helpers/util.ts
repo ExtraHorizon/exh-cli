@@ -37,22 +37,21 @@ export async function asyncExec(cmd: string): Promise<string> {
 
 export function loadAndAssertCredentials() {
   const credentials = {};
-  let credentialsFile: string;
   let errorMessage = '';
 
   try {
-    credentialsFile = fs.readFileSync(EXH_CONFIG_FILE, 'utf-8');
+    const credentialsFile = fs.readFileSync(EXH_CONFIG_FILE, 'utf-8');
+    const credentialFileLines = credentialsFile.split(/\r?\n/);
+
+    for (const credentialFileLine of credentialFileLines) {
+      const [key, value] = credentialFileLine.split('=');
+
+      if (key && value) {
+        credentials[key.trim()] = value.trim();
+      }
+    }
   } catch (e) {
     errorMessage += 'Couldn\'t open ~/.exh/credentials. ';
-  }
-
-  const credentialFileLines = credentialsFile.split(/\r?\n/);
-  for (const credentialFileLine of credentialFileLines) {
-    const [key, value] = credentialFileLine.split('=');
-
-    if (key && value) {
-      credentials[key.trim()] = value.trim();
-    }
   }
 
   const requiredEnvVariables = ['API_HOST', 'API_OAUTH_CONSUMER_KEY', 'API_OAUTH_CONSUMER_SECRET', 'API_OAUTH_TOKEN', 'API_OAUTH_TOKEN_SECRET'];
