@@ -224,8 +224,6 @@ describe('exh tasks sync', () => {
     jest.spyOn(userRepository, 'removePermissionsFromGlobalRole')
       .mockImplementationOnce(() => Promise.resolve({ affectedRecords: 1 }));
 
-    sdkMock.users.me.mockImplementationOnce(() => Promise.resolve(user));
-
     const functionConfig = {
       ...functionMock.functionConfig,
       executionCredentials: {
