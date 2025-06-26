@@ -109,7 +109,7 @@ export async function validateConfig(config: TaskConfig) {
     throw new Error('Code path not specified');
   }
 
-  if (config.executionCredentials) {
+  if (config.executionCredentials && config.environment) {
     const restrictedProperties = ['API_HOST', 'API_OAUTH_CONSUMER_KEY', 'API_OAUTH_CONSUMER_SECRET', 'API_OAUTH_TOKEN', 'API_OAUTH_TOKEN_SECRET'];
     const foundProperties = Object.keys(config.environment).filter(key => restrictedProperties.includes(key));
 
