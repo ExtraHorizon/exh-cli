@@ -300,6 +300,27 @@ describe('exh tasks sync', () => {
     expect(error.message).toBe(`❌  The credentials found in the Function (${otherUser.email}) do not match the user found for the task-config.json executionCredentials (${user.email})`);
   });
 
+  it('Supports not defining environment variables when using executionCredentials', async () => {
+    functionMock = functionRepositoryMock();
+    userRepositoryMock(functionMock.functionConfig.name, []);
+    mockAuthRepository();
+
+    delete functionMock.functionConfig.environment;
+    functionMock.functionConfig.executionCredentials = {
+      permissions: [
+        'VIEW_DOCUMENTS:{schemaName}',
+      ],
+    };
+
+    const taskConfigPath = await tempDirectoryManager.createTempJsonFile(functionMock.functionConfig);
+    await tempDirectoryManager.createTempJsFile('index', functionCode);
+
+    const logSpy = jest.spyOn(global.console, 'log');
+
+    await handler({ sdk: null, path: taskConfigPath });
+    expect(logSpy).toHaveBeenCalledWith(chalk.green('Successfully created task', functionMock.functionConfig.name));
+  });
+
   it('Throws an invalid runtime error when provided an invalid runtime argument', async () => {
     const error = await handler({ sdk: null, name: 'test', entryPoint: 'index.js', runtime: 'nodejs8.x' })
       .catch(e => e);
