@@ -200,6 +200,50 @@ describe('exh tasks sync', () => {
     expect(error.message).toBe('❌  Environment variables [API_OAUTH_TOKEN, API_OAUTH_TOKEN_SECRET] may not be provided when using executionCredentials');
   });
 
+  it('Throws an error when the managed user exists but no credentials were found for the Function', async () => {
+    // This is the same as the "Updates a managed users permissions" test but without assigning the environmentVariables to the find Function mock
+    functionMock = functionRepositoryMock();
+
+    const permissions = ['VIEW_DOCUMENTS:{schemaName}'];
+
+    const user = generateFunctionUser(functionMock.functionConfig.name);
+    const globalRole = generateFunctionGlobalRole(functionMock.functionConfig.name, permissions);
+
+    user.roles = [globalRole];
+
+    jest.spyOn(userRepository, 'findUserByEmail')
+      .mockImplementationOnce(() => Promise.resolve(user));
+
+    jest.spyOn(userRepository, 'findGlobalRoleByName')
+      .mockImplementationOnce(() => Promise.resolve(globalRole));
+
+    jest.spyOn(userRepository, 'addPermissionsToGlobalRole')
+      .mockImplementationOnce(() => Promise.resolve({ affectedRecords: 1 }));
+
+    jest.spyOn(userRepository, 'removePermissionsFromGlobalRole')
+      .mockImplementationOnce(() => Promise.resolve({ affectedRecords: 1 }));
+
+    sdkMock.users.me.mockImplementationOnce(() => Promise.resolve(user));
+
+    const functionConfig = {
+      ...functionMock.functionConfig,
+      executionCredentials: {
+        permissions: [
+          'UPDATE_DOCUMENTS:{schemaName}',
+          'DELETE_DOCUMENTS:{schemaName}',
+        ],
+      },
+    };
+
+    const taskConfigPath = await tempDirectoryManager.createTempJsonFile(functionConfig);
+    await tempDirectoryManager.createTempJsFile('index', functionCode);
+
+    const error = await handler({ sdk: null, path: taskConfigPath })
+      .catch(e => e);
+
+    expect(error.message).toBe('❌ The user for the task-config.json executionCredentials exists, but no credentials were found in the Function environmentVariables');
+  });
+
   it('Throws an invalid runtime error when provided an invalid runtime argument', async () => {
     const error = await handler({ sdk: null, name: 'test', entryPoint: 'index.js', runtime: 'nodejs8.x' })
       .catch(e => e);
