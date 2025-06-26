@@ -44,10 +44,10 @@ exh tasks list
 
 When you have implemented your new task, you need to synchronize this task so it can run in Extra Horizon cloud. There is a single `sync` command to do this efficiently, however there is some extra configuration that you need to take care of.
 
-The backend needs some extra information in order to properly run your task, such as:
+The back end needs some extra information in order to properly run your task, such as:
 
 * Name & description of your task
-* Entrypoint of the task
+* Entry point of the task
 * Memory requirements
 * Execution time requirements
 * Environment variables
@@ -72,6 +72,9 @@ but this can be very tedious to use. Instead you can create a `task-config.json`
   "environment": {
     "setting1": "value1",
     "secret": "$MYSECRET"
+  },
+  "executionCredentials": {
+    permissions: ["VIEW_DOCUMENTS:Measurement"]
   }
 }
 ```
@@ -86,6 +89,65 @@ which will synchronize your task with the requested configuration.
 
 {% hint style="info" %}
 If you need to pass secrets to the task configuration, but do not want to commit this secret in a configuration file, you can use variables such as`$MYSECRET` in the above example. When parsing the configuration file, `exh` will replace this value with an environment variable of the same name. This way, CI systems are able to provision secrets while safeguarding their confidentiality.
+{% endhint %}
+
+#### Execution Credentials
+
+By providing the property `executionCredentials` in the `task-config.json`, the CLI will automatically create a User and Global Role with the defined permissions for the Task. Credentials for this User will be injected into the Task's `environment` automatically.
+
+**Properties**
+
+`executionCredentials.permissions` (_required_)
+
+The permissions that will be attached to the [Global Role](https://docs.extrahorizon.com/extrahorizon/services/access-management/user-service/global-roles) for the created user the Global Role will be created with a name like`exh.tasks.<your task name>`
+
+`executionCredentials.email`
+
+By default the CLI generates an email address like `exh.tasks+<your task name>@extrahorizon.com` for the User which is created for the Task. If you like you can change this behavior and provide your own email address to retain ownership of the user account.
+
+**Consuming the Execution Credentials in your Task**
+
+The properties needed for communicating with Extra Horizon will be available as environment variables:
+
+`API_HOST`, `API_OAUTH_CONSUMER_KEY`, `API_OAUTH_CONSUMER_SECRET`, `API_OAUTH_TOKEN` and `API_OAUTH_TOKEN_SECRET`&#x20;
+
+{% tabs %}
+{% tab title="JavaScript" %}
+```javascript
+const { createOAuth1Client } = require("@extrahorizon/javascript-sdk");
+
+const exh = createOAuth1Client({
+  host: process.env.API_HOST,
+  consumerKey: process.env.API_OAUTH_CONSUMER_KEY,
+  consumerSecret: process.env.API_OAUTH_CONSUMER_SECRET,
+  token: process.env.API_OAUTH_TOKEN,
+  tokenSecret: process.env.API_OAUTH_TOKEN_SECRET
+});
+
+const user = await exh.users.me();
+```
+{% endtab %}
+
+{% tab title="Python" %}
+```python
+from requests_oauthlib import OAuth1Session
+import os
+
+oauth1Client = OAuth1Session(
+  client_key=os.environ['API_OAUTH_CONSUMER_KEY'],
+  client_secret=os.environ['API_OAUTH_CONSUMER_SECRET'],
+  resource_owner_key=os.environ['API_OAUTH_TOKEN'],
+  resource_owner_secret=os.environ['API_OAUTH_TOKEN_SECRET']
+)
+
+result = oauth1Client.get(f'os.environ['API_HOST']/users/v1/me')
+me = result.json()
+```
+{% endtab %}
+{% endtabs %}
+
+{% hint style="warning" %}
+When providing `executionCredentials` the properties `API_HOST`, `API_OAUTH_CONSUMER_KEY`, `API_OAUTH_CONSUMER_SECRET`, `API_OAUTH_TOKEN`  and `API_OAUTH_TOKEN_SECRET` can not be provided to the `environment` property of the `task-config.json`
 {% endhint %}
 
 #### Synchronizing multiple tasks
