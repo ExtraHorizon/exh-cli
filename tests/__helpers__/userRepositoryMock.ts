@@ -1,8 +1,7 @@
-import { Permission } from '@extrahorizon/javascript-sdk';
 import * as userRepository from '../../src/repositories/user';
 import { generateFunctionGlobalRole, generateFunctionUser } from './users';
 
-export const userRepositoryMock = (functionName: string, permissions: Permission[]) => {
+export const userRepositoryMock = (functionName: string, permissions: string[]) => {
   const user = generateFunctionUser(functionName);
   const globalRole = generateFunctionGlobalRole(functionName, permissions);
 
@@ -29,6 +28,7 @@ export const userRepositoryMock = (functionName: string, permissions: Permission
 
   return {
     user,
+    globalRole,
     isEmailAvailableSpy,
     findUserByEmailSpy,
     createUserSpy,
