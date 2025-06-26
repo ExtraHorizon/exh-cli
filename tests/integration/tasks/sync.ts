@@ -11,6 +11,7 @@ import { functionCode } from '../../__helpers__/functions';
 import { createTempDirectoryManager } from '../../__helpers__/tempDirectoryManager';
 import { userRepositoryMock } from '../../__helpers__/userRepositoryMock';
 import { generateFunctionGlobalRole, generateFunctionUser } from '../../__helpers__/users';
+import { generateId } from '../../__helpers__/utils';
 
 describe('exh tasks sync', () => {
   let tempDirectoryManager;
@@ -242,6 +243,63 @@ describe('exh tasks sync', () => {
       .catch(e => e);
 
     expect(error.message).toBe('❌ The user for the task-config.json executionCredentials exists, but no credentials were found in the Function environmentVariables');
+  });
+
+  it('Throws an error when the existing function tokens do not match the managed user', async () => {
+    // This is the same as the "Updates a managed users permissions" test but the 'me' call returns another user
+    functionMock = functionRepositoryMock();
+
+    const permissions = ['VIEW_DOCUMENTS:{schemaName}'];
+
+    const user = generateFunctionUser(functionMock.functionConfig.name);
+    const globalRole = generateFunctionGlobalRole(functionMock.functionConfig.name, permissions);
+
+    user.roles = [globalRole];
+
+    jest.spyOn(userRepository, 'findUserByEmail')
+      .mockImplementationOnce(() => Promise.resolve(user));
+
+    jest.spyOn(userRepository, 'findGlobalRoleByName')
+      .mockImplementationOnce(() => Promise.resolve(globalRole));
+
+    jest.spyOn(userRepository, 'addPermissionsToGlobalRole')
+      .mockImplementationOnce(() => Promise.resolve({ affectedRecords: 1 }));
+
+    jest.spyOn(userRepository, 'removePermissionsFromGlobalRole')
+      .mockImplementationOnce(() => Promise.resolve({ affectedRecords: 1 }));
+
+    functionMock.existingFunction.environmentVariables = {
+      API_HOST: { value: 'https://api.env.customer.extrahorizon.io' },
+      API_OAUTH_TOKEN_SECRET: { value: '68594bb838a0e90b884a7ed968594bbf25432027ec6f0167' },
+      API_OAUTH_TOKEN: { value: '68594baa4cae07be6fe802e268594bb17845e89590e0ee36' },
+      API_OAUTH_CONSUMER_KEY: { value: '685d0ae5ced87d2abfe7c35e685d0aeccc4239d0f68ffbb2' },
+      API_OAUTH_CONSUMER_SECRET: { value: '685d0af08677cfa9e0c15827685d0af5d5cf798c6b118b3d' },
+    };
+
+    const otherUser = {
+      ...user,
+      id: generateId(),
+      email: 'exh.tasks+notForThisFunction@extrahorizon.com',
+    };
+    sdkMock.users.me.mockImplementationOnce(() => Promise.resolve(otherUser));
+
+    const functionConfig = {
+      ...functionMock.functionConfig,
+      executionCredentials: {
+        permissions: [
+          'UPDATE_DOCUMENTS:{schemaName}',
+          'DELETE_DOCUMENTS:{schemaName}',
+        ],
+      },
+    };
+
+    const taskConfigPath = await tempDirectoryManager.createTempJsonFile(functionConfig);
+    await tempDirectoryManager.createTempJsFile('index', functionCode);
+
+    const error = await handler({ sdk: null, path: taskConfigPath })
+      .catch(e => e);
+
+    expect(error.message).toBe(`❌  The credentials found in the Function (${otherUser.email}) do not match the user found for the task-config.json executionCredentials (${user.email})`);
   });
 
   it('Throws an invalid runtime error when provided an invalid runtime argument', async () => {
