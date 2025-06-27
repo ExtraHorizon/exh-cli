@@ -60,7 +60,7 @@ exh tasks sync --name test-filip --description "my test" --code ../sample-repo/t
 
 but this can be very tedious to use. Instead you can create a `task-config.json` configuration which resides in your code folder. This has the added advantage that any changes to the task configuration can be tracked together with your code. A sample `task-config.json` looks like:
 
-```
+```json
 {
   "name": "my-task",
   "description": "My sample task",
@@ -73,8 +73,19 @@ but this can be very tedious to use. Instead you can create a `task-config.json`
     "setting1": "value1",
     "secret": "$MYSECRET"
   },
+  "executionPermission": "permissionRequired",
+  "retryPolicy": {
+    "enabled": true,
+    "errorsToRetry": [
+      "CONNECTION_ERROR",
+      "DATABASE_ERROR"
+    ]
+  },
   "executionCredentials": {
-    permissions: ["VIEW_DOCUMENTS:Measurement"]
+    "permissions": [
+      "UPDATE_DOCUMENTS:my_first_schema",
+      "VIEW_DOCUMENTS:my_second_schema"
+    ]
   }
 }
 ```
@@ -93,7 +104,9 @@ If you need to pass secrets to the task configuration, but do not want to commit
 
 #### Execution Credentials
 
-By providing the property `executionCredentials` in the `task-config.json`, the CLI will automatically create a User and Global Role with the defined permissions for the Task. Credentials for this User will be injected into the Task's `environment` automatically.
+By providing the property `executionCredentials` in the `task-config.json`, the CLI will automatically create a User and Global Role with the defined permissions for the Task. Credentials for this User will be injected into the Task's `environment` automatically.\
+\
+The Global Role and its permissions will be managed by the CLI and synchronized whenever the `executionCredentials.permissions` property is updated.
 
 **Properties**
 
