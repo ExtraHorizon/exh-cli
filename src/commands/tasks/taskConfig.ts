@@ -24,6 +24,10 @@ export interface TaskConfig {
     enabled: boolean;
     errorsToRetry: string[];
   };
+  executionCredentials?: {
+    email?: string;
+    permissions: string[];
+  };
 }
 
 const taskConfigSchema = Joi.object({
@@ -40,6 +44,10 @@ const taskConfigSchema = Joi.object({
   }),
   environment: Joi.object().pattern(/.*/, Joi.string()),
   executionPermission: Joi.string().valid(...Object.values(permissionModes)),
+  executionCredentials: Joi.object({
+    email: Joi.string(),
+    permissions: Joi.array().items(Joi.string()).required(),
+  }),
 });
 
 export function assertExecutionPermission(mode: string): asserts mode is permissionModes | undefined {
@@ -101,12 +109,21 @@ export async function validateConfig(config: TaskConfig) {
     throw new Error('Code path not specified');
   }
 
+  if (config.executionCredentials && config.environment) {
+    const restrictedProperties = ['API_HOST', 'API_OAUTH_CONSUMER_KEY', 'API_OAUTH_CONSUMER_SECRET', 'API_OAUTH_TOKEN', 'API_OAUTH_TOKEN_SECRET'];
+    const foundProperties = Object.keys(config.environment).filter(key => restrictedProperties.includes(key));
+
+    if (foundProperties.length > 0) {
+      throw new Error(`❌  Environment variables [${foundProperties.join(', ')}] may not be provided when using executionCredentials`);
+    }
+  }
+
   assertExecutionPermission(config.executionPermission);
 
   return true;
 }
 
-export async function loadSingleConfigFile(path:string): Promise<TaskConfig> {
+export async function loadSingleConfigFile(path: string): Promise<TaskConfig> {
   let taskConfig: TaskConfig;
   try {
     /* load config file */
