@@ -1,6 +1,6 @@
 {
   "name": "@extrahorizon/exh-cli",
-  "version": "1.8.2",
+  "version": "1.9.0",
   "main": "build/index.js",
   "exports": "./build/index.js",
   "license": "MIT",
@@ -15,6 +15,7 @@
     "clean": "rimraf build",
     "build": "yarn clean && tsc",
     "test": "jest",
+    "test:ci": "jest --silent",
     "lint": "eslint src tests --ext .ts"
   },
   "bin": {

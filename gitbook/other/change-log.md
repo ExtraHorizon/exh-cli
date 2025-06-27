@@ -1,5 +1,12 @@
 # Extra Horizon CLI changelog
 
+### v1.9.0
+* Introduced the `executionCredentials` field in the task configuration:
+  * Specify the permissions your task needs
+  * The CLI automatically creates a user, role, and credentials for your task
+  * These credentials are injected as environment variables into the task automatically
+  * If you want to migrate your existing tasks to use this feature, see the [migration guide](https://docs.extrahorizon.com/extrahorizon/migration-guides/execution-credentials-for-tasks).
+
 ### v1.8.2
 * Updated the ExH SDK to `8.6.0` to fix a security warning from `axios`
 
