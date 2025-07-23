@@ -1,5 +1,8 @@
 # Extra Horizon CLI changelog
 
+### v1.9.1
+* Updated the ExH SDK to `8.7.1` to fix a security warning from `form-data`
+
 ### v1.9.0
 * Introduced the `executionCredentials` field in the task configuration:
   * Specify the permissions your task needs
