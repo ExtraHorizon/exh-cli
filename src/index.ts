@@ -14,6 +14,7 @@ yargs(hideBin(process.argv))
 
     if (
       isEqual(argv._, ['login']) ||
+      isEqual(argv._, ['data', 'schemas', 'init']) ||
       isEqual(argv._, ['data', 'schemas', 'verify']) ||
       isEqual(argv._, ['tasks', 'create-repo']) ||
       isEqual(argv._, ['completion']) ||
