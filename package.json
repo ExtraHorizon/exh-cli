@@ -43,7 +43,7 @@
   "dependencies": {
     "@extrahorizon/javascript-sdk": "^8.7.1",
     "ajv": "^8.11.0",
-    "archiver": "^5.3.1",
+    "archiver": "^7.0.1",
     "chalk": "^4.0.0",
     "joi": "^17.6.0",
     "lodash": "^4.17.21",
