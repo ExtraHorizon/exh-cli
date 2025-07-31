@@ -1,3 +1,5 @@
+export type ConsoleSpy = ReturnType<typeof spyOnConsole>;
+
 export function spyOnConsole() {
   const consoleLogSpy = jest.spyOn(console, 'log');
 
