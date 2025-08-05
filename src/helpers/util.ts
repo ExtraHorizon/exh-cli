@@ -1,5 +1,6 @@
 import { exec } from 'child_process';
 import * as fs from 'fs';
+import * as path from 'path';
 import * as chalk from 'chalk';
 import * as yargs from 'yargs';
 import { EXH_CONFIG_FILE } from '../constants';
@@ -67,4 +68,10 @@ export function loadAndAssertCredentials() {
     errorMessage += `Missing environment variables: ${missingEnvironmentVariables.join(',')}`;
     throw new Error(`Failed to retrieve all credentials. ${errorMessage}`);
   }
+}
+
+export function getCliVersion() {
+  const packageJsonPath = path.join(__dirname, '../../package.json');
+  const packageJsonString = fs.readFileSync(packageJsonPath, 'utf-8');
+  return JSON.parse(packageJsonString).version;
 }
