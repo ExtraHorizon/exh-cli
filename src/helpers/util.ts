@@ -70,10 +70,27 @@ export function loadAndAssertCredentials() {
   }
 }
 
-export function getCliVersion() {
+// Return a string like: https://swagger.extrahorizon.com/cli/${cliVersion}/${subPath}
+export function getSwaggerDocumentationUrl(subPath: string) {
   const packageJsonPath = path.join(__dirname, '../../package.json');
   const packageJsonString = fs.readFileSync(packageJsonPath, 'utf-8');
-  return JSON.parse(packageJsonString).version;
+
+  // Might be `1.10.0` or something like `1.10.0-dev-108-6b89c8f` or `1.10.0-feature-108-6b89c8f`
+  const packageVersion = JSON.parse(packageJsonString).version;
+
+  // If it is a stable version we want to return `1.10.0`
+  if (packageVersion.match(/^\d+\.\d+\.\d+$/)) {
+    return `https://swagger.extrahorizon.com/cli/${packageVersion}/${subPath}`;
+  }
+
+  // If it is not a stable version, we always return `${version}-dev`
+  // As determined by the "Publish the json-schemas of the configuration files" GitHub Action step
+  if (packageVersion.match(/^\d+\.\d+\.\d+-.*$/)) {
+    const versionParts = packageVersion.split('-');
+    return `https://swagger.extrahorizon.com/cli/${versionParts[0]}-dev/${subPath}`;
+  }
+
+  throw new Error(`Unknown CLI version format: ${packageVersion}`);
 }
 
 export function getAjvErrorStrings(errors: any[]) {
