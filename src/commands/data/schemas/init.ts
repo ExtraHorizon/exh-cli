@@ -1,6 +1,6 @@
 import { writeFile, mkdir } from 'fs/promises';
 import * as osPath from 'path';
-import { epilogue } from '../../../helpers/util';
+import { epilogue, getCliVersion } from '../../../helpers/util';
 
 export const command = 'init <name>';
 export const desc = 'Create a basic schema configuration file';
@@ -29,7 +29,7 @@ export const handler = async function init({ name, path }: { name: string; path:
 
 function createSchema(name: string) {
   return {
-    $schema: 'https://swagger.extrahorizon.com/cli/1.10.0/config-json-schemas/Schema.json',
+    $schema: `https://swagger.extrahorizon.com/cli/${getCliVersion()}/config-json-schemas/Schema.json`,
     name,
     description: `The ${name} schema`,
     createMode: 'allUsers',
