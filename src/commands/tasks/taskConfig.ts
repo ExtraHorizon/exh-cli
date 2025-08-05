@@ -3,6 +3,7 @@ import * as fs from 'fs/promises';
 import * as ospath from 'path';
 import Ajv from 'ajv';
 import * as taskConfigSchema from '../../config-json-schemas/TaskConfig.json';
+import { getAjvErrorStrings } from '../../helpers/util';
 
 export enum permissionModes {
   permissionRequired = 'permissionRequired',
@@ -178,21 +179,4 @@ export async function* getValidatedConfigIterator(
   }
   await validateConfig(taskConfig);
   yield taskConfig;
-}
-
-function getAjvErrorStrings(errors: any[]) {
-  return errors.map(error => {
-    let message = '';
-
-    if (error.instancePath) {
-      const normalizedPath = error.instancePath
-        .replace(/^\//, '') // remove leading slash
-        .replace(/\//g, '.'); // replace slashes with dots
-      message += `"${normalizedPath}" `;
-    }
-
-    message += error.message || 'has an unknown error';
-
-    return message;
-  });
 }

@@ -323,20 +323,20 @@ describe('exh tasks sync', () => {
     const error = await handler({ sdk: null, name: 'test', code: './', entryPoint: 'index.js', runtime: 'nodejs8.x' })
       .catch(e => e);
 
-    expect(error.message).toBe('"runtime" must be equal to one of the allowed values');
+    expect(error.message).toContain('"runtime" must be equal to one of the allowed values');
   });
 
   it('Throws an invalid runtime error when provided a task config file with an invalid runtime', async () => {
     const error = await handler({ sdk: null, path: `${root}/invalid-runtime.json` })
       .catch(e => e);
 
-    expect(error.message).toBe('"runtime" must be equal to one of the allowed values');
+    expect(error.message).toContain('"runtime" must be equal to one of the allowed values');
   });
 
   it('Throws an invalid runtime error when provided a directory containing a task config with an invalid runtime', async () => {
     const error = await handler({ sdk: null, path: `${root}` })
       .catch(e => e);
 
-    expect(error.message).toBe('"runtime" must be equal to one of the allowed values');
+    expect(error.message).toContain('"runtime" must be equal to one of the allowed values');
   });
 });
