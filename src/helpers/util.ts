@@ -75,3 +75,25 @@ export function getCliVersion() {
   const packageJsonString = fs.readFileSync(packageJsonPath, 'utf-8');
   return JSON.parse(packageJsonString).version;
 }
+
+export function getAjvErrorStrings(errors: any[]) {
+  return errors.map(error => {
+    let message = '';
+
+    if (error.instancePath) {
+      const normalizedPath = error.instancePath
+        .replace(/^\//, '') // remove leading slash
+        .replace(/\//g, '.'); // replace slashes with dots
+      message += `"${normalizedPath}" `;
+    }
+
+    message += error.message || 'has an unknown error';
+
+    // 'type' and 'required' have clear enough messages, so we don't need to add params
+    if (!['type', 'required'].includes(error.keyword) && error.params) {
+      message += ` ${JSON.stringify(error.params)}`;
+    }
+
+    return message;
+  });
+}
