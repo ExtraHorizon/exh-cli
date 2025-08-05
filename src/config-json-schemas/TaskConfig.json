@@ -1,0 +1,131 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "name": {
+      "description": "The unique identifier amongst all Functions.",
+      "type": "string",
+      "pattern": "^[A-Za-z0-9-]+$"
+    },
+    "description": {
+      "description": "A brief explanation regarding a Function's purpose.",
+      "type": "string"
+    },
+    "path": {
+      "description": "The location of the Function's source code, relative to the folder this configuration file is in. This should be a folder, the code will be zipped and uploaded. Use `./` for the current folder.",
+      "type": "string"
+    },
+    "entryPoint": {
+      "description": "The file and function name to be executed when the Function is invoked. The format is `fileName.functionName`, relative to the `path` property. For example, if the `path` is `./src` and the entry point is `index.handler`, it will look for `./src/index.js` and execute the `handler` function.",
+      "type": "string"
+    },
+    "runtime": {
+      "description": "The runtime (or environment) the Function will be running in.",
+      "type": "string",
+      "enum": [
+        "nodejs22.x",
+        "nodejs20.x",
+        "nodejs18.x",
+        "nodejs16.x",
+        "python3.13",
+        "python3.12",
+        "python3.11",
+        "python3.10",
+        "python3.9",
+        "python3.8",
+        "java21",
+        "java17",
+        "java11",
+        "java8.al2",
+        "dotnet9",
+        "dotnet8",
+        "dotnet7",
+        "dotnet6",
+        "ruby3.4",
+        "ruby3.3",
+        "ruby3.2",
+        "provided.al2023",
+        "provided.al2"
+      ]
+    },
+    "timeLimit": {
+      "description": "The maximum allowed execution time limit for this Function in seconds. It must be between 3 and 300 seconds.",
+      "type": "integer",
+      "minimum": 3,
+      "maximum": 300
+    },
+    "memoryLimit": {
+      "description": "The maximum amount of memory (in MB) that this Function can use. It must be between 128 and 10240.",
+      "type": "integer",
+      "minimum": 128,
+      "maximum": 10240
+    },
+    "executionPermission": {
+      "description": "Defines access for executing the function directly or for invoking it as an API function.",
+      "enum": [
+        "permissionRequired",
+        "allUsers",
+        "public"
+      ]
+    },
+    "environment": {
+      "description": "The environment variables added to the Function execution runtime.",
+      "type": "object",
+      "additionalProperties": {
+          "type": "string"
+        }
+    },
+    "retryPolicy": {
+      "description": "The policy that determines system behavior after the execution of a Function fails.",
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "description": "The retry policy is disabled by default, If this field is set to true, the retry policy becomes active. If active the policy will retry a maximum of 3 times, with an increasing timeout of 2, 5 and 10 seconds respectively.",
+          "type": "boolean"
+        },
+        "errorsToRetry": {
+          "description": "A list of error names that should trigger a retry. If not specified, the default is to retry on all errors.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "enabled"
+      ],
+      "additionalProperties": false
+    },
+    "executionCredentials": {
+      "description": "When this property is set, the CLI will automatically create a User and Global Role with the defined permissions for the Function. Credentials for this User will be injected into the Function's environment automatically. The Global Role and its permissions will be managed by the CLI and synchronized whenever the executionCredentials.permissions property is updated.",
+      "type": "object",
+      "properties": {
+        "permissions": {
+          "description": "The permissions that will be attached to the Global Role for the created user. The Global Role will be created with a name like exh.tasks.<your function name>.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "email": {
+          "description": "By default the CLI generates an email address like exh.tasks+<your function name>@extrahorizon.com for the User which is created for the Function. If you like you can change this behavior and provide your own email address to retain ownership of the user account.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "permissions"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "name",
+    "path",
+    "entryPoint",
+    "runtime"
+  ],
+  "additionalProperties": false
+}

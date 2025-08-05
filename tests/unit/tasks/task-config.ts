@@ -90,23 +90,23 @@ describe('Validating config', () => {
   });
 
   test('Config without name should fail', async () => {
-    await expect(validateConfig(noNameConfig)).rejects.toThrowError(/^"name" is required/);
+    await expect(validateConfig(noNameConfig)).rejects.toThrowError(/^must have required property 'name'$/);
   });
   test('Config without entryPoint should fail', async () => {
-    await expect(validateConfig(noEntryPointConfig)).rejects.toThrowError(/^"entryPoint" is required/);
+    await expect(validateConfig(noEntryPointConfig)).rejects.toThrowError(/^must have required property 'entryPoint'$/);
   });
 
   test('Config without runtime should fail', async () => {
-    await expect(validateConfig(noRuntimeConfig)).rejects.toThrowError(/^"runtime" is required/);
+    await expect(validateConfig(noRuntimeConfig)).rejects.toThrowError(/^must have required property 'runtime'$/);
   });
 
   test('Name with non-alphanumeric characters should fail', async () => {
     const testConfig = { ...validFullConfig, name: 'abcd_*' };
-    await expect(validateConfig(testConfig)).rejects.toThrowError(/fails to match the required pattern/);
+    await expect(validateConfig(testConfig)).rejects.toThrowError(/"name" must match pattern/);
     testConfig.name = '*abcd';
-    await expect(validateConfig(testConfig)).rejects.toThrowError(/fails to match the required pattern/);
+    await expect(validateConfig(testConfig)).rejects.toThrowError(/"name" must match pattern/);
     testConfig.name = 'ab*cd';
-    await expect(validateConfig(testConfig)).rejects.toThrowError(/fails to match the required pattern/);
+    await expect(validateConfig(testConfig)).rejects.toThrowError(/"name" must match pattern/);
   });
 
   test('specifying an invalid path should fail', async () => {
@@ -115,7 +115,7 @@ describe('Validating config', () => {
   });
 
   test('Config without path should fail', async () => {
-    await expect(validateConfig(noPathConfig)).rejects.toThrowError(/^Code path not specified$/);
+    await expect(validateConfig(noPathConfig)).rejects.toThrowError(/^must have required property 'path'$/);
   });
 
   test('specifying a file instead of a directory should fail', async () => {
@@ -125,36 +125,36 @@ describe('Validating config', () => {
 
   test('Time limit value beyond limits should fail', async () => {
     let testConfig = { ...validFullConfig, timeLimit: limits.time.min - 1 };
-    await expect(validateConfig(testConfig)).rejects.toThrowError(/^"timeLimit" must be greater than or equal/);
+    await expect(validateConfig(testConfig)).rejects.toThrowError(/^"timeLimit" must be >= /);
 
     testConfig = { ...validFullConfig, timeLimit: limits.time.max + 1 };
-    await expect(validateConfig(testConfig)).rejects.toThrowError(/^"timeLimit" must be less than or equal/);
+    await expect(validateConfig(testConfig)).rejects.toThrowError(/^"timeLimit" must be <= /);
   });
 
   test('Memory limit value beyond limits should fail', async () => {
     let testConfig = { ...validFullConfig, memoryLimit: limits.memory.min - 1 };
-    await expect(validateConfig(testConfig)).rejects.toThrowError(/^"memoryLimit" must be greater than or equal/);
+    await expect(validateConfig(testConfig)).rejects.toThrowError(/^"memoryLimit" must be >= /);
 
     testConfig = { ...validFullConfig, memoryLimit: limits.memory.max + 1 };
-    await expect(validateConfig(testConfig)).rejects.toThrowError(/^"memoryLimit" must be less than or equal/);
+    await expect(validateConfig(testConfig)).rejects.toThrowError(/^"memoryLimit" must be <= /);
   });
 
   test('Invalid runtime should fail', async () => {
     const testConfig = { ...validFullConfig, runtime: 'myownruntime' };
-    await expect(validateConfig(testConfig)).rejects.toThrowError(/^"runtime" must be one of/);
+    await expect(validateConfig(testConfig)).rejects.toThrowError(/^"runtime" must be equal to one of the allowed values/);
   });
 
   test('Invalid execution permission should fail', async () => {
     const testConfig = { ...validFullConfig, executionPermission: 'whatever' as permissionModes };
-    await expect(validateConfig(testConfig)).rejects.toThrowError(/^"executionPermission" must be one of/);
+    await expect(validateConfig(testConfig)).rejects.toThrowError(/^"executionPermission" must be equal to one of the allowed values/);
   });
 
   test('Invalid retry policy should fail', async () => {
     let testConfig: any = { ...validFullConfig, retryPolicy: 'a string' };
-    await expect(validateConfig(testConfig)).rejects.toThrowError(/^"retryPolicy" must be of type object/);
+    await expect(validateConfig(testConfig)).rejects.toThrowError(/^"retryPolicy" must be object/);
     testConfig = { ...validFullConfig, retryPolicy: { errorsToRetry: ['test'] } };
-    await expect(validateConfig(testConfig)).rejects.toThrowError(/^"retryPolicy.enabled" is required$/);
+    await expect(validateConfig(testConfig)).rejects.toThrowError(/^"retryPolicy" must have required property 'enabled'$/);
     testConfig = { ...validFullConfig, retryPolicy: { enabled: true, errorsToRetry: [1] } };
-    await expect(validateConfig(testConfig)).rejects.toThrowError(/^"retryPolicy.errorsToRetry\[0\]" must be a string$/);
+    await expect(validateConfig(testConfig)).rejects.toThrowError(/^"retryPolicy.errorsToRetry.0" must be string$/);
   });
 });

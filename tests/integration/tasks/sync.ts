@@ -2,7 +2,6 @@ import * as path from 'path';
 import * as chalk from 'chalk';
 import { sdkMock } from '../../../__mocks__/@extrahorizon/javascript-sdk';
 import { handler } from '../../../src/commands/tasks/sync';
-import { runtimeChoices } from '../../../src/constants';
 import * as functionRepository from '../../../src/repositories/functions';
 import * as userRepository from '../../../src/repositories/user';
 import { mockAuthRepository } from '../../__helpers__/authRepositoryMock';
@@ -27,7 +26,6 @@ describe('exh tasks sync', () => {
   });
 
   const root = 'tests/__helpers__/task-configs/invalid-runtimes/';
-  const runtimes = runtimeChoices.map(runtime => runtime).join(', ');
 
   it('Creates a Function', async () => {
     functionMock = functionRepositoryMock();
@@ -322,23 +320,23 @@ describe('exh tasks sync', () => {
   });
 
   it('Throws an invalid runtime error when provided an invalid runtime argument', async () => {
-    const error = await handler({ sdk: null, name: 'test', entryPoint: 'index.js', runtime: 'nodejs8.x' })
+    const error = await handler({ sdk: null, name: 'test', code: './', entryPoint: 'index.js', runtime: 'nodejs8.x' })
       .catch(e => e);
 
-    expect(error.message).toBe(`"runtime" must be one of [${runtimes}]`);
+    expect(error.message).toBe('"runtime" must be equal to one of the allowed values');
   });
 
   it('Throws an invalid runtime error when provided a task config file with an invalid runtime', async () => {
     const error = await handler({ sdk: null, path: `${root}/invalid-runtime.json` })
       .catch(e => e);
 
-    expect(error.message).toBe(`"runtime" must be one of [${runtimes}]`);
+    expect(error.message).toBe('"runtime" must be equal to one of the allowed values');
   });
 
   it('Throws an invalid runtime error when provided a directory containing a task config with an invalid runtime', async () => {
     const error = await handler({ sdk: null, path: `${root}` })
       .catch(e => e);
 
-    expect(error.message).toBe(`"runtime" must be one of [${runtimes}]`);
+    expect(error.message).toBe('"runtime" must be equal to one of the allowed values');
   });
 });
