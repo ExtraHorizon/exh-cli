@@ -10,8 +10,6 @@ When creating a data schema, you'll typically make a JSON file containing a spec
 
 ```json
 {
-  "$schema": "https://swagger.extrahorizon.com/cli/1.9.1/config-json-schemas/Schema.json",
-
   "name": "MyFirstSchema",
   "description": "Minimal schema example",
   
@@ -35,7 +33,9 @@ When creating a data schema, you'll typically make a JSON file containing a spec
     "firstProperty": {
       "type": "string"
     }
-  }
+  },
+  
+  "$schema": "https://swagger.extrahorizon.com/cli/1.10.0/config-json-schemas/Schema.json"
 }
 ```
 
@@ -50,6 +50,24 @@ List the names of all the schemas which are currently configured in the cloud
 ```
 exh data schemas list
 ```
+
+### Schema initialization <a href="#schema-initialization" id="schema-initialization"></a>
+
+To create a new schema, you can use the `init` command. This command will generate a minimal schema file for you to start out with.
+
+This example will create a `<schema-name>.json` file in the `./schemas` directory, containing the basic structure of a schema:
+
+```
+exh data schemas init <schema-name>
+```
+
+After editing the schema file to your liking, you can use the `exh data schemas sync` command to upload your new schema to your Extra Horizon cloud.
+
+#### **Arguments**
+
+`--path`
+
+This argument is used to specify the path where the schema file should be created. By default, the `./schemas` directory will be used.
 
 ### Schema verify
 
@@ -132,8 +150,6 @@ An example of a schema making use of some of the features of the Data Service:
 
 ```json
 {
-  "$schema": "https://swagger.extrahorizon.com/cli/1.8.2/config-json-schemas/Schema.json",
-
   "name": "MyExampleSchema",
   "description": "Example of a schema",
   
@@ -188,6 +204,8 @@ An example of a schema making use of some of the features of the Data Service:
     "secondProperty": {
       "type": "number"
     }
-  }
+  },
+  
+  "$schema": "https://swagger.extrahorizon.com/cli/1.10.0/config-json-schemas/Schema.json"
 }
 ```

@@ -86,7 +86,8 @@ but this can be very tedious to use. Instead you can create a `task-config.json`
       "UPDATE_DOCUMENTS:my_first_schema",
       "VIEW_DOCUMENTS:my_second_schema"
     ]
-  }
+  },
+  "$schema": "https://swagger.extrahorizon.com/cli/1.10.0/config-json-schemas/TaskConfig.json"
 }
 ```
 
