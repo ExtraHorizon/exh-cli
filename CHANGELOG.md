@@ -1,5 +1,14 @@
 # Extra Horizon CLI changelog
 
+### v1.10.0
+* Introduced `exh data schemas init` to create a new schema file with a basic structure
+* Added autocomplete support and inline documentation for `task-config.json`
+  * Via `"$schema": "https://swagger.extrahorizon.com/cli/1.10.0/config-json-schemas/TaskConfig.json"`
+  * Automatically added when using `exh tasks create-repo`
+* You no longer need to be logged in to run `exh completion`
+* Updated the `archiver` package to resolve some deprecations
+* Removed the dependency on `joi` and `uuid`
+
 ### v1.9.1
 * Updated the ExH SDK to `8.7.1` to fix a security warning from `form-data`
 

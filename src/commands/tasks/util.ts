@@ -1,9 +1,9 @@
+import { randomBytes } from 'crypto';
 import { createWriteStream, unlink } from 'fs';
 import { tmpdir } from 'os';
 import { createOAuth1Client, OAuth1Client } from '@extrahorizon/javascript-sdk';
 import * as archiver from 'archiver';
 import * as chalk from 'chalk';
-import { v4 as uuidv4 } from 'uuid';
 import * as authRepository from '../../repositories/auth';
 import * as functionRepository from '../../repositories/functions';
 import * as userRepository from '../../repositories/user';
@@ -11,7 +11,7 @@ import * as userRepository from '../../repositories/user';
 export async function zipFileFromDirectory(path: string): Promise<string> {
   return new Promise((res, rej) => {
     /* Create a temporary file */
-    const tmpPath = `${tmpdir()}/${uuidv4()}`;
+    const tmpPath = `${tmpdir()}/${randomHexString()}`;
     const output = createWriteStream(tmpPath);
     const archive = archiver('zip', {
       zlib: { level: 9 }, // Sets the compression level.
@@ -38,7 +38,7 @@ export async function syncFunctionUser(sdk: OAuth1Client, data: { taskName: stri
   validateEmail(email);
 
   // The password policy requires one number as well as one uppercase and lowercase letter
-  const password = `0Oo-${uuidv4()}`;
+  const password = `0Oo-${randomHexString()}`;
 
   const roleName = `exh.tasks.${taskName}`;
   const role = await syncRoleWithPermissions(sdk, taskName, roleName, targetPermissions);
@@ -192,4 +192,8 @@ function validateEmail(email: string) {
   if (email.length < 3 || email.length > 256 || !emailRegex.test(email)) {
     throw new Error('Invalid email address');
   }
+}
+
+function randomHexString() {
+  return randomBytes(16).toString('hex');
 }
