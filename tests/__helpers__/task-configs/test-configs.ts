@@ -8,16 +8,19 @@ export const simpleVariableConfig = {
 export const noNameConfig = {
   entryPoint: 'build/index',
   runtime: runtimeChoices[0],
+  path: '/path/here',
 };
 
 export const noEntryPointConfig = {
   name: 'testname',
   runtime: runtimeChoices[0],
+  path: '/path/here',
 };
 
 export const noRuntimeConfig = {
   name: 'testname',
   entryPoint: 'build/index',
+  path: '/path/here',
 };
 
 export const wrongPathConfig = {

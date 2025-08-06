@@ -1,8 +1,9 @@
 import { AssertionError } from 'assert';
 import * as fs from 'fs/promises';
 import * as ospath from 'path';
-import Joi = require('joi');
-import { limits, runtimeChoices } from '../../constants';
+import Ajv from 'ajv';
+import * as taskConfigSchema from '../../config-json-schemas/TaskConfig.json';
+import { getAjvErrorStrings } from '../../helpers/util';
 
 export enum permissionModes {
   permissionRequired = 'permissionRequired',
@@ -29,26 +30,6 @@ export interface TaskConfig {
     permissions: string[];
   };
 }
-
-const taskConfigSchema = Joi.object({
-  name: Joi.string().pattern(/^[A-Za-z0-9-]+$/).required(),
-  description: Joi.string(),
-  entryPoint: Joi.string().required(),
-  runtime: Joi.string().valid(...runtimeChoices).required(),
-  timeLimit: Joi.number().min(limits.time.min).max(limits.time.max),
-  memoryLimit: Joi.number().min(limits.memory.min).max(limits.memory.max),
-  path: Joi.string(),
-  retryPolicy: Joi.object({
-    enabled: Joi.boolean().required(),
-    errorsToRetry: Joi.array().items(Joi.string()),
-  }),
-  environment: Joi.object().pattern(/.*/, Joi.string()),
-  executionPermission: Joi.string().valid(...Object.values(permissionModes)),
-  executionCredentials: Joi.object({
-    email: Joi.string(),
-    permissions: Joi.array().items(Joi.string()).required(),
-  }),
-});
 
 export function assertExecutionPermission(mode: string): asserts mode is permissionModes | undefined {
   if (mode !== undefined && !Object.values(permissionModes).includes(mode as permissionModes)) {
@@ -90,23 +71,21 @@ function replaceConfigVariables(config: any): any {
 }
 
 export async function validateConfig(config: TaskConfig) {
-  try {
-    Joi.attempt(config, taskConfigSchema);
-  } catch (err) {
-    throw new Error(err.details[0]?.message || 'Unknown config validation error');
+  const validate = new Ajv().compile(taskConfigSchema);
+  const valid = validate(config);
+  if (!valid) {
+    const errors = getAjvErrorStrings(validate.errors);
+    throw new Error(errors[0] || 'Unknown config validation error');
   }
 
-  if (config.path) {
-    try {
-      await fs.access(config.path);
-    } catch (err) {
-      throw new Error(`Please provide a valid directory path for your code, ${config.path} not found`);
-    }
-    if ((await fs.stat(config.path)).isFile()) {
-      throw new Error(`please provide a valid directory path for your code, ${config.path} points to a file`);
-    }
-  } else {
-    throw new Error('Code path not specified');
+  try {
+    await fs.access(config.path);
+  } catch (err) {
+    throw new Error(`Please provide a valid directory path for your code, ${config.path} not found`);
+  }
+
+  if ((await fs.stat(config.path)).isFile()) {
+    throw new Error(`please provide a valid directory path for your code, ${config.path} points to a file`);
   }
 
   if (config.executionCredentials && config.environment) {

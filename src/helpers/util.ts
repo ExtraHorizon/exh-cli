@@ -1,5 +1,6 @@
 import { exec } from 'child_process';
 import * as fs from 'fs';
+import * as path from 'path';
 import * as chalk from 'chalk';
 import * as yargs from 'yargs';
 import { EXH_CONFIG_FILE } from '../constants';
@@ -67,4 +68,49 @@ export function loadAndAssertCredentials() {
     errorMessage += `Missing environment variables: ${missingEnvironmentVariables.join(',')}`;
     throw new Error(`Failed to retrieve all credentials. ${errorMessage}`);
   }
+}
+
+// Return a string like: https://swagger.extrahorizon.com/cli/${cliVersion}/${subPath}
+export function getSwaggerDocumentationUrl(subPath: string) {
+  const packageJsonPath = path.join(__dirname, '../../package.json');
+  const packageJsonString = fs.readFileSync(packageJsonPath, 'utf-8');
+
+  // Might be `1.10.0` or something like `1.10.0-dev-108-6b89c8f` or `1.10.0-feature-108-6b89c8f`
+  const packageVersion = JSON.parse(packageJsonString).version;
+
+  // If it is a stable version we want to return `1.10.0`
+  if (packageVersion.match(/^\d+\.\d+\.\d+$/)) {
+    return `https://swagger.extrahorizon.com/cli/${packageVersion}/${subPath}`;
+  }
+
+  // If it is not a stable version, we always return `${version}-dev`
+  // As determined by the "Publish the json-schemas of the configuration files" GitHub Action step
+  if (packageVersion.match(/^\d+\.\d+\.\d+-.*$/)) {
+    const versionParts = packageVersion.split('-');
+    return `https://swagger.extrahorizon.com/cli/${versionParts[0]}-dev/${subPath}`;
+  }
+
+  throw new Error(`Unknown CLI version format: ${packageVersion}`);
+}
+
+export function getAjvErrorStrings(errors: any[]) {
+  return errors.map(error => {
+    let message = '';
+
+    if (error.instancePath) {
+      const normalizedPath = error.instancePath
+        .replace(/^\//, '') // remove leading slash
+        .replace(/\//g, '.'); // replace slashes with dots
+      message += `"${normalizedPath}" `;
+    }
+
+    message += error.message || 'has an unknown error';
+
+    // 'type' and 'required' have clear enough messages, so we don't need to add params
+    if (!['type', 'required'].includes(error.keyword) && error.params) {
+      message += ` ${JSON.stringify(error.params)}`;
+    }
+
+    return message;
+  });
 }

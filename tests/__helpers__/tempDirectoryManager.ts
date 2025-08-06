@@ -1,9 +1,9 @@
-import { mkdir, rmdir, writeFile } from 'fs/promises';
+import { mkdir, readFile, rm, writeFile } from 'fs/promises';
 import { join } from 'path';
 import { generateId } from './utils';
 
 export async function createTempDirectoryManager() {
-  let dir = join(__dirname, `temp_${generateId()}`);
+  let dir: string | null = join(__dirname, `temp_${generateId()}`);
   await mkdir(dir);
 
   return {
@@ -36,12 +36,40 @@ export async function createTempDirectoryManager() {
 
       return newDir;
     },
+    async readJsonFile(name: string) {
+      const content = await this.readFile(`${name}.json`);
+      return JSON.parse(content);
+    },
+    async readFile(name: string) {
+      if (!dir) {
+        throw new Error('Temp directory already removed');
+      }
+
+      const filePath = join(dir, name);
+      console.log(`Reading file: ${filePath}`);
+      try {
+        return await readFile(filePath, 'utf-8');
+      } catch (error) {
+        if (error.code === 'ENOENT') {
+          return null;
+        }
+        throw error;
+      }
+    },
     async removeDirectory() {
-      await rmdir(dir, { recursive: true });
+      if (!dir) {
+        return;
+      }
+
+      await rm(dir, { recursive: true });
       dir = null;
     },
-    getPath() {
-      return dir;
+    getPath(subPath?: string) {
+      if (!dir) {
+        throw new Error('Temp directory already removed');
+      }
+
+      return subPath ? join(dir, subPath) : dir;
     },
   };
 }

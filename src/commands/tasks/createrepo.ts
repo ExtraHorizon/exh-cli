@@ -1,6 +1,6 @@
 import { readFile, writeFile } from 'fs/promises';
 import * as chalk from 'chalk';
-import { asyncExec, epilogue } from '../../helpers/util';
+import { asyncExec, epilogue, getSwaggerDocumentationUrl } from '../../helpers/util';
 
 export const command = 'create-repo <name>';
 export const desc = 'Create a new task repository';
@@ -32,6 +32,7 @@ async function changePackageFile(name: string) {
 
   try {
     const taskConfig = JSON.parse((await readFile(`${name}/task-config.json`)).toString());
+    taskConfig.$schema = getSwaggerDocumentationUrl('config-json-schemas/TaskConfig.json');
     taskConfig.name = name;
     taskConfig.description = `${name} task`;
     await writeFile(`${name}/task-config.json`, JSON.stringify(taskConfig, null, 4));
