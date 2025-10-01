@@ -1,5 +1,8 @@
 # Extra Horizon CLI changelog
 
+### v1.10.1
+* Updated the ExH SDK to `8.8.1` to fix a security warning from `axios`
+
 ### v1.10.0
 * Introduced `exh data schemas init` to create a new schema file with a basic structure
 * Added autocomplete support and inline documentation for `task-config.json`
