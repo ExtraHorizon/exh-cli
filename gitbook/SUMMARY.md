@@ -15,5 +15,6 @@
 
 ## other
 
+* [Permissions required by the CLI](other/permissions-required-by-the-cli.md)
 * [Change Log](other/change-log.md)
 * [GitHub](https://github.com/ExtraHorizon/exh-cli/)
