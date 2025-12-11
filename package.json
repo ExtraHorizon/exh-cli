@@ -47,5 +47,8 @@
     "chalk": "^4.0.0",
     "lodash": "^4.17.21",
     "yargs": "^17.5.1"
+  },
+  "resolutions": {
+    "strip-ansi": "6.0.1"
   }
 }
