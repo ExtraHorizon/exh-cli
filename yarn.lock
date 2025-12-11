@@ -446,8 +446,8 @@
 
 "@extrahorizon/javascript-sdk@^8.8.1":
   version "8.8.1"
-  resolved "https://npm.pkg.github.com/download/@ExtraHorizon/javascript-sdk/8.8.1/de2e57f2133410d6e648f360f408aa80489d3cc4#de2e57f2133410d6e648f360f408aa80489d3cc4"
-  integrity sha512-RPsccgtuNo4rSTkuk968XAUmdQzPTlk1uPfNUQD9S1UYJOkcav9KT7PYrAZsxUnsSsEl/tmHrv8d0gYYLEAPHg==
+  resolved "https://registry.yarnpkg.com/@extrahorizon/javascript-sdk/-/javascript-sdk-8.8.1.tgz#e22f23f6a55085d387ca382e9fffd1dc9df4529d"
+  integrity sha512-Bqs8UdO2lyWMq1YFrdTqf5tfSTeZ4oIaqRObYjNSCaeo+tG2lYK0xMep2ddawuHmaNAhKYmoG4B9MAwxq2qUOw==
   dependencies:
     axios "0.30.2"
     buffer "6.0.3"
