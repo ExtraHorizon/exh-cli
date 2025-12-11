@@ -72,7 +72,7 @@
       ]
     },
     "defaultPriority": {
-      "description": "The priority assigned to all tasks created with this function, unless specified otherwise",
+      "description": "The default priority assigned to all tasks created for this function, unless a priority is specified for a task explicitly",
       "type": "integer"
     },
     "environment": {
