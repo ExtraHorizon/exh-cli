@@ -11,7 +11,8 @@ export interface FunctionCreation {
   memoryLimit?: number;
   environmentVariables?: Record<string, any>;
   executionOptions?: {
-    permissionMode: permissionModes;
+    permissionMode?: permissionModes;
+    defaultPriority?: number;
   };
   retryPolicy?: {
     enabled: boolean;

@@ -1,7 +1,7 @@
 # Extra Horizon CLI changelog
 
 ### v1.11.0
-
+* Added `defaultPriority` as an option to the task config
 
 ### v1.10.1
 * Updated the ExH SDK to `8.8.1` to fix a security warning from `axios`
