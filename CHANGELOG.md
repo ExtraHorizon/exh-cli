@@ -1,5 +1,8 @@
 # Extra Horizon CLI changelog
 
+### v1.11.0
+
+
 ### v1.10.1
 * Updated the ExH SDK to `8.8.1` to fix a security warning from `axios`
 
