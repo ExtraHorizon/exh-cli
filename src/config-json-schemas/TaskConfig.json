@@ -71,6 +71,10 @@
         "public"
       ]
     },
+    "defaultPriority": {
+      "description": "The default priority assigned to all tasks created for this function, unless a priority is specified for a task explicitly",
+      "type": "integer"
+    },
     "environment": {
       "description": "The environment variables added to the Function execution runtime.",
       "type": "object",
