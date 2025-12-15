@@ -2,6 +2,10 @@
 
 ### v1.11.0
 * Added `defaultPriority` as an option to the task config
+* Updated the supported Task Service runtime options to include:
+  * `nodejs24.x`
+  * `python3.14`
+  * `java25`
 
 ### v1.10.1
 * Updated the ExH SDK to `8.8.1` to fix a security warning from `axios`
