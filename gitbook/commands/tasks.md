@@ -74,6 +74,7 @@ but this can be very tedious to use. Instead you can create a `task-config.json`
     "secret": "$MYSECRET"
   },
   "executionPermission": "permissionRequired",
+  "defaultPriority": 10,
   "retryPolicy": {
     "enabled": true,
     "errorsToRetry": [
@@ -87,7 +88,7 @@ but this can be very tedious to use. Instead you can create a `task-config.json`
       "VIEW_DOCUMENTS:my_second_schema"
     ]
   },
-  "$schema": "https://swagger.extrahorizon.com/cli/1.10.1/config-json-schemas/TaskConfig.json"
+  "$schema": "https://swagger.extrahorizon.com/cli/1.11.0/config-json-schemas/TaskConfig.json"
 }
 ```
 
@@ -102,6 +103,52 @@ which will synchronize your task with the requested configuration.
 {% hint style="info" %}
 If you need to pass secrets to the task configuration, but do not want to commit this secret in a configuration file, you can use variables such as`$MYSECRET` in the above example. When parsing the configuration file, `exh` will replace this value with an environment variable of the same name. This way, CI systems are able to provision secrets while safeguarding their confidentiality.
 {% endhint %}
+
+#### Config
+
+`name`
+
+Specify the name of the task.
+
+`description`
+
+Specify the description of the task.
+
+`path`
+
+Provide the path to a directory containing the built task. `exh-cli` will compress the directory and upload it.
+
+`entryPoint`
+
+Specify the code function that should be invoked. For example, use 'index.handler' for Node.js.
+
+`runtime`
+
+Specify the [runtime](https://docs.extrahorizon.com/extrahorizon/services/automation/task-service/functions#runtime) to use for the task.
+
+`timeLimit`
+
+Specify the execution [time limit ](https://docs.extrahorizon.com/extrahorizon/services/automation/task-service/functions#timelimit)for this task (in seconds).
+
+`memoryLimit`
+
+Specify the allocated [memory](https://docs.extrahorizon.com/extrahorizon/services/automation/task-service/functions#memorylimit) for this task (in MB).
+
+`environment`
+
+Set environment variables for this task. This option can be used multiple times for multiple environment variables.
+
+`executionPermission`
+
+Specify the [permission mode](https://docs.extrahorizon.com/extrahorizon/services/automation/task-service/functions#executionoptions-properties) of the task.
+
+`defaultPriority`
+
+Specify the defaultPriority of the function.
+
+`retryPolicy`
+
+Specify the [retryPolicy](https://docs.extrahorizon.com/extrahorizon/services/automation/task-service/functions#retrypolicy) of the function.
 
 #### Execution Credentials
 
@@ -177,42 +224,6 @@ When you're synchronizing a single task using a `task-config.json` file, any add
 `--path`
 
 Specify the path to the configuration JSON file containing task parameters. If a directory is provided instead, exh-cli will search for a task-config.json file within all subdirectories and synchronize them. If this option is not used, each parameter (name, code, entryPoint, runtime, etc.) must be supplied separately.
-
-`--name`
-
-Specify the name of the task.
-
-`--code`
-
-Provide the path to a directory containing the built task. exh-cli will compress the directory and upload it.
-
-`--entryPoint`
-
-Specify the code function that should be invoked. For example, use 'index.handler' for Node.js.
-
-`--runtime`
-
-Specify the [runtime](https://docs.extrahorizon.com/extrahorizon/services/automation/task-service/functions#runtime) to use for the task.
-
-`--description`
-
-Add a description for this task.
-
-`--timeLimit`
-
-Specify the execution [time limit ](https://docs.extrahorizon.com/extrahorizon/services/automation/task-service/functions#timelimit)for this task (in seconds).
-
-`--memoryLimit`
-
-Specify the allocated [memory](https://docs.extrahorizon.com/extrahorizon/services/automation/task-service/functions#memorylimit) for this task (in MB).
-
-`--env`
-
-Set environment variables for this task. This option can be used multiple times for multiple environment variables.
-
-`--executionPermission`
-
-Specify the [permission mode](https://docs.extrahorizon.com/extrahorizon/services/automation/task-service/functions#executionoptions-properties) of the task.
 
 #### Example
 
