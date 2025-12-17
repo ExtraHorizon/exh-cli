@@ -27,7 +27,7 @@ describe('exh data schemas init', () => {
 
     const schemaFileAfter = await tempDir.readJsonFile(name);
     expect(schemaFileAfter).toStrictEqual({
-      $schema: 'https://swagger.extrahorizon.com/cli/1.10.1/config-json-schemas/Schema.json',
+      $schema: 'https://swagger.extrahorizon.com/cli/1.11.0/config-json-schemas/Schema.json',
       name,
       description: `The ${name} schema`,
       createMode: 'allUsers',

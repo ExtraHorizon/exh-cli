@@ -58,6 +58,9 @@ export const builder = (yargs: any) => epilogue(yargs).options({
   executionPermission: {
     type: 'string',
   },
+  defaultPriority: {
+    type: 'number',
+  },
 })
   .check(async ({ path, entryPoint, runtime, name, code, executionPermission }) => {
     if (!path && (!name || !code || !runtime || !entryPoint)) {
@@ -95,8 +98,16 @@ async function syncSingleTask(sdk: any, config: TaskConfig) {
   };
 
   /* Add optional values */
+  if (config.executionPermission || config.defaultPriority) {
+    request.executionOptions = {};
+  }
+
+  if (config.defaultPriority) {
+    request.executionOptions.defaultPriority = config.defaultPriority;
+  }
+
   if (config.executionPermission) {
-    request.executionOptions = { permissionMode: config.executionPermission };
+    request.executionOptions.permissionMode = config.executionPermission;
   }
 
   if (config.timeLimit) {

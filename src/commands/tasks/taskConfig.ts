@@ -21,6 +21,7 @@ export interface TaskConfig {
   memoryLimit?: number;
   environment?: Record<string, string>;
   executionPermission?: permissionModes;
+  defaultPriority?: number;
   retryPolicy?: {
     enabled: boolean;
     errorsToRetry: string[];
@@ -128,7 +129,7 @@ export async function loadSingleConfigFile(path: string): Promise<TaskConfig> {
 }
 
 export async function* getValidatedConfigIterator(
-  { path, name, code, entryPoint, runtime, description, timeLimit, memoryLimit, executionPermission, env }: any
+  { path, name, code, entryPoint, runtime, description, timeLimit, memoryLimit, executionPermission, env, defaultPriority }: any
 ): AsyncGenerator<TaskConfig> {
   let taskConfig: TaskConfig = {};
 
@@ -172,6 +173,7 @@ export async function* getValidatedConfigIterator(
   if (timeLimit) { taskConfig.timeLimit = timeLimit; }
   if (memoryLimit) { taskConfig.memoryLimit = memoryLimit; }
   if (executionPermission) { taskConfig.executionPermission = executionPermission; }
+  if (defaultPriority) { taskConfig.defaultPriority = defaultPriority; }
 
   if (env && env.length) {
     const envArr = Array.isArray(env) ? env : [env];
