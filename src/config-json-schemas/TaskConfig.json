@@ -43,6 +43,7 @@
         "java17",
         "java11",
         "java8.al2",
+        "dotnet10",
         "dotnet9",
         "dotnet8",
         "dotnet7",
