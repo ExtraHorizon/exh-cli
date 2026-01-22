@@ -25,7 +25,7 @@ async function changePackageFile(name: string) {
   try {
     const pkg = JSON.parse((await readFile(`${name}/package.json`)).toString());
     pkg.name = name;
-    await writeFile(`${name}/package.json`, JSON.stringify(pkg, null, 4));
+    await writeFile(`${name}/package.json`, JSON.stringify(pkg, null, 2));
   } catch (err) {
     console.log('WARN: package.json not found. (possibly not a javascript repository');
   }
@@ -35,7 +35,7 @@ async function changePackageFile(name: string) {
     taskConfig.$schema = getSwaggerDocumentationUrl('config-json-schemas/TaskConfig.json');
     taskConfig.name = name;
     taskConfig.description = `${name} task`;
-    await writeFile(`${name}/task-config.json`, JSON.stringify(taskConfig, null, 4));
+    await writeFile(`${name}/task-config.json`, JSON.stringify(taskConfig, null, 2));
   } catch (err) { /* */ }
 }
 

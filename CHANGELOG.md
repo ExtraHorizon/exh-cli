@@ -2,6 +2,7 @@
 
 ### v1.12.0
 * Now adding `$schema` as the last property when creating a new schema via `exh data schemas init`
+* The `exh tasks create-repo` command now creates `package.json` and `task-config.json` files with 2 spaces indentation instead of 4 spaces.
 
 ### v1.11.1
 * Updated the ExH SDK to `8.8.2` to fix a security warning from `qs`
