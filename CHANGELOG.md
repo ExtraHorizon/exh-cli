@@ -1,5 +1,8 @@
 # Extra Horizon CLI changelog
 
+## v1.12.0
+
+
 ## v1.11.1
 * Updated the ExH SDK to `8.8.2` to fix a security warning from `qs`
 * Updated the supported Task Service runtime options to include `dotnet10`
