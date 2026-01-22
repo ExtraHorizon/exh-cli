@@ -87,7 +87,7 @@ describe('exh data schemas sync', () => {
   it('Ignores the $schema property', async () => {
     const schemaConfiguration = {
       ...minimalSchema,
-      $schema: 'https://swagger.extrahorizon.com/cli/1.7.0/configuration-files/Schema.json',
+      $schema: 'https://swagger.extrahorizon.com/cli/1.11.1/configuration-files/Schema.json',
     };
 
     const path = await tempDirectoryManager.createTempJsonFile(schemaConfiguration);

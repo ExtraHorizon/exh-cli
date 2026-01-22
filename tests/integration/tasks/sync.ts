@@ -40,6 +40,30 @@ describe('exh tasks sync', () => {
     expect(logSpy).toHaveBeenCalledWith(chalk.green('Successfully created task', functionMock.functionConfig.name));
   });
 
+  it('Creates a Function with a default priority', async () => {
+    const defaultPriority = 12;
+    functionMock = functionRepositoryMock();
+    const taskConfigPath = await tempDirectoryManager.createTempJsonFile({
+      ...functionMock.functionConfig,
+      defaultPriority,
+    });
+    await tempDirectoryManager.createTempJsFile('index', functionCode);
+
+    const logSpy = jest.spyOn(global.console, 'log');
+
+    await handler({ sdk: null, path: taskConfigPath });
+    expect(functionMock.findSpy).toHaveBeenCalledTimes(1);
+    expect(functionMock.createSpy).toHaveBeenCalledTimes(1);
+
+    expect(functionMock.createSpy).toHaveBeenCalledWith(null, expect.objectContaining({
+      executionOptions: {
+        defaultPriority,
+      },
+    }));
+
+    expect(logSpy).toHaveBeenCalledWith(chalk.green('Successfully created task', functionMock.functionConfig.name));
+  });
+
   it('Creates a Function with a managed user', async () => {
     const permissions = [];
 

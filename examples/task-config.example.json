@@ -11,6 +11,7 @@
     "myenvironmentvariable": "$ENV_VALUE"
   },
   "executionPermission": "permissionRequired",
+  "defaultPriority": 120,
   "retryPolicy": {
     "enabled": true,
     "errorsToRetry": [ "Test error", "Another error"]
