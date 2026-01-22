@@ -1,6 +1,6 @@
 {
   "name": "@extrahorizon/exh-cli",
-  "version": "1.11.1",
+  "version": "1.12.0",
   "main": "build/index.js",
   "exports": "./build/index.js",
   "license": "MIT",
