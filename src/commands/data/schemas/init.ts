@@ -29,7 +29,6 @@ export const handler = async function init({ name, path }: { name: string; path:
 
 function createSchema(name: string) {
   return {
-    $schema: getSwaggerDocumentationUrl('config-json-schemas/Schema.json'),
     name,
     description: `The ${name} schema`,
     createMode: 'allUsers',
@@ -49,5 +48,6 @@ function createSchema(name: string) {
         type: 'string',
       },
     },
+    $schema: getSwaggerDocumentationUrl('config-json-schemas/Schema.json'),
   };
 }
