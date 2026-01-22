@@ -1,7 +1,7 @@
 # Extra Horizon CLI changelog
 
 ### v1.12.0
-
+* Now adding `$schema` as the last property when creating a new schema via `exh data schemas init`
 
 ### v1.11.1
 * Updated the ExH SDK to `8.8.2` to fix a security warning from `qs`
