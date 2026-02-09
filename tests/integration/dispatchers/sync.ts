@@ -4,11 +4,12 @@ import { handler } from '../../../src/commands/dispatchers/sync';
 import * as dispatcherRepository from '../../../src/repositories/dispatchers';
 import { cliManagedTag } from '../../../src/services/dispatchers';
 import { generateMailAction, generateTaskAction } from '../../__helpers__/actions';
-import { dispatcherRepositoryMock } from '../../__helpers__/dispatcherRepositoryMock';
+import { dispatcherRepositoryMock, type DispatcherRepositoryMock } from '../../__helpers__/dispatcherRepositoryMock';
 import { generateDispatcher, generateMinimalDispatcher } from '../../__helpers__/dispatchers';
 
 describe('exh dispatchers sync', () => {
-  let repositoryMock;
+  let repositoryMock: DispatcherRepositoryMock;
+
   beforeAll(() => {
     repositoryMock = dispatcherRepositoryMock();
   });
@@ -27,7 +28,7 @@ describe('exh dispatchers sync', () => {
 
     const logSpy = jest.spyOn(global.console, 'log');
 
-    await expect(handler({ sdk: undefined, file: '', clean: false }))
+    await expect(handler({ file: '', clean: false }))
       .rejects.toThrow('The dispatchers file is invalid');
 
     expect(logSpy).toHaveBeenCalledWith(red('- No name'));
@@ -43,7 +44,7 @@ describe('exh dispatchers sync', () => {
 
     const logSpy = jest.spyOn(global.console, 'log');
 
-    await expect(handler({ sdk: undefined, file: '', clean: false }))
+    await expect(handler({ file: '', clean: false }))
       .rejects.toThrow('The dispatchers file is invalid');
 
     expect(logSpy).toHaveBeenCalledWith(red('- Action [0] does not have a name'));
@@ -58,11 +59,10 @@ describe('exh dispatchers sync', () => {
     const createDispatcherSpy = jest.spyOn(dispatcherRepository, 'create')
       .mockImplementationOnce(() => Promise.resolve(dispatcher));
 
-    await handler({ sdk: undefined, file: '', clean: false });
+    await handler({ file: '', clean: false });
 
     expect(createDispatcherSpy).toHaveBeenCalledTimes(1);
     expect(createDispatcherSpy).toHaveBeenCalledWith(
-      undefined,
       expect.objectContaining({
         name: dispatcher.name,
         tags: [dispatcher.tags[0], dispatcher.tags[1], 'EXH_CLI_MANAGED'],
@@ -80,11 +80,10 @@ describe('exh dispatchers sync', () => {
       // @ts-expect-error The minimal dispatcher does not satisfy the Dispatcher type, but is not relevant for the test case
       .mockImplementationOnce(() => Promise.resolve(minimalDispatcher));
 
-    await handler({ sdk: undefined, file: '', clean: false });
+    await handler({ file: '', clean: false });
 
     expect(createDispatcherSpy).toHaveBeenCalledTimes(1);
     expect(createDispatcherSpy).toHaveBeenCalledWith(
-      undefined,
       expect.objectContaining({
         name: minimalDispatcher.name,
         tags: ['EXH_CLI_MANAGED'],
@@ -101,11 +100,10 @@ describe('exh dispatchers sync', () => {
     jest.spyOn(dispatcherRepository, 'findAll')
       .mockImplementationOnce(() => Promise.resolve([dispatcher, generateDispatcher()]));
 
-    await handler({ sdk: undefined, file: '', clean: false });
+    await handler({ file: '', clean: false });
 
     expect(repositoryMock.updateDispatcherSpy).toHaveBeenCalledTimes(1);
     expect(repositoryMock.updateDispatcherSpy).toHaveBeenCalledWith(
-      undefined,
       dispatcher.id,
       expect.objectContaining({
         name: dispatcher.name,
@@ -124,10 +122,9 @@ describe('exh dispatchers sync', () => {
     jest.spyOn(dispatcherRepository, 'create')
       .mockImplementationOnce(() => Promise.resolve(dispatcher));
 
-    await handler({ sdk: undefined, file: '', clean: false });
+    await handler({ file: '', clean: false });
 
     expect(dispatcherRepository.create).toHaveBeenCalledWith(
-      undefined,
       expect.objectContaining({
         name: dispatcher.name,
         tags: expect.arrayContaining(['EXH_CLI_MANAGED']),
@@ -139,7 +136,7 @@ describe('exh dispatchers sync', () => {
     jest.spyOn(fs, 'readFile')
       .mockImplementationOnce(() => Promise.resolve(JSON.stringify([repositoryMock.existingDispatcher])));
 
-    await handler({ sdk: undefined, file: '', clean: false });
+    await handler({ file: '', clean: false });
 
     // The existing dispatcher has 2 actions, thus we expect the updateActionSpy to be called twice
     expect(repositoryMock.updateActionSpy).toHaveBeenCalledTimes(2);
@@ -161,13 +158,9 @@ describe('exh dispatchers sync', () => {
     jest.spyOn(fs, 'readFile')
       .mockImplementationOnce(() => Promise.resolve(JSON.stringify([localDispatcher])));
 
-    await handler({ sdk: undefined, file: '', clean: false });
+    await handler({ file: '', clean: false });
     expect(repositoryMock.removeActionSpy).toHaveBeenCalledTimes(1);
-    expect(repositoryMock.removeActionSpy).toHaveBeenCalledWith(
-      undefined,
-      dispatcherWithExcessAction.id,
-      excessAction.id
-    );
+    expect(repositoryMock.removeActionSpy).toHaveBeenCalledWith(dispatcherWithExcessAction.id, excessAction.id);
   });
 
   it('Removes Dispatchers that has been created with the CLI but is no longer present in the local file', async () => {
@@ -179,13 +172,10 @@ describe('exh dispatchers sync', () => {
     jest.spyOn(dispatcherRepository, 'findAll')
       .mockImplementation(() => Promise.resolve([repositoryMock.existingDispatcher, dispatcherToDelete]));
 
-    await handler({ sdk: undefined, file: '', clean: true });
+    await handler({ file: '', clean: true });
 
     expect(repositoryMock.removeDispatcherSpy).toHaveBeenCalledTimes(1);
-    expect(repositoryMock.removeDispatcherSpy).toHaveBeenCalledWith(
-      undefined,
-      dispatcherToDelete.id
-    );
+    expect(repositoryMock.removeDispatcherSpy).toHaveBeenCalledWith(dispatcherToDelete.id);
   });
 
   it('Removes Dispatchers only when the clean argument is provided', async () => {
@@ -197,7 +187,7 @@ describe('exh dispatchers sync', () => {
     jest.spyOn(dispatcherRepository, 'findAll')
       .mockImplementation(() => Promise.resolve([repositoryMock.existingDispatcher, dispatcherToDelete]));
 
-    await handler({ sdk: undefined, file: '', clean: false });
+    await handler({ file: '', clean: false });
 
     expect(repositoryMock.removeDispatcherSpy).toHaveBeenCalledTimes(0);
   });

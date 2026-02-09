@@ -10,9 +10,9 @@ export const builder = (yargs: any) => epilogue(yargs).option('name', {
   type: 'string',
 });
 
-export const handler = async ({ sdk, name }) => {
+export const handler = async ({ name }) => {
   try {
-    const response = await functionRepository.remove(sdk, name);
+    const response = await functionRepository.remove(name);
     if (response?.affectedRecords) {
       console.log(chalk.green('Successfully deleted task', name));
     } else {

@@ -23,9 +23,9 @@ describe('exh sync', () => {
     await tempDirectory.createDirectory('localizations');
     await tempDirectory.createJsonFile('localizations/en', { test_key: 'My text' });
 
-    await handler({ sdk: undefined, path: tempDirectory.getPath() });
+    await handler({ path: tempDirectory.getPath() });
 
-    expect(localizationRepositoryMock.createSpy).toHaveBeenCalledWith(undefined, [{ key: 'test_key', text: { EN: 'My text' } }]);
+    expect(localizationRepositoryMock.createSpy).toHaveBeenCalledWith([{ key: 'test_key', text: { EN: 'My text' } }]);
   });
 
   it('Syncs localizations within a specified custom directory', async () => {
@@ -33,8 +33,8 @@ describe('exh sync', () => {
     await tempDirectory.createDirectory('locals');
     await tempDirectory.createJsonFile('locals/en', { test_key: 'My text' });
 
-    await handler({ sdk: undefined, path: tempDirectory.getPath() });
+    await handler({ path: tempDirectory.getPath() });
 
-    expect(localizationRepositoryMock.createSpy).toHaveBeenCalledWith(undefined, [{ key: 'test_key', text: { EN: 'My text' } }]);
+    expect(localizationRepositoryMock.createSpy).toHaveBeenCalledWith([{ key: 'test_key', text: { EN: 'My text' } }]);
   });
 });

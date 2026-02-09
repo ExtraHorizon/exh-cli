@@ -1,13 +1,14 @@
+import { getSdk } from '../../exh';
 import { epilogue } from '../../helpers/util';
 
 export const command = 'list';
 export const desc = 'List all tasks';
 export const builder = (yargs: any) => epilogue(yargs);
 
-export const handler = async function list({ sdk, isTTY }) {
+export const handler = async function list({ isTTY }) {
   let functionResponse: any;
   try {
-    functionResponse = await sdk.raw.get('/tasks/v1/functions');
+    functionResponse = await getSdk().raw.get('/tasks/v1/functions');
   } catch (err) {
     console.log(err);
     return;

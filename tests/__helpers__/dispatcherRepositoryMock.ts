@@ -1,6 +1,8 @@
 import * as dispatcherRepository from '../../src/repositories/dispatchers';
 import { generateDispatcher } from './dispatchers';
 
+export type DispatcherRepositoryMock = ReturnType<typeof dispatcherRepositoryMock>;
+
 export const dispatcherRepositoryMock = () => {
   const existingDispatcher = generateDispatcher();
 

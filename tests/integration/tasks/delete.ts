@@ -11,10 +11,10 @@ describe('exh tasks delete', () => {
     const repositoryMock = functionRepositoryMock();
     const logSpy = jest.spyOn(global.console, 'log');
 
-    await handler({ sdk: null, name: repositoryMock.functionConfig.name });
+    await handler({ name: repositoryMock.functionConfig.name });
 
     expect(repositoryMock.removeSpy).toHaveBeenCalledTimes(1);
-    expect(repositoryMock.removeSpy).toHaveBeenCalledWith(null, repositoryMock.functionConfig.name);
+    expect(repositoryMock.removeSpy).toHaveBeenCalledWith(repositoryMock.functionConfig.name);
 
     expect(logSpy).toHaveBeenCalledWith(chalk.green('Successfully deleted task', repositoryMock.functionConfig.name));
   });

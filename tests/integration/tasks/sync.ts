@@ -7,13 +7,13 @@ import * as userRepository from '../../../src/repositories/user';
 import { mockAuthRepository } from '../../__helpers__/authRepositoryMock';
 import { functionRepositoryMock } from '../../__helpers__/functionRepositoryMock';
 import { functionCode } from '../../__helpers__/functions';
-import { createTempDirectoryManager } from '../../__helpers__/tempDirectoryManager';
+import { createTempDirectoryManager, type TempDirectoryManager } from '../../__helpers__/tempDirectoryManager';
 import { userRepositoryMock } from '../../__helpers__/userRepositoryMock';
 import { generateFunctionGlobalRole, generateFunctionUser } from '../../__helpers__/users';
 import { generateId } from '../../__helpers__/utils';
 
 describe('exh tasks sync', () => {
-  let tempDirectoryManager;
+  let tempDirectoryManager: TempDirectoryManager;
   let functionMock;
 
   beforeEach(async () => {
@@ -34,7 +34,7 @@ describe('exh tasks sync', () => {
 
     const logSpy = jest.spyOn(global.console, 'log');
 
-    await handler({ sdk: null, path: taskConfigPath });
+    await handler({ path: taskConfigPath });
     expect(functionMock.findSpy).toHaveBeenCalledTimes(1);
     expect(functionMock.createSpy).toHaveBeenCalledTimes(1);
     expect(logSpy).toHaveBeenCalledWith(chalk.green('Successfully created task', functionMock.functionConfig.name));
@@ -51,11 +51,11 @@ describe('exh tasks sync', () => {
 
     const logSpy = jest.spyOn(global.console, 'log');
 
-    await handler({ sdk: null, path: taskConfigPath });
+    await handler({ path: taskConfigPath });
     expect(functionMock.findSpy).toHaveBeenCalledTimes(1);
     expect(functionMock.createSpy).toHaveBeenCalledTimes(1);
 
-    expect(functionMock.createSpy).toHaveBeenCalledWith(null, expect.objectContaining({
+    expect(functionMock.createSpy).toHaveBeenCalledWith(expect.objectContaining({
       executionOptions: {
         defaultPriority,
       },
@@ -65,7 +65,7 @@ describe('exh tasks sync', () => {
   });
 
   it('Creates a Function with a managed user', async () => {
-    const permissions = [];
+    const permissions: string[] = [];
 
     functionMock = functionRepositoryMock();
     const userMock = userRepositoryMock(functionMock.functionConfig.name, permissions);
@@ -86,11 +86,11 @@ describe('exh tasks sync', () => {
     const logSpy = jest.spyOn(global.console, 'log');
     const groupSpy = jest.spyOn(global.console, 'group');
 
-    await handler({ sdk: null, path: taskConfigPath });
+    await handler({ path: taskConfigPath });
 
     expect(logSpy).toHaveBeenCalledWith(chalk.green('Successfully created task', functionMock.functionConfig.name));
 
-    expect(functionMock.createSpy).toHaveBeenCalledWith(null, expect.objectContaining({
+    expect(functionMock.createSpy).toHaveBeenCalledWith(expect.objectContaining({
       environmentVariables: expect.objectContaining({
         // The undefined values are retrieved from process.env, the fact that the variables are set should be evidence enough
         API_HOST: { value: undefined },
@@ -155,7 +155,7 @@ describe('exh tasks sync', () => {
     const logSpy = jest.spyOn(global.console, 'log');
     const groupSpy = jest.spyOn(global.console, 'group');
 
-    await handler({ sdk: null, path: taskConfigPath });
+    await handler({ path: taskConfigPath });
 
     expect(logSpy).toHaveBeenCalledWith(chalk.green('Successfully created task', functionMock.functionConfig.name));
 
@@ -184,7 +184,7 @@ describe('exh tasks sync', () => {
 
     const logSpy = jest.spyOn(global.console, 'log');
 
-    await handler({ sdk: null, path: taskConfigPath });
+    await handler({ path: taskConfigPath });
     expect(findSpy).toHaveBeenCalledTimes(1);
     expect(functionMock.findByNameSpy).toHaveBeenCalledTimes(1);
     expect(functionMock.updateSpy).toHaveBeenCalledTimes(1);
@@ -192,7 +192,7 @@ describe('exh tasks sync', () => {
   });
 
   it('Accepts a valid runtime when provided a task config file with a valid runtime', async () => {
-    const error = await handler({ sdk: null, path: `${root}/valid-runtime.json` })
+    const error = await handler({ path: `${root}/valid-runtime.json` })
       .catch(e => e);
 
     // Proves that it proceeds passes the runtime validation
@@ -217,7 +217,7 @@ describe('exh tasks sync', () => {
     };
 
     const taskConfigPath = await tempDirectoryManager.createTempJsonFile(functionMock.functionConfig);
-    const error = await handler({ sdk: null, path: taskConfigPath })
+    const error = await handler({ path: taskConfigPath })
       .catch(e => e);
 
     expect(error.message).toBe('❌  Environment variables [API_OAUTH_TOKEN, API_OAUTH_TOKEN_SECRET] may not be provided when using executionCredentials');
@@ -259,7 +259,7 @@ describe('exh tasks sync', () => {
     const taskConfigPath = await tempDirectoryManager.createTempJsonFile(functionConfig);
     await tempDirectoryManager.createTempJsFile('index', functionCode);
 
-    const error = await handler({ sdk: null, path: taskConfigPath })
+    const error = await handler({ path: taskConfigPath })
       .catch(e => e);
 
     expect(error.message).toBe('❌ The user for the task-config.json executionCredentials exists, but no credentials were found in the Function environmentVariables');
@@ -316,7 +316,7 @@ describe('exh tasks sync', () => {
     const taskConfigPath = await tempDirectoryManager.createTempJsonFile(functionConfig);
     await tempDirectoryManager.createTempJsFile('index', functionCode);
 
-    const error = await handler({ sdk: null, path: taskConfigPath })
+    const error = await handler({ path: taskConfigPath })
       .catch(e => e);
 
     expect(error.message).toBe(`❌  The credentials found in the Function (${otherUser.email}) do not match the user found for the task-config.json executionCredentials (${user.email})`);
@@ -339,26 +339,26 @@ describe('exh tasks sync', () => {
 
     const logSpy = jest.spyOn(global.console, 'log');
 
-    await handler({ sdk: null, path: taskConfigPath });
+    await handler({ path: taskConfigPath });
     expect(logSpy).toHaveBeenCalledWith(chalk.green('Successfully created task', functionMock.functionConfig.name));
   });
 
   it('Throws an invalid runtime error when provided an invalid runtime argument', async () => {
-    const error = await handler({ sdk: null, name: 'test', code: './', entryPoint: 'index.js', runtime: 'nodejs8.x' })
+    const error = await handler({ name: 'test', code: './', entryPoint: 'index.js', runtime: 'nodejs8.x' })
       .catch(e => e);
 
     expect(error.message).toContain('"runtime" must be equal to one of the allowed values');
   });
 
   it('Throws an invalid runtime error when provided a task config file with an invalid runtime', async () => {
-    const error = await handler({ sdk: null, path: `${root}/invalid-runtime.json` })
+    const error = await handler({ path: `${root}/invalid-runtime.json` })
       .catch(e => e);
 
     expect(error.message).toContain('"runtime" must be equal to one of the allowed values');
   });
 
   it('Throws an invalid runtime error when provided a directory containing a task config with an invalid runtime', async () => {
-    const error = await handler({ sdk: null, path: `${root}` })
+    const error = await handler({ path: `${root}` })
       .catch(e => e);
 
     expect(error.message).toContain('"runtime" must be equal to one of the allowed values');

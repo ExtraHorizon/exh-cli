@@ -1,5 +1,5 @@
-import { OAuth1Client } from '@extrahorizon/javascript-sdk';
 import chalk = require('chalk');
+import { getSdk } from '../../exh';
 import { epilogue } from '../../helpers/util';
 
 export const command = 'get';
@@ -21,9 +21,9 @@ export const builder = (yargs: any) => epilogue(yargs).options({
   return true;
 });
 
-export const handler = async function list({ sdk, name, id }: {sdk: OAuth1Client; name: string; id: string;}) {
+export const handler = async function list({ name, id }: { name: string; id: string; }) {
   try {
-    const template = name ? await sdk.templates.findByName(name) : await sdk.templates.findById(id);
+    const template = name ? await getSdk().templates.findByName(name) : await getSdk().templates.findById(id);
     if (!template) {
       console.log(chalk.red('Failed to get template!'));
       return;

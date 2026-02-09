@@ -1,13 +1,13 @@
-import { OAuth1Client } from '@extrahorizon/javascript-sdk';
 import chalk = require('chalk');
+import { getSdk } from '../../exh';
 import { epilogue } from '../../helpers/util';
 
 export const command = 'list';
 export const desc = 'List all templates';
 export const builder = (yargs: any) => epilogue(yargs);
 
-export const handler = async function list({ sdk, isTTY }: {sdk: OAuth1Client; isTTY: boolean;}) {
-  const templates = await sdk.templates.findAll();
+export const handler = async function list({ isTTY }: { isTTY: boolean; }) {
+  const templates = await getSdk().templates.findAll();
   if (templates) {
     if (!templates.length) {
       console.log(chalk.red('No templates found'));

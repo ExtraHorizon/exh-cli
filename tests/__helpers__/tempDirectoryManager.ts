@@ -2,6 +2,8 @@ import { mkdir, readFile, rm, writeFile } from 'fs/promises';
 import { join } from 'path';
 import { generateId } from './utils';
 
+export type TempDirectoryManager = Awaited<ReturnType<typeof createTempDirectoryManager>>;
+
 export async function createTempDirectoryManager() {
   let dir: string | null = join(__dirname, `temp_${generateId()}`);
   await mkdir(dir);

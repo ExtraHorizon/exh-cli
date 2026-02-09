@@ -9,6 +9,7 @@ export function sdkInitOnly(apiHost: string, consumerKey: string, consumerSecret
     consumerSecret,
     host: apiHost,
   });
+
   return sdk;
 }
 
@@ -29,6 +30,14 @@ export async function sdkAuth() {
     });
   } catch (err) {
     throw new Error(`Failed to authenticate. All credentials found but some might be wrong or no longer valid.\nError was: "${err}"`);
+  }
+
+  return sdk;
+}
+
+export function getSdk() {
+  if (!sdk) {
+    throw new Error('SDK not initialized. Please call sdkAuth() or sdkInitOnly() first.');
   }
   return sdk;
 }

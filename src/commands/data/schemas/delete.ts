@@ -10,14 +10,14 @@ export const builder = (yargs: any) => epilogue(yargs).option('id', {
   type: 'string',
 });
 
-export const handler = async ({ sdk, id }) => {
-  const disableResponse = await schemaRepository.disable(sdk, id);
+export const handler = async ({ id }) => {
+  const disableResponse = await schemaRepository.disable(id);
   if (disableResponse.affectedRecords !== 1) {
     console.log(chalk.red('Failed to delete schema', id));
     return;
   }
 
-  const deleteResponse = await schemaRepository.remove(sdk, id);
+  const deleteResponse = await schemaRepository.remove(id);
   if (deleteResponse.affectedRecords) {
     console.log(chalk.green('Successfully deleted schema', id));
   } else {
