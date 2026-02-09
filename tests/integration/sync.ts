@@ -1,10 +1,10 @@
 import { handler } from '../../src/commands/sync';
-import { mockLocalizationRepository } from '../__helpers__/localizationRepositoryMock';
-import { createTempDirectoryManager } from '../__helpers__/tempDirectoryManager';
+import { mockLocalizationRepository, type LocalizationRepositoryMock } from '../__helpers__/localizationRepositoryMock';
+import { createTempDirectoryManager, type TempDirectoryManager } from '../__helpers__/tempDirectoryManager';
 
 describe('exh sync', () => {
-  let tempDirectory: Awaited<ReturnType<typeof createTempDirectoryManager>>;
-  let localizationRepositoryMock: ReturnType<typeof mockLocalizationRepository>;
+  let tempDirectory: TempDirectoryManager;
+  let localizationRepositoryMock: LocalizationRepositoryMock;
 
   beforeAll(() => {
     localizationRepositoryMock = mockLocalizationRepository();

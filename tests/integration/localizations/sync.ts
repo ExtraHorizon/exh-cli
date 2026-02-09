@@ -1,16 +1,16 @@
 import { handler } from '../../../src/commands/localizations/sync';
+import { spyOnConsole } from '../../__helpers__/consoleSpy';
 import { mockLocalizationRepository, type LocalizationRepositoryMock } from '../../__helpers__/localizationRepositoryMock';
-import { createTempDirectoryManager } from '../../__helpers__/tempDirectoryManager';
+import { createTempDirectoryManager, type TempDirectoryManager } from '../../__helpers__/tempDirectoryManager';
 
 describe('exh localizations sync', () => {
-  let tempDirectoryManager: Awaited<ReturnType<typeof createTempDirectoryManager>>;
+  let tempDirectoryManager: TempDirectoryManager;
   let localizationRepositoryMock: LocalizationRepositoryMock;
-  let logSpy: jest.SpyInstance;
+  const { expectConsoleLogToContain } = spyOnConsole();
 
   beforeEach(async () => {
     tempDirectoryManager = await createTempDirectoryManager();
     localizationRepositoryMock = mockLocalizationRepository();
-    logSpy = jest.spyOn(global.console, 'log');
   });
 
   afterEach(async () => {
@@ -53,13 +53,13 @@ describe('exh localizations sync', () => {
   it('Does nothing if no files are found', async () => {
     await handler({ path: tempDirectoryManager.getPath() });
 
-    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('No localizations found'));
+    expectConsoleLogToContain('No localizations found');
 
     expect(localizationRepositoryMock.createSpy).not.toHaveBeenCalled();
   });
 
   it('Chunks up localization creation and updates if there are more than 30', async () => {
-    const fileContent = {};
+    const fileContent: Record<string, string> = {};
     const localizations = [];
 
     for (let i = 0; i < 100; i += 1) {

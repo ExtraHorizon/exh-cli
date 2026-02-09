@@ -1,7 +1,7 @@
 import { ObjectId } from '@extrahorizon/javascript-sdk';
 import { getSdk } from '../exh';
 
-interface Transition {
+export interface Transition {
   name: string;
   type: string;
   fromStatuses: string[];

@@ -1,9 +1,9 @@
 import { handler } from '../../../../src/commands/data/schemas/init';
 import { ConsoleSpy, spyOnConsole } from '../../../__helpers__/consoleSpy';
-import { createTempDirectoryManager } from '../../../__helpers__/tempDirectoryManager';
+import { createTempDirectoryManager, type TempDirectoryManager } from '../../../__helpers__/tempDirectoryManager';
 
 describe('exh data schemas init', () => {
-  let tempDir: Awaited<ReturnType<typeof createTempDirectoryManager>>;
+  let tempDir: TempDirectoryManager;
   let consoleSpy: ConsoleSpy;
 
   beforeEach(async () => {

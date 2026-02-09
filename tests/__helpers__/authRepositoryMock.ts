@@ -15,6 +15,8 @@ export const exampleUser = {
   creationTimestamp: new Date(),
 };
 
+export type AuthRepositoryMock = ReturnType<typeof mockAuthRepository>;
+
 export const mockAuthRepository = () => {
   const oAuth1Tokens = generateOAuth1Tokens();
 
