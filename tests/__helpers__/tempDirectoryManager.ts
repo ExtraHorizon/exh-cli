@@ -5,8 +5,8 @@ import { generateId } from './utils';
 export type TempDirectoryManager = Awaited<ReturnType<typeof createTempDirectoryManager>>;
 
 export async function createTempDirectoryManager() {
-  let dir: string | null = join(__dirname, `temp_${generateId()}`);
-  await mkdir(dir);
+  let dir: string | null = join('./temp/', `temp_${generateId()}`);
+  await mkdir(dir, { recursive: true });
 
   return {
     async createTempJsonFile(content: object) {

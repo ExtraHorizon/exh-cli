@@ -3,7 +3,6 @@ import * as ospath from 'path';
 import { epilogue } from '../../helpers/util';
 import { buildTemplates } from './util/buildTemplates';
 import { readTemplateFiles, readTemplateFolder, readTemplateJson } from './util/readTemplateFiles';
-import { TemplateService } from './util/templateService';
 import { uploadTemplate } from './util/uploadTemplate';
 import { removeFileNameExtension } from './util/utils';
 
@@ -34,32 +33,32 @@ export const builder = (yargs: any) => epilogue(yargs).options({
   return true;
 });
 
-export const handler = async ({ path, template }) => {
-  const service: TemplateService = new TemplateService();
+export const handler = async ({ path, template }: { path?: string; template?: string; }) => {
   if (path) {
-    await syncTargetDir(service, ospath.resolve(path || '.'));
+    await syncTargetDir(ospath.resolve(path));
     return;
   }
 
   let templ = null;
-  const templateName = removeFileNameExtension(ospath.basename(template));
   if (fs.statSync(ospath.join(process.cwd(), template)).isFile()) {
     /* In case a template file was provided */
     templ = await readTemplateJson(template);
   } else {
     templ = await readTemplateFolder(template);
   }
-  await buildAndUploadTemplates(service, { [templateName]: templ });
+
+  const templateName = removeFileNameExtension(ospath.basename(template));
+  await buildAndUploadTemplates({ [templateName]: templ });
 };
 
-async function buildAndUploadTemplates(service: TemplateService, templateObject: any) {
-  const templates = await buildTemplates(service, templateObject);
+async function buildAndUploadTemplates(templateObject: any) {
+  const templates = await buildTemplates(templateObject);
   for (const template of templates) {
-    await uploadTemplate(service, template);
+    await uploadTemplate(template);
   }
 }
 
-export async function syncTargetDir(service: TemplateService, targetDir: string) {
+export async function syncTargetDir(targetDir: string) {
   const templateFilesByName = await readTemplateFiles(targetDir);
-  await buildAndUploadTemplates(service, templateFilesByName);
+  await buildAndUploadTemplates(templateFilesByName);
 }

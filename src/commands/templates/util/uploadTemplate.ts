@@ -1,15 +1,15 @@
-import { TemplateService } from './templateService';
+import * as templateRepository from '../../../repositories/templates';
 
-export async function uploadTemplate(service: TemplateService, template: any) {
-  const existingTemplate = await service.byName(template.name);
+export async function uploadTemplate(template: any) {
+  const existingTemplate = await templateRepository.findByName(template.name);
 
   try {
     if (!existingTemplate) {
       console.log(`Creating new template '${template.name}'`);
-      await service.create(template);
+      await templateRepository.create(template);
     } else {
       console.log(`Updating existing template '${template.name}'`);
-      await service.update(existingTemplate.id, template);
+      await templateRepository.update(existingTemplate.id, template);
     }
   } catch (err) {
     throw new Error(`Error creating or updating template: ${JSON.stringify(err.response)}`);
