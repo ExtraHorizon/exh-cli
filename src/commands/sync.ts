@@ -1,7 +1,6 @@
 import { existsSync } from 'fs';
 import * as fs from 'fs/promises';
 import * as ospath from 'path';
-import { OAuth1Client } from '@extrahorizon/javascript-sdk';
 import * as chalk from 'chalk';
 import { getRepoConfig, REPO_CONFIG_FILE } from '../helpers/repoConfig';
 import { epilogue } from '../helpers/util';
@@ -78,9 +77,8 @@ If not, the local directory is assumed with a default configuration which assume
   });
 
 export const handler = async ({
-  sdk, path, schemas, tasks, templates, dispatchers, cleanDispatchers, localizations, ignoreSchemaVerificationErrors,
+  path, schemas, tasks, templates, dispatchers, cleanDispatchers, localizations, ignoreSchemaVerificationErrors,
 }: {
-  sdk: OAuth1Client;
   path?: string;
   schemas?: boolean;
   tasks?: boolean;
@@ -100,7 +98,7 @@ export const handler = async ({
   if ((syncAll || schemas) && cfg.schemas) {
     console.log(chalk.green('\n ⚙️  Syncing schemas ...'));
     for (const schema of cfg.schemas) {
-      await syncSchemas(sdk, ospath.join(targetPath, schema), undefined, ignoreSchemaVerificationErrors);
+      await syncSchemas(ospath.join(targetPath, schema), undefined, ignoreSchemaVerificationErrors);
     }
   }
 
@@ -108,7 +106,7 @@ export const handler = async ({
   if ((syncAll || templates) && cfg.templates) {
     console.log(chalk.green('\n ⚙️  Syncing templates...'));
     for (const template of cfg.templates) {
-      await syncTemplates({ sdk, path: ospath.join(targetPath, template), template: null });
+      await syncTemplates({ path: ospath.join(targetPath, template), template: null });
     }
   }
 
@@ -116,7 +114,7 @@ export const handler = async ({
   if ((syncAll || tasks) && cfg.tasks) {
     console.log(chalk.green('\n ⚙️  Syncing tasks...'));
     for (const task of cfg.tasks) {
-      await syncTask({ sdk, path: ospath.join(targetPath, task) });
+      await syncTask({ path: ospath.join(targetPath, task) });
     }
   }
 
@@ -124,7 +122,7 @@ export const handler = async ({
   if ((syncAll || localizations) && cfg.localizations) {
     console.log(chalk.green('\n ⚙️  Syncing localizations...'));
     for (const localization of cfg.localizations) {
-      await sync(sdk, ospath.join(targetPath, localization));
+      await sync(ospath.join(targetPath, localization));
     }
   }
 
@@ -139,7 +137,7 @@ export const handler = async ({
     if (isValidPath) {
       console.log(chalk.green('\n ⚙️  Syncing dispatchers...'));
 
-      await syncDispatchers(sdk, dispatchersPath, cleanDispatchers);
+      await syncDispatchers(dispatchersPath, cleanDispatchers);
     } else if (dispatchers) {
       console.log(chalk.yellow('Warning: dispatchers.json not found'));
     }

@@ -1,4 +1,3 @@
-import { OAuth1Client } from '@extrahorizon/javascript-sdk';
 import { epilogue } from '../../helpers/util';
 import * as localizationsService from '../../services/localizations';
 
@@ -13,6 +12,6 @@ export const builder = (yargs: any) => epilogue(yargs).options({
   },
 });
 
-export const handler = async ({ sdk, path }: { sdk: OAuth1Client; path?: string; }) => {
-  await localizationsService.sync(sdk, path);
+export const handler = async ({ path }: { path?: string; }) => {
+  await localizationsService.sync(path);
 };

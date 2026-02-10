@@ -1,10 +1,11 @@
 import { OAuth1Client } from '@extrahorizon/javascript-sdk';
+import { getSdk } from '../../../exh';
 
 export class TemplateService {
   private sdk: OAuth1Client;
 
-  constructor(sdk: OAuth1Client) {
-    this.sdk = sdk;
+  constructor() {
+    this.sdk = getSdk();
   }
 
   async byName(name: string) {

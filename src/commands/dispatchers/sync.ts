@@ -1,4 +1,3 @@
-import { OAuth1Client } from '@extrahorizon/javascript-sdk';
 import { Argv } from 'yargs';
 import { epilogue } from '../../helpers/util';
 import * as dispatchersService from '../../services/dispatchers';
@@ -18,6 +17,6 @@ export const builder = (yargs: Argv) => epilogue(yargs).options({
   },
 });
 
-export const handler = async ({ sdk, file, clean }: {sdk: OAuth1Client; file: string; clean: boolean;}) => {
-  await dispatchersService.sync(sdk, file, clean);
+export const handler = async ({ file, clean }: { file: string; clean: boolean; }) => {
+  await dispatchersService.sync(file, clean);
 };

@@ -2,16 +2,14 @@ import { Schema } from '@extrahorizon/javascript-sdk';
 import { handler } from '../../../../src/commands/data/schemas/verify';
 import { spyOnConsole } from '../../../__helpers__/consoleSpy';
 import { minimalSchema } from '../../../__helpers__/schemas';
-import { createTempDirectoryManager } from '../../../__helpers__/tempDirectoryManager';
+import { createTempDirectoryManager, type TempDirectoryManager } from '../../../__helpers__/tempDirectoryManager';
 
 describe('exh data schemas verify', () => {
   const { expectConsoleLogToContain } = spyOnConsole();
-  let tempDirectoryManager: Awaited<ReturnType<typeof createTempDirectoryManager>>;
-  let consoleLogSpy: jest.SpyInstance;
+  let tempDirectoryManager: TempDirectoryManager;
 
   beforeEach(async () => {
     tempDirectoryManager = await createTempDirectoryManager();
-    consoleLogSpy = jest.spyOn(console, 'log');
   });
 
   afterEach(async () => {
@@ -26,7 +24,7 @@ describe('exh data schemas verify', () => {
       ignoreVerificationErrors: false,
     })).resolves.not.toThrow();
 
-    expect(consoleLogSpy).toHaveBeenCalledWith(expect.stringContaining('Checking'));
+    expectConsoleLogToContain('Checking');
   });
 
   it('Throws for unknown fields in the property configuration', async () => {

@@ -1,10 +1,9 @@
-import { OAuth1Client } from '@extrahorizon/javascript-sdk';
 import { yellow } from 'chalk';
 import { PartialLocalization } from '../../repositories/localizations';
 import { readFiles } from './readFiles';
 import { syncLocalizations } from './syncLocalizations';
 
-export async function sync(sdk: OAuth1Client, path: string) {
+export async function sync(path: string) {
   console.log(yellow(`Synchronizing localizations from ${path}`));
   const localizations = readFiles(path);
 
@@ -15,7 +14,7 @@ export async function sync(sdk: OAuth1Client, path: string) {
 
   assertDefaultLanguageSetForAll(localizations);
 
-  await syncLocalizations(sdk, localizations);
+  await syncLocalizations(localizations);
 }
 
 function assertDefaultLanguageSetForAll(localizations: PartialLocalization[]) {

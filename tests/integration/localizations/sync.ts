@@ -1,10 +1,10 @@
 import { handler } from '../../../src/commands/localizations/sync';
-import { mockLocalizationRepository } from '../../__helpers__/localizationRepositoryMock';
+import { mockLocalizationRepository, type LocalizationRepositoryMock } from '../../__helpers__/localizationRepositoryMock';
 import { createTempDirectoryManager } from '../../__helpers__/tempDirectoryManager';
 
 describe('exh localizations sync', () => {
   let tempDirectoryManager: Awaited<ReturnType<typeof createTempDirectoryManager>>;
-  let localizationRepositoryMock: ReturnType<typeof mockLocalizationRepository>;
+  let localizationRepositoryMock: LocalizationRepositoryMock;
   let logSpy: jest.SpyInstance;
 
   beforeEach(async () => {
@@ -22,9 +22,9 @@ describe('exh localizations sync', () => {
     await tempDirectoryManager.createJsonFile('en', { test_key: 'My text' });
     await tempDirectoryManager.createJsonFile('nl', { test_key: 'Mijn tekst' });
 
-    await handler({ sdk: undefined, path: tempDirectoryManager.getPath() });
+    await handler({ path: tempDirectoryManager.getPath() });
 
-    expect(localizationRepositoryMock.createSpy).toHaveBeenCalledWith(undefined, [
+    expect(localizationRepositoryMock.createSpy).toHaveBeenCalledWith([
       { key: 'test_key', text: { EN: 'My text', NL: 'Mijn tekst' } },
     ]);
   });
@@ -39,19 +39,19 @@ describe('exh localizations sync', () => {
       existingIds: ['existing_key'],
     });
 
-    await handler({ sdk: undefined, path: tempDirectoryManager.getPath() });
+    await handler({ path: tempDirectoryManager.getPath() });
 
-    expect(localizationRepositoryMock.createSpy).toHaveBeenCalledWith(undefined, [
+    expect(localizationRepositoryMock.createSpy).toHaveBeenCalledWith([
       { key: 'new_key', text: { EN: 'My new text', NL: 'Mijn nieuwe tekst' } },
       { key: 'existing_key', text: { EN: 'My other text', NL: 'Mijn andere text' } },
     ]);
-    expect(localizationRepositoryMock.updateSpy).toHaveBeenCalledWith(undefined, [
+    expect(localizationRepositoryMock.updateSpy).toHaveBeenCalledWith([
       { key: 'existing_key', text: { EN: 'My other text', NL: 'Mijn andere text' } },
     ]);
   });
 
   it('Does nothing if no files are found', async () => {
-    await handler({ sdk: undefined, path: tempDirectoryManager.getPath() });
+    await handler({ path: tempDirectoryManager.getPath() });
 
     expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('No localizations found'));
 
@@ -74,23 +74,23 @@ describe('exh localizations sync', () => {
 
     // Make the CLI think that all localizations already exist, so that it will update them
     localizationRepositoryMock.createSpy
-      .mockImplementation((_sdk, items) => Promise.resolve({ created: 0, existing: items.length, existingIds: items.map(item => item.key) }));
+      .mockImplementation(items => Promise.resolve({ created: 0, existing: items.length, existingIds: items.map(item => item.key) }));
 
-    await handler({ sdk: undefined, path: tempDirectoryManager.getPath() });
+    await handler({ path: tempDirectoryManager.getPath() });
 
-    expect(localizationRepositoryMock.createSpy).toHaveBeenCalledWith(undefined, localizations.slice(0, 30));
-    expect(localizationRepositoryMock.createSpy).toHaveBeenCalledWith(undefined, localizations.slice(30, 60));
-    expect(localizationRepositoryMock.createSpy).toHaveBeenCalledWith(undefined, localizations.slice(60, 90));
-    expect(localizationRepositoryMock.createSpy).toHaveBeenCalledWith(undefined, localizations.slice(90));
+    expect(localizationRepositoryMock.createSpy).toHaveBeenCalledWith(localizations.slice(0, 30));
+    expect(localizationRepositoryMock.createSpy).toHaveBeenCalledWith(localizations.slice(30, 60));
+    expect(localizationRepositoryMock.createSpy).toHaveBeenCalledWith(localizations.slice(60, 90));
+    expect(localizationRepositoryMock.createSpy).toHaveBeenCalledWith(localizations.slice(90));
 
-    expect(localizationRepositoryMock.updateSpy).toHaveBeenCalledWith(undefined, localizations.slice(0, 30));
-    expect(localizationRepositoryMock.updateSpy).toHaveBeenCalledWith(undefined, localizations.slice(30, 60));
-    expect(localizationRepositoryMock.updateSpy).toHaveBeenCalledWith(undefined, localizations.slice(60, 90));
-    expect(localizationRepositoryMock.updateSpy).toHaveBeenCalledWith(undefined, localizations.slice(90));
+    expect(localizationRepositoryMock.updateSpy).toHaveBeenCalledWith(localizations.slice(0, 30));
+    expect(localizationRepositoryMock.updateSpy).toHaveBeenCalledWith(localizations.slice(30, 60));
+    expect(localizationRepositoryMock.updateSpy).toHaveBeenCalledWith(localizations.slice(60, 90));
+    expect(localizationRepositoryMock.updateSpy).toHaveBeenCalledWith(localizations.slice(90));
   });
 
   it('Throws if the target directory does not exist', async () => {
-    const promise = handler({ sdk: undefined, path: 'non-existing-directory' });
+    const promise = handler({ path: 'non-existing-directory' });
 
     await expect(promise).rejects.toThrow(
       expect.objectContaining({ message: expect.stringContaining('Was not able to list localization files in directory \'non-existing-directory\'') })
@@ -100,7 +100,7 @@ describe('exh localizations sync', () => {
   it('Throws if a json file is found with a name not being a valid language code', async () => {
     await tempDirectoryManager.createJsonFile('not-a-valid-language-code', { test_key: 'My text' });
 
-    const promise = handler({ sdk: undefined, path: tempDirectoryManager.getPath() });
+    const promise = handler({ path: tempDirectoryManager.getPath() });
 
     await expect(promise).rejects.toThrow(
       expect.objectContaining({ message: expect.stringContaining('language code NOT-A-VALID-LANGUAGE-CODE is not available') })
@@ -110,7 +110,7 @@ describe('exh localizations sync', () => {
   it('Throws if a json file its content is not valid json', async () => {
     await tempDirectoryManager.createFile('ru.json', 'Not a valid json file content');
 
-    const promise = handler({ sdk: undefined, path: tempDirectoryManager.getPath() });
+    const promise = handler({ path: tempDirectoryManager.getPath() });
 
     await expect(promise).rejects.toThrow(
       expect.objectContaining({ message: expect.stringContaining('Was not able to parse \'ru.json\', not a valid JSON file') })
@@ -120,7 +120,7 @@ describe('exh localizations sync', () => {
   it('Throws if a json file its content is something else than an object', async () => {
     await tempDirectoryManager.createJsonFile('ru', ['Not', 'valid', 'localization', 'file', 'content']);
 
-    const promise = handler({ sdk: undefined, path: tempDirectoryManager.getPath() });
+    const promise = handler({ path: tempDirectoryManager.getPath() });
 
     await expect(promise).rejects.toThrow(
       expect.objectContaining({ message: expect.stringContaining('The content of localization file \'ru.json\' is not valid') })
@@ -130,7 +130,7 @@ describe('exh localizations sync', () => {
   it('Throws if one of the keys does not match the allowed pattern, mentioning the erroneous key', async () => {
     await tempDirectoryManager.createJsonFile('ru', { 'Not a valid key': 'My text' });
 
-    const promise = handler({ sdk: undefined, path: tempDirectoryManager.getPath() });
+    const promise = handler({ path: tempDirectoryManager.getPath() });
 
     await expect(promise).rejects.toThrow(
       expect.objectContaining({ message: expect.stringContaining('Not a valid key') })
@@ -140,7 +140,7 @@ describe('exh localizations sync', () => {
   it('Throws if one of the values is something else than a string, mentioning the erroneous key', async () => {
     await tempDirectoryManager.createJsonFile('ru', { key_with_invalid_value: ['Not', 'a', 'valid', 'localization', 'value'] });
 
-    const promise = handler({ sdk: undefined, path: tempDirectoryManager.getPath() });
+    const promise = handler({ path: tempDirectoryManager.getPath() });
 
     await expect(promise).rejects.toThrow(
       expect.objectContaining({ message: expect.stringContaining('key_with_invalid_value') })
@@ -152,7 +152,7 @@ describe('exh localizations sync', () => {
     await tempDirectoryManager.createJsonFile('fr', { first_not_in_default: 'Nope nope nope' });
     await tempDirectoryManager.createJsonFile('nl', { second_not_in_default: 'Mijn andere tekst' });
 
-    const promise = handler({ sdk: undefined, path: tempDirectoryManager.getPath() });
+    const promise = handler({ path: tempDirectoryManager.getPath() });
 
     await expect(promise).rejects.toThrow(
       expect.objectContaining({ message: expect.stringContaining(

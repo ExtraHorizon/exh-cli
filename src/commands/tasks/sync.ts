@@ -71,21 +71,21 @@ export const builder = (yargs: any) => epilogue(yargs).options({
     return true;
   });
 
-export const handler = async ({ sdk, ...cmdLineParams }) => {
+export const handler = async ({ ...cmdLineParams }) => {
   for await (const config of getValidatedConfigIterator(cmdLineParams)) {
     console.log('Syncing task', config.name, '...');
-    await syncSingleTask(sdk, config);
+    await syncSingleTask(config);
   }
 };
 
-async function syncSingleTask(sdk: any, config: TaskConfig) {
+async function syncSingleTask(config: TaskConfig) {
   /* load configuration & overload parameters passed through command line */
 
   const uploadFilePath = await zipFileFromDirectory(config.path);
   const file = await fs.readFile(uploadFilePath);
 
   /* Check if the function already exists */
-  const allFunctions = await functionRepository.find(sdk);
+  const allFunctions = await functionRepository.find();
   const myFunction = allFunctions.find((f: any) => f.name === config.name);
 
   /* Construct a request object to send to the API */
@@ -123,14 +123,11 @@ async function syncSingleTask(sdk: any, config: TaskConfig) {
   }
 
   if (config.executionCredentials) {
-    const credentials = await syncFunctionUser(
-      sdk,
-      {
-        taskName: config.name,
-        targetEmail: config.executionCredentials.email,
-        targetPermissions: config.executionCredentials.permissions,
-      }
-    );
+    const credentials = await syncFunctionUser({
+      taskName: config.name,
+      targetEmail: config.executionCredentials.email,
+      targetPermissions: config.executionCredentials.permissions,
+    });
 
     // eslint-disable-next-line no-param-reassign
     config.environment = {
@@ -153,16 +150,16 @@ async function syncSingleTask(sdk: any, config: TaskConfig) {
   }
 
   if (myFunction === undefined) {
-    await functionRepository.create(sdk, request);
+    await functionRepository.create(request);
     console.log(chalk.green('Successfully created task', config.name));
   } else {
     // TODO: Check all fields and only update if they are different
-    const existingFunction = await functionRepository.findByName(sdk, myFunction.name);
+    const existingFunction = await functionRepository.findByName(myFunction.name);
     if (request.runtime === existingFunction.runtime) {
       delete request.runtime;
     }
 
-    const updateResponse = await functionRepository.update(sdk, request);
+    const updateResponse = await functionRepository.update(request);
     if (!updateResponse?.affectedRecords) {
       throw new Error(`Failed to update task ${request.name}`);
     }

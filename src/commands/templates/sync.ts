@@ -34,8 +34,8 @@ export const builder = (yargs: any) => epilogue(yargs).options({
   return true;
 });
 
-export const handler = async ({ sdk, path, template }) => {
-  const service: TemplateService = new TemplateService(sdk);
+export const handler = async ({ path, template }) => {
+  const service: TemplateService = new TemplateService();
   if (path) {
     await syncTargetDir(service, ospath.resolve(path || '.'));
     return;
