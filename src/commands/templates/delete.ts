@@ -1,6 +1,6 @@
 import chalk = require('chalk');
-import { getSdk } from '../../exh';
 import { epilogue } from '../../helpers/util';
+import * as templateRepository from '../../repositories/templates';
 
 export const command = 'delete';
 export const desc = 'Delete a template';
@@ -20,20 +20,20 @@ export const builder = (yargs: any) => epilogue(yargs).options({
   return true;
 });
 
-export const handler = async function list({ name, id }: { name: string; id: string; }) {
+export const handler = async function list({ name, id }: { name?: string; id?: string; }) {
   let template = null;
   if (name) {
-    template = await getSdk().templates.findByName(name);
+    template = await templateRepository.findByName(name);
   }
   if (id) {
-    template = await getSdk().templates.findById(id);
+    template = await templateRepository.findById(id);
   }
   if (!template) {
     console.log(chalk.red('Template not found!'));
     return;
   }
   try {
-    const { affectedRecords } = await getSdk().templates.remove(template.id);
+    const { affectedRecords } = await templateRepository.remove(template.id);
     if (!affectedRecords) {
       console.log(chalk.red('Failed to remove template', name));
       return;
