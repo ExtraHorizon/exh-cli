@@ -1,10 +1,11 @@
 import { handler } from '../../../../src/commands/data/schemas/sync';
+import type { Transition } from '../../../../src/repositories/schemas';
 import { schemaRepositoryMock, type SchemaRepositoryMock } from '../../../__helpers__/schemaRepositoryMock';
 import { defaultSchemaReturnId, minimalSchema, validSchema } from '../../../__helpers__/schemas';
-import { createTempDirectoryManager } from '../../../__helpers__/tempDirectoryManager';
+import { createTempDirectoryManager, type TempDirectoryManager } from '../../../__helpers__/tempDirectoryManager';
 
 describe('exh data schemas sync', () => {
-  let tempDirectoryManager: Awaited<ReturnType<typeof createTempDirectoryManager>>;
+  let tempDirectoryManager: TempDirectoryManager;
   let repositoryMock: SchemaRepositoryMock;
 
   beforeEach(async () => {
@@ -42,7 +43,7 @@ describe('exh data schemas sync', () => {
 
     // Transition creation is called for every transition
     expect(repositoryMock.createTransitionSpy).toBeCalledTimes(Object.keys(validSchema.transitions).length);
-    validSchema.transitions.forEach(transition => {
+    validSchema.transitions.forEach((transition: Transition) => {
       expect(repositoryMock.createTransitionSpy)
         .toHaveBeenCalledWith(expect.any(String), transition);
     });
