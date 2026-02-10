@@ -1,6 +1,8 @@
 import * as functionRepository from '../../src/repositories/functions';
 import { functionConfig, generateFunction } from './functions';
 
+export type FunctionRepositoryMock = ReturnType<typeof functionRepositoryMock>;
+
 export const functionRepositoryMock = () => {
   const existingFunction = generateFunction(functionConfig);
 

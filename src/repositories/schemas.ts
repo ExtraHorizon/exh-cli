@@ -1,4 +1,4 @@
-import { ObjectId } from '@extrahorizon/javascript-sdk';
+import { ObjectId, rqlBuilder } from '@extrahorizon/javascript-sdk';
 import { getSdk } from '../exh';
 
 export interface Transition {
@@ -25,6 +25,11 @@ export async function disable(schemaId: ObjectId) {
  */
 export async function fetchSchemaByName(name: string) {
   return await getSdk().data.schemas.findByName(name);
+}
+
+export async function fetchAll() {
+  const rql = rqlBuilder().select(['id', 'name', 'description']).build();
+  return await getSdk().data.schemas.findAll({ rql });
 }
 
 /**

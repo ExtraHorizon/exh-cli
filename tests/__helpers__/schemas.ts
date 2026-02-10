@@ -167,10 +167,10 @@ export const validSchema: any = {
   },
 };
 
-export const createEmptySchema = (name: string, description: string): Schema => ({
-  name,
-  description,
+export const createEmptySchema = (name?: string, description?: string): Schema => ({
   id: '65b2291d9bfa72b8fdc6a7b2',
+  name: name || 'my-schema',
+  description: description || 'My Test Schema',
   createMode: 'default',
   readMode: 'default',
   updateMode: 'default',

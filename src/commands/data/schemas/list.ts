@@ -1,17 +1,26 @@
-import { getSdk } from '../../../exh';
 import { epilogue } from '../../../helpers/util';
+import * as schemaRepository from '../../../repositories/schemas';
 
 export const command = 'list';
 export const desc = 'List all schemas';
 export const builder = (yargs: any) => epilogue(yargs);
 
 export const handler = async function list({ isTTY }) {
-  const schemaListResponse = await getSdk().raw.get('/data/v1/');
-  if (schemaListResponse.data.data.length !== 0) {
-    if (isTTY) {
-      console.table(schemaListResponse.data.data.map((c:any) => ({ Id: c.id, Name: c.name, Description: c.description || '<none>' })));
-    } else {
-      schemaListResponse.data.data.forEach((f:any) => (console.log([f.id, f.name].join(','))));
-    }
+  const schemas = await schemaRepository.fetchAll();
+
+  if (schemas.length < 1) {
+    return;
+  }
+
+  if (isTTY) {
+    console.table(schemas.map(schema => ({
+      Id: schema.id,
+      Name: schema.name,
+      Description: schema.description || '<none>',
+    })));
+  } else {
+    schemas.forEach(schema => console.log(
+      [schema.id, schema.name].join(',')
+    ));
   }
 };

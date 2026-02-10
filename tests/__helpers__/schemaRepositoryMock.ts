@@ -13,6 +13,9 @@ export const schemaRepositoryMock = () => {
   const fetchSchemaByNameSpy = jest.spyOn(schemaRepository, 'fetchSchemaByName')
     .mockImplementation(() => Promise.resolve(undefined));
 
+  const fetchAllSpy = jest.spyOn(schemaRepository, 'fetchAll')
+    .mockImplementation(() => Promise.resolve([createEmptySchema()]));
+
   const createSchemaSpy = jest.spyOn(schemaRepository, 'createSchema')
     .mockImplementation((name, description) => Promise.resolve(createEmptySchema(name, description)));
 
@@ -41,6 +44,7 @@ export const schemaRepositoryMock = () => {
     removeSchemaSpy,
     disableSchemaSpy,
     fetchSchemaByNameSpy,
+    fetchAllSpy,
     createSchemaSpy,
     createPropertySpy,
     createStatusSpy,
