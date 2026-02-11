@@ -4,13 +4,13 @@ export type TemplateRepositoryMock = ReturnType<typeof templateRepositoryMock>;
 
 export const templateRepositoryMock = () => {
   const findByNameSpy = jest.spyOn(templateRepository, 'findByName')
-    .mockImplementation(async () => undefined);
+    .mockResolvedValue(undefined);
 
   const findByIdSpy = jest.spyOn(templateRepository, 'findById')
-    .mockImplementation(async () => undefined);
+    .mockResolvedValue(undefined);
 
   const findAllSpy = jest.spyOn(templateRepository, 'findAll')
-    .mockImplementation(async () => []);
+    .mockResolvedValue([]);
 
   const createSpy = jest.spyOn(templateRepository, 'create')
     .mockImplementation(async data => ({
@@ -29,7 +29,7 @@ export const templateRepositoryMock = () => {
     }));
 
   const removeSpy = jest.spyOn(templateRepository, 'remove')
-    .mockImplementation(async () => ({ affectedRecords: 1 }));
+    .mockResolvedValue({ affectedRecords: 1 });
 
   return {
     findByNameSpy,

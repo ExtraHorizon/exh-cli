@@ -26,7 +26,7 @@ describe('exh data schemas delete', () => {
   });
 
   it('Throws on a non-existing schema', async () => {
-    repositoryMock.disableSchemaSpy.mockImplementationOnce(async () => ({ affectedRecords: 0 }));
+    repositoryMock.disableSchemaSpy.mockResolvedValue({ affectedRecords: 0 });
 
     await handler({ id: 'InvalidSchemaId' });
 

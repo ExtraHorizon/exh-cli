@@ -26,7 +26,7 @@ describe('exh dispatchers sync', () => {
     });
 
     jest.spyOn(fs, 'readFile')
-      .mockImplementationOnce(() => Promise.resolve(JSON.stringify([dispatcher])));
+      .mockResolvedValueOnce(JSON.stringify([dispatcher]));
 
     await expect(handler({ file: '', clean: false }))
       .rejects.toThrow('The dispatchers file is invalid');
@@ -40,7 +40,7 @@ describe('exh dispatchers sync', () => {
     });
 
     jest.spyOn(fs, 'readFile')
-      .mockImplementationOnce(() => Promise.resolve(JSON.stringify([dispatcher])));
+      .mockResolvedValueOnce(JSON.stringify([dispatcher]));
 
     await expect(handler({ file: '', clean: false }))
       .rejects.toThrow('The dispatchers file is invalid');
@@ -52,10 +52,10 @@ describe('exh dispatchers sync', () => {
     const dispatcher = generateDispatcher();
 
     jest.spyOn(fs, 'readFile')
-      .mockImplementationOnce(() => Promise.resolve(JSON.stringify([dispatcher])));
+      .mockResolvedValueOnce(JSON.stringify([dispatcher]));
 
     const createDispatcherSpy = jest.spyOn(dispatcherRepository, 'create')
-      .mockImplementationOnce(() => Promise.resolve(dispatcher));
+      .mockResolvedValueOnce(dispatcher);
 
     await handler({ file: '', clean: false });
 
@@ -72,11 +72,11 @@ describe('exh dispatchers sync', () => {
     const minimalDispatcher = generateMinimalDispatcher();
 
     jest.spyOn(fs, 'readFile')
-      .mockImplementationOnce(() => Promise.resolve(JSON.stringify([minimalDispatcher])));
+      .mockResolvedValueOnce(JSON.stringify([minimalDispatcher]));
 
     const createDispatcherSpy = jest.spyOn(dispatcherRepository, 'create')
       // @ts-expect-error The minimal dispatcher does not satisfy the Dispatcher type, but is not relevant for the test case
-      .mockImplementationOnce(() => Promise.resolve(minimalDispatcher));
+      .mockResolvedValueOnce(minimalDispatcher);
 
     await handler({ file: '', clean: false });
 
@@ -93,10 +93,10 @@ describe('exh dispatchers sync', () => {
     const dispatcher = generateDispatcher({ tags: [cliManagedTag, 'Tag1', 'Tag2'] });
 
     jest.spyOn(fs, 'readFile')
-      .mockImplementationOnce(() => Promise.resolve(JSON.stringify([dispatcher])));
+      .mockResolvedValueOnce(JSON.stringify([dispatcher]));
 
     jest.spyOn(dispatcherRepository, 'findAll')
-      .mockImplementationOnce(() => Promise.resolve([dispatcher, generateDispatcher()]));
+      .mockResolvedValueOnce([dispatcher, generateDispatcher()]);
 
     await handler({ file: '', clean: false });
 
@@ -115,10 +115,10 @@ describe('exh dispatchers sync', () => {
     expect(dispatcher.tags).not.toContain('EXH_CLI_MANAGED');
 
     jest.spyOn(fs, 'readFile')
-      .mockImplementationOnce(() => Promise.resolve(JSON.stringify([dispatcher])));
+      .mockResolvedValueOnce(JSON.stringify([dispatcher]));
 
     jest.spyOn(dispatcherRepository, 'create')
-      .mockImplementationOnce(() => Promise.resolve(dispatcher));
+      .mockResolvedValueOnce(dispatcher);
 
     await handler({ file: '', clean: false });
 
@@ -132,7 +132,7 @@ describe('exh dispatchers sync', () => {
 
   it('Updates the Actions of an existing Dispatcher', async () => {
     jest.spyOn(fs, 'readFile')
-      .mockImplementationOnce(() => Promise.resolve(JSON.stringify([repositoryMock.existingDispatcher])));
+      .mockResolvedValueOnce(JSON.stringify([repositoryMock.existingDispatcher]));
 
     await handler({ file: '', clean: false });
 
@@ -151,10 +151,10 @@ describe('exh dispatchers sync', () => {
     };
 
     jest.spyOn(dispatcherRepository, 'findAll')
-      .mockImplementationOnce(() => Promise.resolve([dispatcherWithExcessAction]));
+      .mockResolvedValueOnce([dispatcherWithExcessAction]);
 
     jest.spyOn(fs, 'readFile')
-      .mockImplementationOnce(() => Promise.resolve(JSON.stringify([localDispatcher])));
+      .mockResolvedValueOnce(JSON.stringify([localDispatcher]));
 
     await handler({ file: '', clean: false });
     expect(repositoryMock.removeActionSpy).toHaveBeenCalledTimes(1);
@@ -165,10 +165,10 @@ describe('exh dispatchers sync', () => {
     const dispatcherToDelete = generateDispatcher();
 
     jest.spyOn(fs, 'readFile')
-      .mockImplementationOnce(() => Promise.resolve(JSON.stringify([repositoryMock.existingDispatcher])));
+      .mockResolvedValueOnce(JSON.stringify([repositoryMock.existingDispatcher]));
 
     jest.spyOn(dispatcherRepository, 'findAll')
-      .mockImplementation(() => Promise.resolve([repositoryMock.existingDispatcher, dispatcherToDelete]));
+      .mockResolvedValue([repositoryMock.existingDispatcher, dispatcherToDelete]);
 
     await handler({ file: '', clean: true });
 
@@ -180,10 +180,10 @@ describe('exh dispatchers sync', () => {
     const dispatcherToDelete = generateDispatcher();
 
     jest.spyOn(fs, 'readFile')
-      .mockImplementationOnce(() => Promise.resolve(JSON.stringify([repositoryMock.existingDispatcher])));
+      .mockResolvedValueOnce(JSON.stringify([repositoryMock.existingDispatcher]));
 
     jest.spyOn(dispatcherRepository, 'findAll')
-      .mockImplementation(() => Promise.resolve([repositoryMock.existingDispatcher, dispatcherToDelete]));
+      .mockResolvedValue([repositoryMock.existingDispatcher, dispatcherToDelete]);
 
     await handler({ file: '', clean: false });
 

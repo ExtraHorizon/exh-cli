@@ -10,7 +10,7 @@ describe('exh tasks list', () => {
 
   beforeAll(() => {
     repositoryMock = functionRepositoryMock();
-    repositoryMock.findSpy.mockImplementation(async () => [functionA, functionB]);
+    repositoryMock.findSpy.mockResolvedValue([functionA, functionB]);
   });
 
   afterEach(() => {

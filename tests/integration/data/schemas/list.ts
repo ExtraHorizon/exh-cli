@@ -11,7 +11,7 @@ describe('exh data schemas list', () => {
 
   beforeAll(() => {
     repositoryMock = schemaRepositoryMock();
-    repositoryMock.fetchAllSpy.mockImplementation(async () => [schemaA, schemaB]);
+    repositoryMock.fetchAllSpy.mockResolvedValue([schemaA, schemaB]);
   });
 
   afterEach(() => {

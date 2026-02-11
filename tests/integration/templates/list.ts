@@ -11,7 +11,7 @@ describe('exh templates list', () => {
 
   beforeAll(() => {
     repositoryMock = templateRepositoryMock();
-    repositoryMock.findAllSpy.mockImplementation(async () => [templateA, templateB]);
+    repositoryMock.findAllSpy.mockResolvedValue([templateA, templateB]);
   });
 
   afterEach(() => {
@@ -46,7 +46,7 @@ describe('exh templates list', () => {
   });
 
   it('Prints a message when no templates are found', async () => {
-    repositoryMock.findAllSpy.mockImplementationOnce(async () => []);
+    repositoryMock.findAllSpy.mockResolvedValueOnce([]);
 
     await handler({ isTTY: false });
 
