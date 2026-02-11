@@ -1,11 +1,12 @@
 import { handler } from '../../../src/commands/templates/list';
 import { spyOnConsole } from '../../__helpers__/consoleSpy';
 import { templateRepositoryMock, type TemplateRepositoryMock } from '../../__helpers__/templateRepositoryMock';
+import { generateTemplate } from '../../__helpers__/templates';
 
 describe('exh templates list', () => {
   const { expectConsoleLogToContain } = spyOnConsole();
-  const templateA = { name: 'TemplateA', description: 'My template A', updateTimestamp: new Date() };
-  const templateB = { name: 'TemplateB', description: 'My template B', updateTimestamp: new Date() };
+  const templateA = generateTemplate();
+  const templateB = generateTemplate();
   let repositoryMock: TemplateRepositoryMock;
 
   beforeAll(() => {
@@ -30,11 +31,13 @@ describe('exh templates list', () => {
 
     expect(consoleTableSpy).toHaveBeenCalledWith([
       {
+        Id: templateA.id,
         Name: templateA.name,
         Description: templateA.description,
         'Last updated': templateA.updateTimestamp.toISOString(),
       },
       {
+        Id: templateB.id,
         Name: templateB.name,
         Description: templateB.description,
         'Last updated': templateB.updateTimestamp.toISOString(),

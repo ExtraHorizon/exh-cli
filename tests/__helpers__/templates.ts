@@ -1,14 +1,39 @@
-import type { TemplateOut } from '@extrahorizon/javascript-sdk';
+import type { Template, TemplateV2 } from '@extrahorizon/javascript-sdk';
+import { generateId } from './utils';
 
-export const minimalTemplate: TemplateOut = {
-  id: '65b2291d9bfa72b8fdc6a7b2',
-  name: 'My Template',
-  description: 'A test template',
-  schema: {},
-  fields: {
-    subject: 'My Subject',
-    body: 'My Body',
-  },
-  creationTimestamp: new Date(),
-  updateTimestamp: new Date(),
-};
+export function generateTemplate(overrides: Partial<Template> = {}): Template {
+  return {
+    id: generateId(),
+    name: `template-${generateId()}`,
+    description: `template-description-${generateId()}`,
+    schema: {
+      type: 'object',
+    },
+    fields: {
+      subject: 'My Subject',
+      body: 'My Body',
+    },
+    updateTimestamp: new Date(),
+    creationTimestamp: new Date(),
+    ...overrides,
+  };
+}
+
+export function generateTemplateV2(overrides: Partial<TemplateV2> = {}): TemplateV2 {
+  return {
+    id: generateId(),
+    name: `template-${generateId()}`,
+    description: `template-description-${generateId()}`,
+    properties: {
+      subject: { type: 'string' },
+      body: { type: 'string' },
+    },
+    outputs: {
+      subject: 'My Subject',
+      body: 'My Body',
+    },
+    updateTimestamp: new Date(),
+    creationTimestamp: new Date(),
+    ...overrides,
+  };
+}

@@ -17,3 +17,7 @@ export async function readTextFile(path: string) {
 export function removeFileNameExtension(fileName: string) {
   return fileName.split('.')[0];
 }
+
+export function isV1Template(template: any): boolean {
+  return !!template.schema || !!template.fields;
+}
