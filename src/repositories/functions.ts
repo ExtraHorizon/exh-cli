@@ -1,5 +1,5 @@
-import { permissionModes } from '../commands/tasks/taskConfig';
 import { getSdk } from '../exh';
+import { permissionModes } from '../services/tasks/taskConfig';
 
 export interface FunctionCreation {
   name: string;
