@@ -1,16 +1,15 @@
 /* eslint-disable camelcase */
+import * as templateRepository from '../../../repositories/templates';
 
-import { TemplateService } from './templateService';
-
-export async function buildTemplates(service: TemplateService, templateFilesByName: any) {
+export async function buildTemplates(templateFilesByName: any) {
   const templates = [];
   for (const name of Object.keys(templateFilesByName)) {
-    templates.push(await buildTemplate(service, name, templateFilesByName));
+    templates.push(await buildTemplate(name, templateFilesByName));
   }
   return templates;
 }
 
-async function buildTemplate(service: TemplateService, name: string, templateFilesByName: any, callChain = []) {
+async function buildTemplate(name: string, templateFilesByName: any, callChain = []) {
   if (callChain.includes(name)) {
     throw new Error(`Circular extension detected. ${[...callChain, name].reverse().map((n:string) => `'${n}'`).join(' > ')}`);
   }
@@ -18,7 +17,7 @@ async function buildTemplate(service: TemplateService, name: string, templateFil
   let templateFile = templateFilesByName[name];
 
   if (templateFile === undefined) {
-    templateFile = await service.byName(name);
+    templateFile = await templateRepository.findByName(name);
     if (!templateFile) {
       throw new Error(`Template file dependency ${name} not found!`);
     }
@@ -28,7 +27,7 @@ async function buildTemplate(service: TemplateService, name: string, templateFil
   let { fields } = templateFile;
 
   if (extends_template) {
-    const extendingTemplate = await buildTemplate(service, extends_template, templateFilesByName, [...callChain, name]);
+    const extendingTemplate = await buildTemplate(extends_template, templateFilesByName, [...callChain, name]);
 
     const match = (_fullMatch: any, variableName: string) => {
       const value = fields[variableName];
