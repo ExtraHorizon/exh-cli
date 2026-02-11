@@ -1,6 +1,7 @@
+import type { TemplateOut } from '@extrahorizon/javascript-sdk';
 import chalk = require('chalk');
-import { getSdk } from '../../exh';
 import { epilogue } from '../../helpers/util';
+import * as templateRepository from '../../repositories/templates';
 
 export const command = 'get';
 export const desc = 'Fetch a template';
@@ -21,15 +22,18 @@ export const builder = (yargs: any) => epilogue(yargs).options({
   return true;
 });
 
-export const handler = async function list({ name, id }: { name: string; id: string; }) {
-  try {
-    const template = name ? await getSdk().templates.findByName(name) : await getSdk().templates.findById(id);
-    if (!template) {
-      console.log(chalk.red('Failed to get template!'));
-      return;
-    }
-    console.log(JSON.stringify(template, null, 4));
-  } catch (err) {
-    console.log(chalk.red('Failed to get template', name));
+export const handler = async function list({ name, id }: { name?: string; id?: string; }) {
+  let template: TemplateOut;
+  if (name) {
+    template = await templateRepository.findByName(name);
+  } else if (id) {
+    template = await templateRepository.findById(id);
   }
+
+  if (!template) {
+    console.log(chalk.red('Failed to get template!'));
+    return;
+  }
+
+  console.log(JSON.stringify(template, null, 4));
 };
