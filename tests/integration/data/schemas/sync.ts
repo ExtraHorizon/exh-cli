@@ -57,7 +57,7 @@ describe('exh data schemas sync', () => {
   });
 
   it('Updates a schema by adding the new property', async () => {
-    repositoryMock.fetchSchemaByNameSpy.mockImplementationOnce(() => Promise.resolve({ id: 'anyid', ...validSchema }));
+    repositoryMock.fetchSchemaByNameSpy.mockResolvedValueOnce({ id: 'anyid', ...validSchema });
 
     const path = await tempDirectoryManager.createTempJsonFile({
       ...validSchema,

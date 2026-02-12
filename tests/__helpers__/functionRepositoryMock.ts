@@ -7,20 +7,19 @@ export const functionRepositoryMock = () => {
   const existingFunction = generateFunction(functionConfig);
 
   const findSpy = jest.spyOn(functionRepository, 'find')
-    .mockImplementation(() => Promise.resolve([]));
+    .mockResolvedValue([]);
 
   const findByNameSpy = jest.spyOn(functionRepository, 'findByName')
-    .mockImplementation(() => Promise.resolve(existingFunction));
+    .mockResolvedValue(existingFunction);
 
   const createSpy = jest.spyOn(functionRepository, 'create')
-    .mockImplementation(() => Promise.resolve(existingFunction));
+    .mockResolvedValue(existingFunction);
 
   const updateSpy = jest.spyOn(functionRepository, 'update')
-    .mockImplementation(() => Promise.resolve({ affectedRecords: 1 }));
+    .mockResolvedValue({ affectedRecords: 1 });
 
   const removeSpy = jest.spyOn(functionRepository, 'remove')
-    .mockImplementation(() => Promise.resolve({ affectedRecords: 1 }));
-
+    .mockResolvedValue({ affectedRecords: 1 });
   return {
     functionConfig,
     existingFunction,

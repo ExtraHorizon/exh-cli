@@ -12,8 +12,8 @@ const { env } = process;
 beforeEach(() => {
   jest.resetModules();
   process.env = { ...env };
-  accessMock.mockImplementation(async () => true);
-  statMock.mockImplementation(async () => ({ isFile: () => false }));
+  accessMock.mockResolvedValue(true);
+  statMock.mockResolvedValue({ isFile: () => false });
 });
 
 afterEach(() => {
@@ -22,7 +22,7 @@ afterEach(() => {
 
 describe('Loading config file', () => {
   test('Valid json config should not throw an error', async () => {
-    readFileMock.mockImplementationOnce(async () => Buffer.from(JSON.stringify(validFullConfig)));
+    readFileMock.mockResolvedValueOnce(Buffer.from(JSON.stringify(validFullConfig)));
     let config: TaskConfig;
     try {
       config = await loadSingleConfigFile('mypath');
@@ -38,7 +38,7 @@ describe('Loading config file', () => {
     delete testConfig.memoryLimit;
     delete testConfig.timeLimit;
     delete testConfig.environment;
-    readFileMock.mockImplementationOnce(async () => Buffer.from(JSON.stringify(testConfig)));
+    readFileMock.mockResolvedValueOnce(Buffer.from(JSON.stringify(testConfig)));
     let resultConfig: TaskConfig;
 
     try {
@@ -54,22 +54,22 @@ describe('Loading config file', () => {
   });
 
   test('Malformed json config file should throw an error', async () => {
-    readFileMock.mockImplementationOnce(async () => Buffer.from("{ 'no json': here}"));
+    readFileMock.mockResolvedValueOnce(Buffer.from("{ 'no json': here}"));
     await expect(loadSingleConfigFile('mypath')).rejects.toThrowError(/failed to parse file/);
   });
 
   test('Not-existing file should throw an error', async () => {
-    readFileMock.mockImplementationOnce(async () => { throw new Error('File doesn\'t exist'); });
+    readFileMock.mockRejectedValueOnce(new Error('File doesn\'t exist'));
     await expect(loadSingleConfigFile('mypath')).rejects.toThrowError(/^Invalid config file/);
   });
 
   test('Task config variables which do not exist, should throw an error', async () => {
-    readFileMock.mockImplementationOnce(async () => Buffer.from(JSON.stringify(simpleVariableConfig)));
+    readFileMock.mockResolvedValueOnce(Buffer.from(JSON.stringify(simpleVariableConfig)));
     await expect(loadSingleConfigFile('mypath')).rejects.toThrowError(/not found in environment$/);
   });
 
   test('Multiple task config variables should be properly substituted', async () => {
-    readFileMock.mockImplementationOnce(async () => Buffer.from(JSON.stringify(simpleVariableConfig)));
+    readFileMock.mockResolvedValueOnce(Buffer.from(JSON.stringify(simpleVariableConfig)));
     process.env.TESTNAME = 'myname';
     process.env.TESTDESCRIPTION = 'mydescription';
     try {
@@ -110,7 +110,7 @@ describe('Validating config', () => {
   });
 
   test('specifying an invalid path should fail', async () => {
-    accessMock.mockImplementation(async () => { throw new Error(); });
+    accessMock.mockRejectedValue(new Error());
     await expect(validateConfig(wrongPathConfig)).rejects.toThrowError(/not found$/);
   });
 
@@ -119,7 +119,7 @@ describe('Validating config', () => {
   });
 
   test('specifying a file instead of a directory should fail', async () => {
-    statMock.mockImplementation(async () => ({ isFile: () => true }));
+    statMock.mockResolvedValue({ isFile: () => true });
     await expect(validateConfig(wrongPathConfig)).rejects.toThrowError(/points to a file$/);
   });
 

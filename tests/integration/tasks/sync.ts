@@ -115,16 +115,16 @@ describe('exh tasks sync', () => {
     user.roles = [globalRole];
 
     jest.spyOn(userRepository, 'findUserByEmail')
-      .mockImplementationOnce(() => Promise.resolve(user));
+      .mockResolvedValueOnce(user);
 
     jest.spyOn(userRepository, 'findGlobalRoleByName')
-      .mockImplementationOnce(() => Promise.resolve(globalRole));
+      .mockResolvedValueOnce(globalRole);
 
     jest.spyOn(userRepository, 'addPermissionsToGlobalRole')
-      .mockImplementationOnce(() => Promise.resolve({ affectedRecords: 1 }));
+      .mockResolvedValueOnce({ affectedRecords: 1 });
 
     jest.spyOn(userRepository, 'removePermissionsFromGlobalRole')
-      .mockImplementationOnce(() => Promise.resolve({ affectedRecords: 1 }));
+      .mockResolvedValueOnce({ affectedRecords: 1 });
 
     functionMock.existingFunction.environmentVariables = {
       API_HOST: { value: 'https://api.env.customer.extrahorizon.io' },
@@ -134,7 +134,7 @@ describe('exh tasks sync', () => {
       API_OAUTH_CONSUMER_SECRET: { value: '685d0af08677cfa9e0c15827685d0af5d5cf798c6b118b3d' },
     };
 
-    sdkMock.users.me.mockImplementationOnce(() => Promise.resolve(user));
+    sdkMock.users.me.mockResolvedValueOnce(user);
 
     const functionConfig = {
       ...functionMock.functionConfig,
@@ -173,7 +173,7 @@ describe('exh tasks sync', () => {
     }];
 
     const findSpy = jest.spyOn(functionRepository, 'find')
-      .mockImplementationOnce(() => Promise.resolve(existingFunctions));
+      .mockResolvedValueOnce(existingFunctions);
 
     const taskConfigPath = await tempDirectoryManager.createTempJsonFile(functionMock.functionConfig);
     await tempDirectoryManager.createTempJsFile('index', functionCode);
@@ -229,16 +229,16 @@ describe('exh tasks sync', () => {
     user.roles = [globalRole];
 
     jest.spyOn(userRepository, 'findUserByEmail')
-      .mockImplementationOnce(() => Promise.resolve(user));
+      .mockResolvedValueOnce(user);
 
     jest.spyOn(userRepository, 'findGlobalRoleByName')
-      .mockImplementationOnce(() => Promise.resolve(globalRole));
+      .mockResolvedValueOnce(globalRole);
 
     jest.spyOn(userRepository, 'addPermissionsToGlobalRole')
-      .mockImplementationOnce(() => Promise.resolve({ affectedRecords: 1 }));
+      .mockResolvedValueOnce({ affectedRecords: 1 });
 
     jest.spyOn(userRepository, 'removePermissionsFromGlobalRole')
-      .mockImplementationOnce(() => Promise.resolve({ affectedRecords: 1 }));
+      .mockResolvedValueOnce({ affectedRecords: 1 });
 
     const functionConfig = {
       ...functionMock.functionConfig,
@@ -271,16 +271,16 @@ describe('exh tasks sync', () => {
     user.roles = [globalRole];
 
     jest.spyOn(userRepository, 'findUserByEmail')
-      .mockImplementationOnce(() => Promise.resolve(user));
+      .mockResolvedValueOnce(user);
 
     jest.spyOn(userRepository, 'findGlobalRoleByName')
-      .mockImplementationOnce(() => Promise.resolve(globalRole));
+      .mockResolvedValueOnce(globalRole);
 
     jest.spyOn(userRepository, 'addPermissionsToGlobalRole')
-      .mockImplementationOnce(() => Promise.resolve({ affectedRecords: 1 }));
+      .mockResolvedValueOnce({ affectedRecords: 1 });
 
     jest.spyOn(userRepository, 'removePermissionsFromGlobalRole')
-      .mockImplementationOnce(() => Promise.resolve({ affectedRecords: 1 }));
+      .mockResolvedValueOnce({ affectedRecords: 1 });
 
     functionMock.existingFunction.environmentVariables = {
       API_HOST: { value: 'https://api.env.customer.extrahorizon.io' },
@@ -295,7 +295,7 @@ describe('exh tasks sync', () => {
       id: generateId(),
       email: 'exh.tasks+notForThisFunction@extrahorizon.com',
     };
-    sdkMock.users.me.mockImplementationOnce(() => Promise.resolve(otherUser));
+    sdkMock.users.me.mockResolvedValueOnce(otherUser);
 
     const functionConfig = {
       ...functionMock.functionConfig,

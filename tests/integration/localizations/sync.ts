@@ -73,8 +73,11 @@ describe('exh localizations sync', () => {
     await tempDirectoryManager.createJsonFile('en', fileContent);
 
     // Make the CLI think that all localizations already exist, so that it will update them
-    localizationRepositoryMock.createSpy
-      .mockImplementation(items => Promise.resolve({ created: 0, existing: items.length, existingIds: items.map(item => item.key) }));
+    localizationRepositoryMock.createSpy.mockImplementation(async items => ({
+      created: 0,
+      existing: items.length,
+      existingIds: items.map(item => item.key),
+    }));
 
     await handler({ path: tempDirectoryManager.getPath() });
 
