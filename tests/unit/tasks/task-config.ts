@@ -1,6 +1,6 @@
 import { readFile, access, stat } from 'fs/promises';
-import { loadSingleConfigFile, permissionModes, TaskConfig, validateConfig } from '../../../src/commands/tasks/taskConfig';
 import { limits } from '../../../src/constants';
+import { loadSingleConfigFile, permissionModes, TaskConfig, validateConfig } from '../../../src/services/tasks/taskConfig';
 import { noEntryPointConfig, noNameConfig, noPathConfig, noRuntimeConfig, simpleVariableConfig, validFullConfig, wrongPathConfig } from '../../__helpers__/task-configs/test-configs';
 
 jest.mock('fs/promises');
