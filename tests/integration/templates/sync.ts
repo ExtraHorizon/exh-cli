@@ -2,13 +2,16 @@ import { handler } from '../../../src/commands/templates/sync';
 import { spyOnConsole } from '../../__helpers__/consoleSpy';
 import { createTempDirectoryManager, type TempDirectoryManager } from '../../__helpers__/tempDirectoryManager';
 import { templateRepositoryMock, type TemplateRepositoryMock } from '../../__helpers__/templateRepositoryMock';
+import { generateTemplate, generateTemplateV2 } from '../../__helpers__/templates';
+import { templateV2RepositoryMock, type TemplateV2RepositoryMock } from '../../__helpers__/templateV2RepositoryMock';
 
 describe('exh templates sync', () => {
   const { expectConsoleLogToContain } = spyOnConsole();
-  let repositoryMock: TemplateRepositoryMock;
+  let v1RepositoryMock: TemplateRepositoryMock;
+  let v2RepositoryMock: TemplateV2RepositoryMock;
   let tempDir: TempDirectoryManager;
 
-  const minimalConfig = {
+  const minimalV1Config = {
     description: 'A simple template',
     schema: {
       type: 'object',
@@ -21,9 +24,20 @@ describe('exh templates sync', () => {
     },
   };
 
+  const minimalV2Config = {
+    description: 'A simple template',
+    properties: {
+      field1: { type: 'string' },
+    },
+    outputs: {
+      message: 'A simple template',
+    },
+  };
+
   beforeEach(async () => {
-    repositoryMock = templateRepositoryMock();
     tempDir = await createTempDirectoryManager();
+    v1RepositoryMock = templateRepositoryMock();
+    v2RepositoryMock = templateV2RepositoryMock();
   });
 
   afterEach(async () => {
@@ -31,56 +45,190 @@ describe('exh templates sync', () => {
     jest.clearAllMocks();
   });
 
-  it('Creates a template based on a file', async () => {
-    const filePath = await tempDir.createJsonFile('myTemplate', minimalConfig);
+  describe('v1 templates', () => {
+    it('Creates a template based on a file', async () => {
+      const filePath = await tempDir.createJsonFile('myTemplate', minimalV1Config);
 
-    await handler({ template: filePath });
+      await handler({ template: filePath });
 
-    expectConsoleLogToContain('Creating', 'myTemplate');
-    expect(repositoryMock.createSpy).toHaveBeenCalledWith({
-      ...minimalConfig,
-      name: 'myTemplate',
+      expectConsoleLogToContain('Creating', 'myTemplate');
+      expect(v1RepositoryMock.createSpy).toHaveBeenCalledWith({
+        ...minimalV1Config,
+        name: 'myTemplate',
+      });
+    });
+
+    it('Updates an existing template', async () => {
+      const existingTemplate = generateTemplate({ name: 'myTemplate' });
+      const filePath = await tempDir.createJsonFile('myTemplate', minimalV1Config);
+      v1RepositoryMock.findByNameSpy.mockResolvedValueOnce(existingTemplate);
+
+      await handler({ template: filePath });
+
+      expectConsoleLogToContain('Updating', 'myTemplate');
+      expect(v1RepositoryMock.updateSpy).toHaveBeenCalledWith(existingTemplate.id, {
+        ...minimalV1Config,
+        name: 'myTemplate',
+      });
+    });
+
+    it('Creates a template based on a directory', async () => {
+      const dirPath = await tempDir.createDirectory('a-dir-template');
+      await tempDir.createJsonFile('a-dir-template/template', minimalV1Config);
+      await tempDir.createFile('a-dir-template/extra.html', '<h1>Hello world</h1>');
+
+      await handler({ template: dirPath });
+
+      expectConsoleLogToContain('Creating', 'a-dir-template');
+      expect(v1RepositoryMock.createSpy).toHaveBeenCalledWith({
+        ...minimalV1Config,
+        name: 'a-dir-template',
+        fields: {
+          message: 'A simple template',
+          extra: '<h1>Hello world</h1>',
+        },
+      });
+    });
+
+    it('Allows extending other templates', async () => {
+      const filePath = await tempDir.createJsonFile('myExtendingTemplate', {
+        extends_template: 'my_base_template',
+        description: 'Template extending another template',
+        schema: {
+          type: 'object',
+          fields: {
+            name: { type: 'string' },
+          },
+        },
+        fields: { message: 'Hello $content.name' },
+      });
+
+      v1RepositoryMock.findByNameSpy.mockResolvedValueOnce(generateTemplate({
+        name: 'my_base_template',
+        schema: {
+          type: 'object',
+          fields: {
+            message: { type: 'string' },
+          },
+        },
+        fields: {
+          title: 'ExH: Notification',
+          body: '<html><body>$content.message</body></html>',
+        },
+      }));
+
+      await handler({ template: filePath });
+
+      expectConsoleLogToContain('Creating', 'myExtendingTemplate');
+      expect(v1RepositoryMock.createSpy).toHaveBeenCalledWith({
+        name: 'myExtendingTemplate',
+        description: 'Template extending another template',
+        schema: {
+          type: 'object',
+          fields: {
+            name: { type: 'string' },
+          },
+        },
+        fields: {
+          title: 'ExH: Notification',
+          body: '<html><body>Hello $content.name</body></html>',
+        },
+      });
     });
   });
 
-  it('Updates an existing template', async () => {
-    const filePath = await tempDir.createJsonFile('myTemplate', minimalConfig);
-    repositoryMock.findByNameSpy.mockResolvedValueOnce({ id: 'template-id' });
+  describe('v2 templates', () => {
+    it('Creates a v2 template based on a file', async () => {
+      const filePath = await tempDir.createJsonFile('myV2Template', minimalV2Config);
 
-    await handler({ template: filePath });
+      await handler({ template: filePath });
 
-    expectConsoleLogToContain('Updating', 'myTemplate');
-    expect(repositoryMock.updateSpy).toHaveBeenCalledWith('template-id', {
-      ...minimalConfig,
-      name: 'myTemplate',
+      expectConsoleLogToContain('Creating', 'myV2Template');
+      expect(v2RepositoryMock.createSpy).toHaveBeenCalledWith({
+        ...minimalV2Config,
+        name: 'myV2Template',
+      });
     });
-  });
 
-  it('Creates a template based on a directory', async () => {
-    const dirPath = await tempDir.createDirectory('a-dir-template');
-    await tempDir.createJsonFile('a-dir-template/template', minimalConfig);
-    await tempDir.createFile('a-dir-template/extra.html', '<h1>Hello world</h1>');
+    it('Updates an existing v2 template', async () => {
+      const filePath = await tempDir.createJsonFile('myV2Template', minimalV2Config);
+      const existingTemplate = generateTemplateV2({ name: 'myV2Template' });
+      v2RepositoryMock.findByNameSpy.mockResolvedValueOnce(existingTemplate);
 
-    await handler({ template: dirPath });
+      await handler({ template: filePath });
 
-    expectConsoleLogToContain('Creating', 'a-dir-template');
-    expect(repositoryMock.createSpy).toHaveBeenCalledWith({
-      ...minimalConfig,
-      name: 'a-dir-template',
-      fields: {
-        message: 'A simple template',
-        extra: '<h1>Hello world</h1>',
-      },
+      expectConsoleLogToContain('Updating', 'myV2Template');
+      expect(v2RepositoryMock.updateSpy).toHaveBeenCalledWith(existingTemplate.id, {
+        ...minimalV2Config,
+        name: 'myV2Template',
+      });
+    });
+
+    it('Creates a v2 template based on a directory', async () => {
+      const dirPath = await tempDir.createDirectory('a-dir-template');
+      await tempDir.createJsonFile('a-dir-template/template', minimalV2Config);
+      await tempDir.createFile('a-dir-template/extra.html', '<h1>Hello world</h1>');
+
+      await handler({ template: dirPath });
+
+      expectConsoleLogToContain('Creating', 'a-dir-template');
+      expect(v2RepositoryMock.createSpy).toHaveBeenCalledWith({
+        ...minimalV2Config,
+        name: 'a-dir-template',
+        outputs: {
+          message: 'A simple template',
+          extra: '<h1>Hello world</h1>',
+        },
+      });
+    });
+
+    it('Allows extending other v2 templates', async () => {
+      const filePath = await tempDir.createJsonFile('myExtendingTemplate', {
+        extendsTemplate: 'my_base_template',
+        description: 'Template extending another template',
+        properties: {
+          name: { type: 'string' },
+        },
+        outputs: {
+          message: 'Hello {{@data.name}}',
+        },
+      });
+
+      v2RepositoryMock.findByNameSpy.mockResolvedValueOnce(generateTemplateV2({
+        name: 'my_base_template',
+        properties: {
+          message: { type: 'string' },
+        },
+        outputs: {
+          title: 'ExH: Notification',
+          body: '<html><body>{{@data.message}}</body></html>',
+        },
+      }));
+
+      await handler({ template: filePath });
+
+      expectConsoleLogToContain('Creating', 'myExtendingTemplate');
+      expect(v2RepositoryMock.createSpy).toHaveBeenCalledWith({
+        name: 'myExtendingTemplate',
+        description: 'Template extending another template',
+        properties: {
+          name: { type: 'string' },
+        },
+        outputs: {
+          title: 'ExH: Notification',
+          body: '<html><body>Hello {{@data.name}}</body></html>',
+        },
+      });
     });
   });
 
   it('Syncs multiple templates in a directory', async () => {
     const dirPath = await tempDir.createDirectory('multiple-templates');
-    await tempDir.createJsonFile('multiple-templates/file-template-1', minimalConfig);
-    await tempDir.createJsonFile('multiple-templates/file-template-2', minimalConfig);
+    await tempDir.createJsonFile('multiple-templates/file-template-1', minimalV1Config);
+    await tempDir.createJsonFile('multiple-templates/file-template-2', minimalV2Config);
 
     await tempDir.createDirectory('multiple-templates/dir-template');
-    await tempDir.createJsonFile('multiple-templates/dir-template/template', minimalConfig);
+    await tempDir.createJsonFile('multiple-templates/dir-template/template', minimalV1Config);
     await tempDir.createFile('multiple-templates/dir-template/body.html', '<i>Moar templates</i>');
 
     await handler({ path: dirPath });
@@ -88,60 +236,14 @@ describe('exh templates sync', () => {
     expectConsoleLogToContain('Creating', 'file-template-1');
     expectConsoleLogToContain('Creating', 'file-template-2');
     expectConsoleLogToContain('Creating', 'dir-template');
-    expect(repositoryMock.createSpy).toHaveBeenCalledWith({ ...minimalConfig, name: 'file-template-1' });
-    expect(repositoryMock.createSpy).toHaveBeenCalledWith({ ...minimalConfig, name: 'file-template-2' });
-    expect(repositoryMock.createSpy).toHaveBeenCalledWith({
-      ...minimalConfig,
+    expect(v1RepositoryMock.createSpy).toHaveBeenCalledWith({ ...minimalV1Config, name: 'file-template-1' });
+    expect(v2RepositoryMock.createSpy).toHaveBeenCalledWith({ ...minimalV2Config, name: 'file-template-2' });
+    expect(v1RepositoryMock.createSpy).toHaveBeenCalledWith({
+      ...minimalV1Config,
       name: 'dir-template',
       fields: {
         message: 'A simple template',
         body: '<i>Moar templates</i>',
-      },
-    });
-  });
-
-  it('Allows extending other templates', async () => {
-    const filePath = await tempDir.createJsonFile('myExtendingTemplate', {
-      extends_template: 'my_base_template',
-      description: 'Template that extends another template',
-      schema: {
-        type: 'object',
-        fields: {
-          name: { type: 'string' },
-        },
-      },
-      fields: { message: 'Hello $content.name' },
-    });
-
-    repositoryMock.findByNameSpy.mockResolvedValueOnce({
-      description: 'Base template',
-      schema: {
-        type: 'object',
-        fields: {
-          message: { type: 'string' },
-        },
-      },
-      fields: {
-        title: 'ExH: Notification',
-        body: '<html><body>$content.message</body></html>',
-      },
-    });
-
-    await handler({ template: filePath });
-
-    expectConsoleLogToContain('Creating', 'myExtendingTemplate');
-    expect(repositoryMock.createSpy).toHaveBeenCalledWith({
-      name: 'myExtendingTemplate',
-      description: 'Template that extends another template',
-      schema: {
-        type: 'object',
-        fields: {
-          name: { type: 'string' },
-        },
-      },
-      fields: {
-        title: 'ExH: Notification',
-        body: '<html><body>Hello $content.name</body></html>',
       },
     });
   });

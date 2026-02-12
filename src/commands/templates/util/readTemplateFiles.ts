@@ -1,6 +1,6 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { listFolderContent, readTextFile, readJsonFile, removeFileNameExtension } from './utils';
+import { listFolderContent, readTextFile, readJsonFile, removeFileNameExtension, isV1Template } from './utils';
 
 export async function readTemplateFiles(targetFolder: string) {
   const fileNames = await listFolderContent(targetFolder);
@@ -26,31 +26,36 @@ export async function readTemplateJson(fileName: string) {
 
 export async function readTemplateFolder(subFolder: string) {
   const templateFile = await readTemplateJson(path.join(subFolder, 'template.json'));
+  const extraFiles = await readExtraTemplateFolderFiles(subFolder);
 
-  const templateFields = await readTemplateFolderFieldFiles(subFolder);
-  if (!templateFile.fields) {
-    templateFile.fields = templateFields;
-  } else {
+  if (isV1Template(templateFile)) {
     templateFile.fields = {
       ...templateFile.fields,
-      ...templateFields,
+      ...extraFiles,
+    };
+  } else {
+    templateFile.outputs = {
+      ...templateFile.outputs,
+      ...extraFiles,
     };
   }
 
   return templateFile;
 }
 
-async function readTemplateFolderFieldFiles(subFolder: string) {
-  const templateFields = {};
+async function readExtraTemplateFolderFiles(subFolder: string) {
+  const extraFiles = {};
 
-  const folderFileNames = await listFolderContent(subFolder);
-  const fieldFileNames = folderFileNames.filter((fileName: string) => fileName !== 'template.json');
-  for (const fieldFileName of fieldFileNames) {
-    const fieldName = removeFileNameExtension(fieldFileName);
-    const fieldContent = await readTextFile(path.join(subFolder, fieldFileName));
+  const fileNames = await listFolderContent(subFolder);
+  for (const fileName of fileNames) {
+    if (fileName === 'template.json') {
+      continue;
+    }
+    const name = removeFileNameExtension(fileName);
+    const content = await readTextFile(path.join(subFolder, fileName));
 
-    templateFields[fieldName] = fieldContent;
+    extraFiles[name] = content;
   }
 
-  return templateFields;
+  return extraFiles;
 }
