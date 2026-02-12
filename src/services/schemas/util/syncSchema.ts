@@ -1,7 +1,7 @@
 /* eslint-disable lines-between-class-members */
 import chalk = require('chalk');
 import * as _ from 'lodash';
-import * as schemaRepository from '../../../../repositories/schemas';
+import * as schemaRepository from '../../../repositories/schemas';
 import { compareStatuses, calculateStatusUpdateData } from '../sync/statusHelpers';
 import { stripUnsupportedDescriptionFields } from './stripUnsupportedDescriptionFields';
 

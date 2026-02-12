@@ -1,6 +1,6 @@
 import Ajv from 'ajv';
-import { SchemaVerify, TestId } from '../../../src/commands/data/schemas/util/schemaverify';
 import * as metaschema from '../../../src/config-json-schemas/Schema.json';
+import { SchemaVerify, TestId } from '../../../src/services/schemas/util/schemaverify';
 import { minimalSchema } from '../../__helpers__/schemas';
 
 const ajv = new Ajv();

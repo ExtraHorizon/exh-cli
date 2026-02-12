@@ -1,6 +1,5 @@
-import * as chalk from 'chalk';
 import { epilogue } from '../../../helpers/util';
-import * as schemaRepository from '../../../repositories/schemas';
+import * as schemaService from '../../../services/schemas';
 
 export const command = 'delete';
 export const desc = 'Delete a schema';
@@ -11,16 +10,5 @@ export const builder = (yargs: any) => epilogue(yargs).option('id', {
 });
 
 export const handler = async ({ id }) => {
-  const disableResponse = await schemaRepository.disable(id);
-  if (disableResponse.affectedRecords !== 1) {
-    console.log(chalk.red('Failed to delete schema', id));
-    return;
-  }
-
-  const deleteResponse = await schemaRepository.remove(id);
-  if (deleteResponse.affectedRecords) {
-    console.log(chalk.green('Successfully deleted schema', id));
-  } else {
-    console.log(chalk.red('Failed to delete schema', id));
-  }
+  await schemaService.remove(id);
 };
