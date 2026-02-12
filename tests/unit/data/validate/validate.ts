@@ -1,7 +1,7 @@
 import Ajv from 'ajv';
 import { cloneDeep } from 'lodash';
-import { SchemaVerify, TestId } from '../../../../src/commands/data/schemas/util/schemaverify';
 import * as metaschema from '../../../../src/config-json-schemas/Schema.json';
+import { SchemaVerify, TestId } from '../../../../src/services/schemas/util/schemaverify';
 import { validSchema } from '../../../__helpers__/schemas';
 
 describe('Data - Schema - Validate', () => {
