@@ -1,15 +1,12 @@
 import * as fs from 'fs/promises';
-import { red } from 'chalk';
 import { handler } from '../../../src/commands/dispatchers/sync';
 import * as dispatcherRepository from '../../../src/repositories/dispatchers';
 import { cliManagedTag } from '../../../src/services/dispatchers';
 import { generateMailAction, generateTaskAction } from '../../__helpers__/actions';
-import { spyOnConsole } from '../../__helpers__/consoleSpy';
 import { dispatcherRepositoryMock, type DispatcherRepositoryMock } from '../../__helpers__/dispatcherRepositoryMock';
 import { generateDispatcher, generateMinimalDispatcher } from '../../__helpers__/dispatchers';
 
 describe('exh dispatchers sync', () => {
-  const { expectConsoleLogToContain } = spyOnConsole();
   let repositoryMock: DispatcherRepositoryMock;
 
   beforeAll(() => {
@@ -29,9 +26,7 @@ describe('exh dispatchers sync', () => {
       .mockResolvedValueOnce(JSON.stringify([dispatcher]));
 
     await expect(handler({ file: '', clean: false }))
-      .rejects.toThrow('The dispatchers file is invalid');
-
-    expectConsoleLogToContain(red('- No name'));
+      .rejects.toThrow('"0" must have required property \'name\'');
   });
 
   it('Throws for an Action without a name', async () => {
@@ -43,9 +38,7 @@ describe('exh dispatchers sync', () => {
       .mockResolvedValueOnce(JSON.stringify([dispatcher]));
 
     await expect(handler({ file: '', clean: false }))
-      .rejects.toThrow('The dispatchers file is invalid');
-
-    expectConsoleLogToContain(red('- Action [0] does not have a name'));
+      .rejects.toThrow('"0.actions.0" must have required property \'name\'');
   });
 
   it('Creates a Dispatcher with all fields set', async () => {
