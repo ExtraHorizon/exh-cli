@@ -2,18 +2,6 @@ import * as dispatchersConfigSchema from '../../../src/config-json-schemas/Dispa
 import { ajvValidate } from '../../../src/helpers/util';
 
 describe('Dispatchers.json JSON Schema definition', () => {
-  const minimalDispatcher: any = {
-    eventType: 'myEvent',
-    name: 'myDispatcher',
-    actions: [],
-  };
-
-  const fullDispatcher: any = {
-    ...minimalDispatcher,
-    description: 'A full dispatcher config',
-    tags: ['tag1', 'tag2'],
-  };
-
   const minimalMailAction: any = {
     type: 'mail',
     name: 'myMailAction',
@@ -23,15 +11,21 @@ describe('Dispatchers.json JSON Schema definition', () => {
     templateId: 'template123',
   };
 
-  const fullMailAction: any = {
-    ...minimalMailAction,
-    description: 'A full mail action config',
-  };
-
   const minimalTaskAction: any = {
     type: 'task',
     name: 'myTaskAction',
     functionName: 'myFunction',
+  };
+
+  const minimalDispatcher: any = {
+    eventType: 'myEvent',
+    name: 'myDispatcher',
+    actions: [minimalMailAction, minimalTaskAction],
+  };
+
+  const fullMailAction: any = {
+    ...minimalMailAction,
+    description: 'A full mail action config',
   };
 
   const fullTaskAction: any = {
@@ -42,6 +36,13 @@ describe('Dispatchers.json JSON Schema definition', () => {
     },
     tags: ['tag1', 'tag2'],
     startTimestamp: new Date().toISOString(),
+  };
+
+  const fullDispatcher: any = {
+    ...minimalDispatcher,
+    description: 'A full dispatcher config',
+    actions: [fullMailAction, fullTaskAction],
+    tags: ['tag1', 'tag2'],
   };
 
   it('Accepts an array or a wrapper object with an array', () => {
@@ -55,6 +56,14 @@ describe('Dispatchers.json JSON Schema definition', () => {
 
   it('Accepts a full dispatcher', () => {
     expect(() => ajvValidate(dispatchersConfigSchema, [fullDispatcher])).not.toThrow();
+  });
+
+  it('Accepts additional properties on the dispatcher objects', () => {
+    const dispatcher = {
+      ...minimalDispatcher,
+      extra: 'not allowed',
+    };
+    expect(() => ajvValidate(dispatchersConfigSchema, [dispatcher])).not.toThrow();
   });
 
   it('Throws for missing required properties on the dispatcher object', () => {
@@ -71,29 +80,44 @@ describe('Dispatchers.json JSON Schema definition', () => {
     expect(() => ajvValidate(dispatchersConfigSchema, [dispatcherNoActions])).toThrow(/must have required property 'actions'/);
   });
 
-  it('Throws for additional properties on the dispatcher object', () => {
+  it('Throws for a dispatcher missing an action', () => {
     const dispatcher = {
       ...minimalDispatcher,
-      extra: 'not allowed',
+      actions: [],
     };
-    expect(() => ajvValidate(dispatchersConfigSchema, [dispatcher])).toThrow(/must NOT have additional properties/);
+    expect(() => ajvValidate(dispatchersConfigSchema, [dispatcher])).toThrow(/must NOT have fewer than 1 items /);
+  });
+
+  it('Throws for anything that is not an array or the wrapper object', () => {
+    expect(() => ajvValidate(dispatchersConfigSchema, 'not an array')).toThrow(/must be array/);
+    expect(() => ajvValidate(dispatchersConfigSchema, 42)).toThrow(/must be array/);
   });
 
   describe('Mail action', () => {
-    it('Accepts a dispatcher with a minimal mail action', () => {
-      const dispatcherWithMailAction = {
+    it('Accepts additional properties on the mail action', () => {
+      const dispatcher = {
         ...minimalDispatcher,
-        actions: [minimalMailAction],
+        actions: [{
+          ...minimalMailAction,
+          extra: 'not allowed',
+        }],
       };
-      expect(() => ajvValidate(dispatchersConfigSchema, [dispatcherWithMailAction])).not.toThrow();
+      expect(() => ajvValidate(dispatchersConfigSchema, [dispatcher])).not.toThrow();
     });
 
-    it('Accepts a dispatcher with a full mail action', () => {
-      const dispatcherWithMailAction = {
-        ...minimalDispatcher,
-        actions: [fullMailAction],
+    it('Accepts additional properties on the recipients object', () => {
+      const mailActionWithExtraRecipientField = {
+        ...minimalMailAction,
+        recipients: {
+          ...minimalMailAction.recipients,
+          extra: 'not allowed',
+        },
       };
-      expect(() => ajvValidate(dispatchersConfigSchema, [dispatcherWithMailAction])).not.toThrow();
+      const dispatcher = {
+        ...minimalDispatcher,
+        actions: [mailActionWithExtraRecipientField],
+      };
+      expect(() => ajvValidate(dispatchersConfigSchema, [dispatcher])).not.toThrow();
     });
 
     it('Throws for missing required properties on the mail action', () => {
@@ -121,36 +145,9 @@ describe('Dispatchers.json JSON Schema definition', () => {
       };
       expect(() => ajvValidate(dispatchersConfigSchema, [dispatcher2])).toThrow(/must have required property 'templateId'/);
     });
-
-    it('Throws for additional properties on the mail action', () => {
-      const dispatcher = {
-        ...minimalDispatcher,
-        actions: [{
-          ...minimalMailAction,
-          extra: 'not allowed',
-        }],
-      };
-      expect(() => ajvValidate(dispatchersConfigSchema, [dispatcher])).toThrow(/must NOT have additional properties/);
-    });
   });
 
   describe('Task action', () => {
-    it('Accepts a dispatcher with a minimal task action', () => {
-      const dispatcherWithTaskAction = {
-        ...minimalDispatcher,
-        actions: [minimalTaskAction],
-      };
-      expect(() => ajvValidate(dispatchersConfigSchema, [dispatcherWithTaskAction])).not.toThrow();
-    });
-
-    it('Accepts a dispatcher with a full task action', () => {
-      const dispatcherWithTaskAction = {
-        ...minimalDispatcher,
-        actions: [fullTaskAction],
-      };
-      expect(() => ajvValidate(dispatchersConfigSchema, [dispatcherWithTaskAction])).not.toThrow();
-    });
-
     it('Accepts any kind of data fields in the task action', () => {
       const dispatcherWithTaskAction = {
         ...minimalDispatcher,
@@ -166,6 +163,17 @@ describe('Dispatchers.json JSON Schema definition', () => {
         }],
       };
       expect(() => ajvValidate(dispatchersConfigSchema, [dispatcherWithTaskAction])).not.toThrow();
+    });
+
+    it('Accepts additional properties on the task action', () => {
+      const dispatcher = {
+        ...minimalDispatcher,
+        actions: [{
+          ...minimalTaskAction,
+          extra: 'not allowed',
+        }],
+      };
+      expect(() => ajvValidate(dispatchersConfigSchema, [dispatcher])).not.toThrow();
     });
 
     it('Throws for missing required properties on the task action', () => {
@@ -185,17 +193,6 @@ describe('Dispatchers.json JSON Schema definition', () => {
       };
       expect(() => ajvValidate(dispatchersConfigSchema, [dispatcher])).toThrow(/must have required property 'functionName'/);
     });
-
-    it('Throws for additional properties on the task action', () => {
-      const dispatcher = {
-        ...minimalDispatcher,
-        actions: [{
-          ...minimalTaskAction,
-          extra: 'not allowed',
-        }],
-      };
-      expect(() => ajvValidate(dispatchersConfigSchema, [dispatcher])).toThrow(/must NOT have additional properties/);
-    });
   });
 
   describe('wrapper object', () => {
@@ -207,12 +204,12 @@ describe('Dispatchers.json JSON Schema definition', () => {
       expect(() => ajvValidate(dispatchersConfigSchema, wrapper)).not.toThrow();
     });
 
-    it('Throws for extra properties on the wrapper object', () => {
+    it('Accepts extra properties on the wrapper object', () => {
       const wrapper = {
         dispatchers: [],
         extra: 'not allowed',
       };
-      expect(() => ajvValidate(dispatchersConfigSchema, wrapper)).toThrow(/must NOT have additional properties/);
+      expect(() => ajvValidate(dispatchersConfigSchema, wrapper)).not.toThrow();
     });
 
     it('Throws for missing the dispatchers array on the wrapper object', () => {
