@@ -51,6 +51,7 @@
     },
     "TypeConfigurationV2": {
       "type": "object",
+      "required": ["type"],
       "properties": {
         "type": { "enum": ["object", "array", "string", "number", "boolean"] }
       },
@@ -164,6 +165,7 @@
     },
     "TypeConfiguration": {
       "type": "object",
+      "required": ["type"],  
       "properties": {
         "type": { "enum": ["object", "array", "string", "number", "boolean"] }
       },
@@ -217,6 +219,7 @@
     },
     "ObjectConfiguration": {
       "type": "object",
+      "required": ["type"],
       "properties": {
         "type": { "const": "object" },
         "fields": {
@@ -229,25 +232,29 @@
     },
     "ArrayConfiguration": {
       "type": "object",
+      "required": ["type", "type_configuration"],
       "properties": {
         "type": { "const": "array" },
-        "items": { "$ref": "#/definitions/TypeConfiguration" }
+        "type_configuration": { "$ref": "#/definitions/TypeConfiguration" }
       }
     },
     "StringConfiguration": {
       "type": "object",
+      "required": ["type"],
       "properties": {
         "type": { "const": "string" }
       }
     },
     "NumberConfiguration": {
       "type": "object",
+      "required": ["type"],
       "properties": {
         "type": { "const": "number" }
       }
     },
     "BooleanConfiguration": {
       "type": "object",
+      "required": ["type"],
       "properties": {
         "type": { "const": "boolean" }
       }

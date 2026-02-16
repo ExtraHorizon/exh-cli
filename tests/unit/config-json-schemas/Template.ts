@@ -52,7 +52,7 @@ describe('Template.json JSON Schema definition', () => {
         age: { type: 'number' },
         tags: {
           type: 'array',
-          items: { type: 'string' },
+          type_configuration: { type: 'string' },
         },
         address: {
           type: 'object',
@@ -222,6 +222,30 @@ describe('Template.json JSON Schema definition', () => {
         fields: undefined,
       };
       expect(() => ajvValidate(templateConfigSchema, missingFields)).toThrow(/must have required property 'fields'/);
+    });
+
+    it('Throws for missing required properties on the type definitions', () => {
+      const missingType = {
+        ...minimalTemplateV1,
+        schema: {
+          type: 'object',
+          fields: {
+            name: { },
+          },
+        },
+      };
+      expect(() => ajvValidate(templateConfigSchema, missingType)).toThrow(/must have required property 'type'/);
+
+      const missingTypeConfiguration = {
+        ...minimalTemplateV1,
+        schema: {
+          type: 'object',
+          fields: {
+            tags: { type: 'array' },
+          },
+        },
+      };
+      expect(() => ajvValidate(templateConfigSchema, missingTypeConfiguration)).toThrow(/must have required property 'type_configuration'/);
     });
 
     it('Throws when specifying "version": 1, but missing any of the required v1 properties', () => {
