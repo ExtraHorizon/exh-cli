@@ -1,5 +1,8 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
+import * as templateConfigSchema from '../../../config-json-schemas/Template.json';
+import { ajvValidate } from '../../../helpers/util';
+import type { TemplateConfig } from './models';
 import { listFolderContent, readTextFile, readJsonFile, removeFileNameExtension, isV1Template } from './utils';
 
 export async function readTemplateFiles(targetFolder: string) {
@@ -13,19 +16,25 @@ export async function readTemplateFiles(targetFolder: string) {
       templateFilesByName[fileName] = await readTemplateFolder(filePath);
     } else if (fileName.endsWith('.json')) {
       const templateName = removeFileNameExtension(fileName);
-      templateFilesByName[templateName] = await readTemplateJson(filePath);
+      templateFilesByName[templateName] = await readAndValidateTemplateJson(filePath);
     }
   }
 
   return templateFilesByName;
 }
 
-export async function readTemplateJson(fileName: string) {
-  return readJsonFile(fileName);
+export async function readAndValidateTemplateJson(fileName: string) {
+  try {
+    const content = await readJsonFile(fileName);
+    ajvValidate<TemplateConfig>(templateConfigSchema, content);
+    return content;
+  } catch (error) {
+    throw new Error(`Error while reading template file ${fileName}: ${error.message}`);
+  }
 }
 
 export async function readTemplateFolder(subFolder: string) {
-  const templateFile = await readTemplateJson(path.join(subFolder, 'template.json'));
+  const templateFile = await readAndValidateTemplateJson(path.join(subFolder, 'template.json'));
   const extraFiles = await readExtraTemplateFolderFiles(subFolder);
 
   if (isV1Template(templateFile)) {

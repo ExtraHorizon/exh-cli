@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as ospath from 'path';
 import { buildTemplates } from './util/buildTemplates';
-import { readTemplateFiles, readTemplateFolder, readTemplateJson } from './util/readTemplateFiles';
+import { readTemplateFiles, readTemplateFolder, readAndValidateTemplateJson } from './util/readTemplateFiles';
 import { uploadTemplate } from './util/uploadTemplate';
 import { removeFileNameExtension } from './util/utils';
 
@@ -14,7 +14,7 @@ export async function sync(path?: string, template?: string) {
   let templ = null;
   if (fs.statSync(ospath.join(process.cwd(), template)).isFile()) {
     /* In case a template file was provided */
-    templ = await readTemplateJson(template);
+    templ = await readAndValidateTemplateJson(template);
   } else {
     templ = await readTemplateFolder(template);
   }

@@ -135,6 +135,17 @@ describe('exh templates sync', () => {
         },
       });
     });
+
+    it('Throws an error for an invalid template file', async () => {
+      const filePath = await tempDir.createJsonFile('invalidTemplate', {
+        description: 'Invalid template',
+        schema: '<--- should not be a string --->',
+        fields: { message: 'Hello world' },
+      });
+
+      await expect(handler({ template: filePath }))
+        .rejects.toThrow(/invalidTemplate\.json: "schema" must be object/);
+    });
   });
 
   describe('v2 templates', () => {
@@ -219,6 +230,17 @@ describe('exh templates sync', () => {
           body: '<html><body>Hello {{@data.name}}</body></html>',
         },
       });
+    });
+
+    it('Throws an error for an invalid template file', async () => {
+      const filePath = await tempDir.createJsonFile('invalidTemplate', {
+        description: 'Invalid template',
+        properties: '<--- should not be a string --->',
+        outputs: { message: 'Hello world' },
+      });
+
+      await expect(handler({ template: filePath }))
+        .rejects.toThrow(/invalidTemplate\.json: "properties" must be object/);
     });
   });
 
