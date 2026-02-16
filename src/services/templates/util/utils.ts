@@ -22,7 +22,7 @@ export function removeFileNameExtension(fileName: string) {
 export function isV1Template(template: any): template is TemplateV1Config {
   return (
     template.version === 1 ||
-    !!template.$schema ||
+    !!template.schema ||
     !!template.fields
   );
 }
