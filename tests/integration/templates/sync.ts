@@ -26,7 +26,7 @@ describe('exh templates sync', () => {
 
   const minimalV2Config = {
     description: 'A simple template',
-    properties: {
+    inputs: {
       field1: { type: 'string' },
     },
     outputs: {
@@ -197,22 +197,22 @@ describe('exh templates sync', () => {
       const filePath = await tempDir.createJsonFile('myExtendingTemplate', {
         extendsTemplate: 'my_base_template',
         description: 'Template extending another template',
-        properties: {
+        inputs: {
           name: { type: 'string' },
         },
         outputs: {
-          message: 'Hello {{@data.name}}',
+          message: 'Hello {{@inputs.name}}',
         },
       });
 
       v2RepositoryMock.findByNameSpy.mockResolvedValueOnce(generateTemplateV2({
         name: 'my_base_template',
-        properties: {
+        inputs: {
           message: { type: 'string' },
         },
         outputs: {
           title: 'ExH: Notification',
-          body: '<html><body>{{@data.message}}</body></html>',
+          body: '<html><body>{{@inputs.message}}</body></html>',
         },
       }));
 
@@ -222,12 +222,12 @@ describe('exh templates sync', () => {
       expect(v2RepositoryMock.createSpy).toHaveBeenCalledWith({
         name: 'myExtendingTemplate',
         description: 'Template extending another template',
-        properties: {
+        inputs: {
           name: { type: 'string' },
         },
         outputs: {
           title: 'ExH: Notification',
-          body: '<html><body>Hello {{@data.name}}</body></html>',
+          body: '<html><body>Hello {{@inputs.name}}</body></html>',
         },
       });
     });
@@ -235,12 +235,12 @@ describe('exh templates sync', () => {
     it('Throws an error for an invalid template file', async () => {
       const filePath = await tempDir.createJsonFile('invalidTemplate', {
         description: 'Invalid template',
-        properties: '<--- should not be a string --->',
+        inputs: '<--- should not be a string --->',
         outputs: { message: 'Hello world' },
       });
 
       await expect(handler({ template: filePath }))
-        .rejects.toThrow(/invalidTemplate\.json: "properties" must be object/);
+        .rejects.toThrow(/invalidTemplate\.json: "inputs" must be object/);
     });
   });
 

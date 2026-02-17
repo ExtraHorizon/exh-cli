@@ -11,7 +11,7 @@ describe('Template.json JSON Schema definition', () => {
     $schema: 'example.com/schema.json',
     extendsTemplate: 'baseTemplate',
     description: 'A full template config',
-    properties: {
+    inputs: {
       name: { type: 'string' },
       age: { type: 'number' },
       tags: {
@@ -108,7 +108,7 @@ describe('Template.json JSON Schema definition', () => {
     it('Throws when specifying any extra properties on the type definitions', () => {
       const stringPropertyWithExtra = {
         ...minimalTemplateV2,
-        properties: {
+        inputs: {
           name: { type: 'string', extra: 'not allowed' },
         },
       };
@@ -116,7 +116,7 @@ describe('Template.json JSON Schema definition', () => {
 
       const numberPropertyWithExtra = {
         ...minimalTemplateV2,
-        properties: {
+        inputs: {
           age: { type: 'number', extra: 'not allowed' },
         },
       };
@@ -124,7 +124,7 @@ describe('Template.json JSON Schema definition', () => {
 
       const booleanPropertyWithExtra = {
         ...minimalTemplateV2,
-        properties: {
+        inputs: {
           isActive: { type: 'boolean', extra: 'not allowed' },
         },
       };
@@ -132,7 +132,7 @@ describe('Template.json JSON Schema definition', () => {
 
       const objectPropertyWithExtra = {
         ...minimalTemplateV2,
-        properties: {
+        inputs: {
           address: {
             type: 'object',
             properties: {
@@ -146,7 +146,7 @@ describe('Template.json JSON Schema definition', () => {
 
       const arrayPropertyWithExtra = {
         ...minimalTemplateV2,
-        properties: {
+        inputs: {
           tags: {
             type: 'array',
             items: { type: 'string' },
@@ -160,7 +160,7 @@ describe('Template.json JSON Schema definition', () => {
     it('Throws for missing required properties on the type definitions', () => {
       const missingType = {
         ...minimalTemplateV2,
-        properties: {
+        inputs: {
           name: { },
         },
       };
@@ -168,7 +168,7 @@ describe('Template.json JSON Schema definition', () => {
 
       const missingItems = {
         ...minimalTemplateV2,
-        properties: {
+        inputs: {
           tags: { type: 'array' },
         },
       };
@@ -176,7 +176,7 @@ describe('Template.json JSON Schema definition', () => {
 
       const missingProperties = {
         ...minimalTemplateV2,
-        properties: {
+        inputs: {
           address: { type: 'object' },
         },
       };
