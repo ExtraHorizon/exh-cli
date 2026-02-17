@@ -24,7 +24,7 @@ export function generateTemplateV2(overrides: Partial<TemplateV2> = {}): Templat
     id: generateId(),
     name: `template-${generateId()}`,
     description: `template-description-${generateId()}`,
-    properties: {
+    inputs: {
       subject: { type: 'string' },
       body: { type: 'string' },
     },

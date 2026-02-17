@@ -29,7 +29,7 @@
   },
   "then": { "$ref": "#/definitions/TemplateV1" },
   "else": { "$ref": "#/definitions/TemplateV2" },
-  
+
   "definitions": {
     "TemplateV2": {
       "type": "object",
@@ -39,7 +39,7 @@
         "$schema": { "type": "string" },
         "description": { "type": "string" },
         "extendsTemplate": { "type": "string" },
-        "properties": {
+        "inputs": {
           "type": "object",
           "additionalProperties": { "$ref": "#/definitions/TypeConfigurationV2" }
         },
@@ -165,7 +165,7 @@
     },
     "TypeConfiguration": {
       "type": "object",
-      "required": ["type"],  
+      "required": ["type"],
       "properties": {
         "type": { "enum": ["object", "array", "string", "number", "boolean"] }
       },

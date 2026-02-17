@@ -73,7 +73,7 @@ async function extendV1Template(name: string, templateFilesByName: any, callChai
 }
 
 async function extendV2Template(name: string, templateFilesByName: any, callChain: string[]) {
-  const { extendsTemplate, description, properties, outputs } = templateFilesByName[name];
+  const { extendsTemplate, description, inputs, outputs } = templateFilesByName[name];
 
   if (!templateFilesByName[extendsTemplate]) {
     // eslint-disable-next-line no-param-reassign
@@ -85,7 +85,7 @@ async function extendV2Template(name: string, templateFilesByName: any, callChai
     throw v2ExtendingV1Error(extendsTemplate, callChain);
   }
 
-  // Used in the regex replacement below to replace {{@data.variableName}} with the value from the current template's outputs
+  // Used in the regex replacement below to replace {{@inputs.variableName}} with the value from the current template's outputs
   const resolveMatch = (_fullMatch: any, variableName: string) => {
     const value = outputs[variableName];
     if (typeof value === 'undefined') {
@@ -98,7 +98,7 @@ async function extendV2Template(name: string, templateFilesByName: any, callChai
   const newOutputs = {};
   for (const output of Object.keys(extendingTemplate.outputs)) {
     const extendedValue = extendingTemplate.outputs[output]
-      .replace(/{{[ ]*@data\.([a-zA-Z0-9_-]+)[ ]*}}/g, resolveMatch);
+      .replace(/{{[ ]*@inputs\.([a-zA-Z0-9_-]+)[ ]*}}/g, resolveMatch);
 
     newOutputs[output] = extendedValue;
   }
@@ -106,7 +106,7 @@ async function extendV2Template(name: string, templateFilesByName: any, callChai
   return {
     name,
     description,
-    properties,
+    inputs,
     outputs: newOutputs,
   };
 }
@@ -135,7 +135,7 @@ function v2ExtendingV1Error(extendsTemplate: string, callChain: string[]) {
 
 function v2VariableNotFoundError(variableName: string, extendsTemplate: string, callChain: string[]) {
   return new Error(
-    `Could not find a value to fill '{{@data.${variableName}}}' ` +
+    `Could not find a value to fill '{{@inputs.${variableName}}}' ` +
     `while extending '${extendsTemplate}' ` +
     `in ${renderCallChain(callChain)}`
   );
