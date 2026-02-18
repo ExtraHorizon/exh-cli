@@ -362,10 +362,106 @@ describe('exh templates sync', () => {
         inputs: {
           field1: { type: 'string' },
         },
+        outputs: { body: '<h1>Hello world</h1>' },
+      });
+    });
+
+    it('Throws for an invalid template name', async () => {
+      // Template file name starting with a number
+      const singleFileStartsWithNumber = await tempDir.createJsonFile('123invalid', {
+        description: 'Template with invalid name',
+        inputs: {
+          field1: { type: 'string' },
+        },
+        outputs: { message: 'Hello world' },
+      });
+
+      await expect(handler({ template: singleFileStartsWithNumber }))
+        .rejects.toThrow(
+          'Template name \'123invalid\' is invalid. ' +
+          'Template names must start with a letter and can only contain letters, numbers, underscores and hyphens, and be at most 50 characters long.'
+        );
+
+      // Template file name with spaces
+      const singleFileWithSpaces = await tempDir.createJsonFile('name with spaces', {
+        description: 'Template with invalid name',
+        inputs: {
+          field1: { type: 'string' },
+        },
+        outputs: { message: 'Hello world' },
+      });
+
+      await expect(handler({ template: singleFileWithSpaces }))
+        .rejects.toThrow(
+          'Template name \'name with spaces\' is invalid. ' +
+          'Template names must start with a letter and can only contain letters, numbers, underscores and hyphens, and be at most 50 characters long.'
+        );
+
+      // Too long template file name
+      const singleFileTooLong = await tempDir.createJsonFile('a'.repeat(51), {
+        description: 'Template with invalid name',
+        inputs: {
+          field1: { type: 'string' },
+        },
+        outputs: { message: 'Hello world' },
+      });
+
+      await expect(handler({ template: singleFileTooLong }))
+        .rejects.toThrow(
+          `Template name '${'a'.repeat(51)}' is invalid. ` +
+          'Template names must start with a letter and can only contain letters, numbers, underscores and hyphens, and be at most 50 characters long.'
+        );
+
+      // Template directory with spaces in the name
+      const dirWithInvalidName = await tempDir.createDirectory('dir with spaces');
+      await tempDir.createJsonFile('dir with spaces/template', {
+        description: 'Template with invalid name',
+        inputs: {
+          field1: { type: 'string' },
+        },
+        outputs: { message: 'Hello world' },
+      });
+
+      await expect(handler({ template: dirWithInvalidName }))
+        .rejects.toThrow(
+          'Template name \'dir with spaces\' is invalid. ' +
+          'Template names must start with a letter and can only contain letters, numbers, underscores and hyphens, and be at most 50 characters long.'
+        );
+    });
+
+    it('Throws for invalid output names', async () => {
+      // Inline output with spaces in the name
+      const filePath = await tempDir.createJsonFile('invalidOutputs', {
+        description: 'Template with invalid outputs',
+        inputs: {
+          field1: { type: 'string' },
+        },
         outputs: {
-          body: '<h1>Hello world</h1>',
+          'invalid output': 'Output name with spaces',
         },
       });
+
+      await expect(handler({ template: filePath }))
+        .rejects.toThrow(
+          'Output name \'invalid output\' is invalid. ' +
+          'Output names must start with a letter and can only contain letters, numbers, underscores and hyphens, and be at most 50 characters long.'
+        );
+
+      // Output file in template folder with spaces in the name
+      const dirPath = await tempDir.createDirectory('dirWithInvalidOutput');
+      await tempDir.createJsonFile('dirWithInvalidOutput/template', {
+        description: 'Template with invalid outputs',
+        inputs: {
+          field1: { type: 'string' },
+        },
+      });
+      await tempDir.createFile('dirWithInvalidOutput/invalid output.html', 'Output name with spaces');
+
+      await expect(handler({ template: dirPath }))
+        .rejects.toThrow(
+          'Output name \'invalid output\' is invalid. ' +
+          'Output names must start with a letter and can only contain letters, numbers, underscores and hyphens, and be at most 50 characters long.'
+        );
     });
 
     it('Allows using variables in the extends chain', async () => {
@@ -430,7 +526,7 @@ describe('exh templates sync', () => {
       });
 
       await expect(handler({ template: filePath }))
-        .rejects.toThrow(/Template 'invalidTemplate' must have at least one output defined!/);
+        .rejects.toThrow(/Template 'invalidTemplate' must have at least one output defined\./);
     });
   });
 
