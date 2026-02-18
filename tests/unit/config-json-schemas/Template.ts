@@ -48,6 +48,7 @@ describe('Template.json JSON Schema definition', () => {
     schema: {
       type: 'object',
       fields: {
+        userId: { type: 'object_id' },
         name: { type: 'string' },
         age: { type: 'number' },
         tags: {
@@ -61,6 +62,7 @@ describe('Template.json JSON Schema definition', () => {
             city: { type: 'string' },
           },
         },
+        createdAt: { type: 'date' },
       },
     },
     fields: {
