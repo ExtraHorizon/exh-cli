@@ -1,3 +1,4 @@
+/* eslint-disable no-template-curly-in-string */
 import { handler } from '../../../src/commands/templates/sync';
 import { spyOnConsole } from '../../__helpers__/consoleSpy';
 import { createTempDirectoryManager, type TempDirectoryManager } from '../../__helpers__/tempDirectoryManager';
@@ -34,6 +35,10 @@ describe('exh templates sync', () => {
     },
   };
 
+  beforeAll(() => {
+    process.env.EXH_CLI_TEST_ENV_VAR = 'FromEnv';
+  });
+
   beforeEach(async () => {
     tempDir = await createTempDirectoryManager();
     v1RepositoryMock = templateRepositoryMock();
@@ -43,6 +48,10 @@ describe('exh templates sync', () => {
   afterEach(async () => {
     await tempDir.removeDirectory();
     jest.clearAllMocks();
+  });
+
+  afterAll(() => {
+    delete process.env.EXH_CLI_TEST_ENV_VAR;
   });
 
   describe('v1 templates', () => {
@@ -193,6 +202,108 @@ describe('exh templates sync', () => {
       });
     });
 
+    it('Replaces variables in the outputs with the correct value', async () => {
+      const filePath = await tempDir.createJsonFile('myV2Template', {
+        ...minimalV2Config,
+        variables: { VAR_1: 'Hello world' },
+        outputs: {
+          message_with_braces: '<div>${VAR_1}</div>',
+          message_without_braces: '<div>$VAR_1</div>',
+        },
+      });
+
+      await handler({ template: filePath });
+
+      expectConsoleLogToContain('Creating', 'myV2Template');
+      expect(v2RepositoryMock.createSpy).toHaveBeenCalledWith({
+        ...minimalV2Config,
+        name: 'myV2Template',
+        outputs: {
+          message_with_braces: '<div>Hello world</div>',
+          message_without_braces: '<div>Hello world</div>',
+        },
+      });
+    });
+
+    it('Does not replace variables that are not defined in the template', async () => {
+      const filePath = await tempDir.createJsonFile('myV2Template', {
+        ...minimalV2Config,
+        outputs: {
+          message_with_braces: '<div>${UNDEFINED_VAR}</div>',
+          message_without_braces: '<div>$VAR_1</div>',
+        },
+      });
+
+      await handler({ template: filePath });
+
+      expectConsoleLogToContain('Creating', 'myV2Template');
+      expect(v2RepositoryMock.createSpy).toHaveBeenCalledWith({
+        ...minimalV2Config,
+        name: 'myV2Template',
+        outputs: {
+          message_with_braces: '<div>${UNDEFINED_VAR}</div>',
+          message_without_braces: '<div>$VAR_1</div>',
+        },
+      });
+    });
+
+    it('Replaces variables with environment variable values', async () => {
+      const filePath = await tempDir.createJsonFile('envVarTemplate', {
+        ...minimalV2Config,
+        variables: {
+          VAR_WITHOUT_BRACES: '$EXH_CLI_TEST_ENV_VAR',
+          VAR_WITH_BRACES: '${EXH_CLI_TEST_ENV_VAR}',
+        },
+        outputs: {
+          message: 'Hello $VAR_WITHOUT_BRACES',
+          message_braces: 'Hello $VAR_WITH_BRACES',
+        },
+      });
+
+      await handler({ template: filePath });
+
+      expectConsoleLogToContain('Creating', 'envVarTemplate');
+      expect(v2RepositoryMock.createSpy).toHaveBeenCalledWith({
+        ...minimalV2Config,
+        name: 'envVarTemplate',
+        outputs: {
+          message: 'Hello FromEnv',
+          message_braces: 'Hello FromEnv',
+        },
+      });
+    });
+
+    it('Throws an error when a variable value references an environment variable that is not defined', async () => {
+      const filePath = await tempDir.createJsonFile('myV2Template', {
+        ...minimalV2Config,
+        variables: {
+          VAR_1: '$UNDEFINED_ENV_VAR',
+        },
+        outputs: {
+          message: 'Hello $VAR_1',
+        },
+      });
+
+      await expect(handler({ template: filePath })).rejects.toThrow(/Variable UNDEFINED_ENV_VAR not found in environment/);
+    });
+
+    it('Throws an error when an environment variable name does not match the valid pattern', async () => {
+      const filePath = await tempDir.createJsonFile('invalidEnvVarPatternTemplate', {
+        ...minimalV2Config,
+        variables: {
+          VAR_1: '$INVALID-ENV-VAR', // Invalid env var name (contains a dash)
+        },
+        outputs: {
+          message: 'Hello $VAR_1',
+        },
+      });
+
+      await expect(handler({ template: filePath }))
+        .rejects.toThrow(
+          'Invalid environment variable name INVALID-ENV-VAR. Environment variable names must contain only uppercase letters, numbers, and underscores and must start with a letter.'
+        );
+    });
+
     it('Allows extending other v2 templates', async () => {
       const filePath = await tempDir.createJsonFile('myExtendingTemplate', {
         extendsTemplate: 'my_base_template',
@@ -253,6 +364,50 @@ describe('exh templates sync', () => {
         },
         outputs: {
           body: '<h1>Hello world</h1>',
+        },
+      });
+    });
+
+    it('Allows using variables in the extends chain', async () => {
+      await tempDir.createJsonFile('myExtendingTemplate', {
+        extendsTemplate: 'myBaseTemplate',
+        description: 'Template extending another template',
+        inputs: {
+          name: { type: 'string' },
+        },
+        outputs: {
+          message: 'Hello {{@inputs.name}} $VAR_1',
+        },
+        variables: {
+          VAR_1: 'From Extending Template Variable',
+        },
+      });
+
+      await tempDir.createJsonFile('myBaseTemplate', {
+        inputs: {
+          message: { type: 'string' },
+        },
+        outputs: {
+          title: 'ExH: Notification',
+          body: '<html><body>{{@inputs.message}} $VAR_1</body></html>',
+        },
+        variables: {
+          VAR_1: 'From Base Template Variable',
+        },
+      });
+
+      await handler({ path: tempDir.getPath() });
+
+      expectConsoleLogToContain('Creating', 'myExtendingTemplate');
+      expect(v2RepositoryMock.createSpy).toHaveBeenCalledWith({
+        name: 'myExtendingTemplate',
+        description: 'Template extending another template',
+        inputs: {
+          name: { type: 'string' },
+        },
+        outputs: {
+          title: 'ExH: Notification',
+          body: '<html><body>Hello {{@inputs.name}} From Extending Template Variable From Base Template Variable</body></html>',
         },
       });
     });
