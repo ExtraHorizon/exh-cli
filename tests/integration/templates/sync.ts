@@ -184,6 +184,26 @@ describe('exh templates sync', () => {
       });
     });
 
+    it('Removes description and inputs when not provided in the template file anymore', async () => {
+      const filePath = await tempDir.createJsonFile('myV2Template', {
+        outputs: minimalV2Config.outputs,
+      });
+
+      const existingTemplate = generateTemplateV2({ name: 'myV2Template' });
+      v2RepositoryMock.findByNameSpy.mockResolvedValueOnce(existingTemplate);
+
+      await handler({ template: filePath });
+
+      expectConsoleLogToContain('Updating', 'myV2Template');
+      expect(v2RepositoryMock.updateSpy).toHaveBeenCalledWith(existingTemplate.id, {
+        ...minimalV2Config,
+        name: 'myV2Template',
+        // Setting description and inputs to null makes the service remove them from the template
+        description: null,
+        inputs: null,
+      });
+    });
+
     it('Creates a v2 template based on a directory', async () => {
       const dirPath = await tempDir.createDirectory('a-dir-template');
       await tempDir.createJsonFile('a-dir-template/template', minimalV2Config);
