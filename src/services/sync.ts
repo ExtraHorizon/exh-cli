@@ -37,7 +37,7 @@ export async function sync({
   if ((syncAll || schemas) && cfg.schemas) {
     console.log(chalk.green('\n ⚙️  Syncing schemas ...'));
     for (const schema of cfg.schemas) {
-      await schemaService.sync(ospath.join(targetPath, schema), undefined, false, ignoreSchemaVerificationErrors);
+      await schemaService.sync(undefined, ospath.join(targetPath, schema), false, ignoreSchemaVerificationErrors);
     }
   }
 
