@@ -184,7 +184,7 @@ describe('exh templates sync', () => {
       });
     });
 
-    it('Removes description and inputs when not provided in the template file anymore', async () => {
+    it('Instructs the service to remove description and inputs when not provided in the template file', async () => {
       const filePath = await tempDir.createJsonFile('myV2Template', {
         outputs: minimalV2Config.outputs,
       });
