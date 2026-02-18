@@ -179,22 +179,22 @@ function resolveVariableValue(value: string): string {
 function v1ExtendingV2Error(extendsTemplate: string, callChain: string[]) {
   return new Error(
     `You cannot extend a v2 template ('${extendsTemplate}') in a v1 template!` +
-        `In ${renderCallChain(callChain)}`
+      `In ${renderCallChain(callChain)}`
   );
 }
 
 function v1VariableNotFoundError(variableName: string, extendsTemplate: string, callChain: string[]) {
   return new Error(
     `Could not find a value to fill '$content.${variableName}' ` +
-        `while extending '${extendsTemplate}' ` +
-        `in ${renderCallChain(callChain)}`
+      `while extending '${extendsTemplate}' ` +
+      `in ${renderCallChain(callChain)}`
   );
 }
 
 function v2ExtendingV1Error(extendsTemplate: string, callChain: string[]) {
   return new Error(
     `You cannot extend a v1 template ('${extendsTemplate}') in a v2 template!` +
-        `In ${renderCallChain(callChain)}`
+      `In ${renderCallChain(callChain)}`
   );
 }
 
