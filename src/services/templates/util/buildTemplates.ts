@@ -178,25 +178,25 @@ function resolveVariableValue(value: string): string {
 function validateV2Template(template: any) {
   // Template names must be "safe strings"
   if (!/^[A-Za-z][A-Za-z0-9_-]{0,49}$/.test(template.name)) {
-    throw new Error(`Template name '${template.name}' is invalid! Template names must start with a letter and can only contain letters, numbers, underscores and hyphens, and be at most 50 characters long.`);
+    throw new Error(`Template name '${template.name}' is invalid. Template names must start with a letter and can only contain letters, numbers, underscores and hyphens, and be at most 50 characters long.`);
   }
 
   // Templates must have at least one output
   if (Object.keys(template.outputs || {}).length < 1) {
-    throw new Error(`Template '${template.name}' must have at least one output defined!`);
+    throw new Error(`Template '${template.name}' must have at least one output defined.`);
   }
 
   // Output names must be "safe strings"
   for (const outputName of Object.keys(template.outputs)) {
     if (!/^[A-Za-z][A-Za-z0-9_-]{0,49}$/.test(outputName)) {
-      throw new Error(`Output name '${outputName}' is invalid! Output names must start with a letter and can only contain letters, numbers, underscores and hyphens, and be at most 50 characters long.`);
+      throw new Error(`Output name '${outputName}' is invalid. Output names must start with a letter and can only contain letters, numbers, underscores and hyphens, and be at most 50 characters long.`);
     }
   }
 }
 
 function v1ExtendingV2Error(extendsTemplate: string, callChain: string[]) {
   return new Error(
-    `You cannot extend a v2 template ('${extendsTemplate}') in a v1 template!` +
+    `You cannot extend a v2 template ('${extendsTemplate}') in a v1 template.` +
     `In ${renderCallChain(callChain)}`
   );
 }
@@ -211,7 +211,7 @@ function v1VariableNotFoundError(variableName: string, extendsTemplate: string, 
 
 function v2ExtendingV1Error(extendsTemplate: string, callChain: string[]) {
   return new Error(
-    `You cannot extend a v1 template ('${extendsTemplate}') in a v2 template!` +
+    `You cannot extend a v1 template ('${extendsTemplate}') in a v2 template.` +
     `In ${renderCallChain(callChain)}`
   );
 }

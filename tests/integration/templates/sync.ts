@@ -378,7 +378,7 @@ describe('exh templates sync', () => {
 
       await expect(handler({ template: singleFileStartsWithNumber }))
         .rejects.toThrow(
-          'Template name \'123invalid\' is invalid! ' +
+          'Template name \'123invalid\' is invalid. ' +
           'Template names must start with a letter and can only contain letters, numbers, underscores and hyphens, and be at most 50 characters long.'
         );
 
@@ -393,7 +393,7 @@ describe('exh templates sync', () => {
 
       await expect(handler({ template: singleFileWithSpaces }))
         .rejects.toThrow(
-          'Template name \'name with spaces\' is invalid! ' +
+          'Template name \'name with spaces\' is invalid. ' +
           'Template names must start with a letter and can only contain letters, numbers, underscores and hyphens, and be at most 50 characters long.'
         );
 
@@ -408,7 +408,7 @@ describe('exh templates sync', () => {
 
       await expect(handler({ template: singleFileTooLong }))
         .rejects.toThrow(
-          `Template name '${'a'.repeat(51)}' is invalid! ` +
+          `Template name '${'a'.repeat(51)}' is invalid. ` +
           'Template names must start with a letter and can only contain letters, numbers, underscores and hyphens, and be at most 50 characters long.'
         );
 
@@ -424,7 +424,7 @@ describe('exh templates sync', () => {
 
       await expect(handler({ template: dirWithInvalidName }))
         .rejects.toThrow(
-          'Template name \'dir with spaces\' is invalid! ' +
+          'Template name \'dir with spaces\' is invalid. ' +
           'Template names must start with a letter and can only contain letters, numbers, underscores and hyphens, and be at most 50 characters long.'
         );
     });
@@ -443,7 +443,7 @@ describe('exh templates sync', () => {
 
       await expect(handler({ template: filePath }))
         .rejects.toThrow(
-          'Output name \'invalid output\' is invalid! ' +
+          'Output name \'invalid output\' is invalid. ' +
           'Output names must start with a letter and can only contain letters, numbers, underscores and hyphens, and be at most 50 characters long.'
         );
 
@@ -459,7 +459,7 @@ describe('exh templates sync', () => {
 
       await expect(handler({ template: dirPath }))
         .rejects.toThrow(
-          'Output name \'invalid output\' is invalid! ' +
+          'Output name \'invalid output\' is invalid. ' +
           'Output names must start with a letter and can only contain letters, numbers, underscores and hyphens, and be at most 50 characters long.'
         );
     });
@@ -526,7 +526,7 @@ describe('exh templates sync', () => {
       });
 
       await expect(handler({ template: filePath }))
-        .rejects.toThrow(/Template 'invalidTemplate' must have at least one output defined!/);
+        .rejects.toThrow(/Template 'invalidTemplate' must have at least one output defined\./);
     });
   });
 
