@@ -167,7 +167,7 @@
       "type": "object",
       "required": ["type"],
       "properties": {
-        "type": { "enum": ["object", "array", "string", "number", "boolean"] }
+        "type": { "enum": ["object", "array", "string", "number", "boolean", "object_id", "date"] }
       },
       "allOf": [
         {
@@ -214,6 +214,24 @@
             }
           },
           "then": { "$ref": "#/definitions/BooleanConfiguration" }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": {
+              "type": { "const": "object_id" }
+            }
+          },
+          "then": { "$ref": "#/definitions/ObjectIdConfiguration" }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": {
+              "type": { "const": "date" }
+            }
+          },
+          "then": { "$ref": "#/definitions/DateConfiguration" }
         }
       ]
     },
@@ -257,6 +275,20 @@
       "required": ["type"],
       "properties": {
         "type": { "const": "boolean" }
+      }
+    },
+    "ObjectIdConfiguration": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": { "const": "object_id" }
+      }
+    },
+    "DateConfiguration": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": { "const": "date" }
       }
     }
   }
