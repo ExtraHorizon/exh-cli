@@ -26,7 +26,7 @@ async function buildTemplate(name: string, templateFilesByName: any, callChain =
   if (variables && templateFile.outputs) {
     templateFile.outputs = replaceVariables(templateFile.outputs, variables);
     // Make sure to update the template file in the map with the outputs that have had their variables replaced,
-    // so that if another template extends this template, it will get the outputs with the variables replaced
+    // so that if another template is extended from this template, it will get the outputs with the variables replaced
     // eslint-disable-next-line no-param-reassign
     templateFilesByName[name] = templateFile;
   }
