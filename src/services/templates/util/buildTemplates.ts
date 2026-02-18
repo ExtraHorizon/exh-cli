@@ -17,9 +17,18 @@ async function buildTemplate(name: string, templateFilesByName: any, callChain =
     throw new Error(`Circular extension detected. ${renderCallChain(newCallChain)}`);
   }
 
-  const templateFile = templateFilesByName[name];
-  if (!templateFile) {
+  if (!templateFilesByName[name]) {
     throw new Error(`Template file dependency ${name} not found!`);
+  }
+
+  const { variables, ...templateFile } = templateFilesByName[name];
+
+  if (variables && templateFile.outputs) {
+    templateFile.outputs = replaceVariables(templateFile.outputs, variables);
+    // Make sure to update the template file in the map with the outputs that have had their variables replaced,
+    // so that if another template is extended from this template, it will get the outputs with the variables replaced
+    // eslint-disable-next-line no-param-reassign
+    templateFilesByName[name] = templateFile;
   }
 
   let templateConfig;
@@ -115,6 +124,56 @@ async function extendV2Template(name: string, templateFilesByName: any, callChai
     inputs,
     outputs: newOutputs,
   };
+}
+
+function replaceVariables(outputs: Record<string, any>, variables: Record<string, string>) {
+  const replaced: Record<string, string> = {};
+
+  const resolvedVariables: Record<string, string> = {};
+  // Replaces the value of variables that reference environment variables with their resolved value from the environment
+  for (const [varName, varValue] of Object.entries(variables)) {
+    resolvedVariables[varName] = resolveVariableValue(varValue);
+  }
+
+  // For each output, replace any instance of ${VAR} or $VAR with the value of the variable from the current template's variables
+  for (const [key, value] of Object.entries(outputs)) {
+    let replacedValue = value;
+    for (const [varName, varValue] of Object.entries(resolvedVariables)) {
+      // Replace both ${VAR} and $VAR
+      replacedValue = replacedValue
+        .replaceAll(`\${${varName}}`, varValue)
+        .replaceAll(`$${varName}`, varValue);
+    }
+    replaced[key] = replacedValue;
+  }
+
+  return replaced;
+}
+
+function resolveVariableValue(value: string): string {
+  // Expecting only the environment variable in here, not a string that contains the environment variable
+  if (!value.startsWith('$')) { return value; }
+
+  // Replace both ${VAR} and $VAR
+  const envVar = value.startsWith('${') && value.endsWith('}') ?
+    value.slice(2, -1) :
+    value.slice(1);
+
+  const validEnvPattern = /^[A-Z][A-Z0-9_]*$/;
+
+  if (!validEnvPattern.test(envVar)) {
+    throw new Error(
+      `Invalid environment variable name ${envVar}. Environment variable names must contain only uppercase letters, numbers, and underscores and must start with a letter.`
+    );
+  }
+
+  const resolved = process.env[envVar];
+
+  if (resolved === undefined) {
+    throw new Error(`Variable ${envVar} not found in environment`);
+  }
+
+  return resolved;
 }
 
 function v1ExtendingV2Error(extendsTemplate: string, callChain: string[]) {
