@@ -35,7 +35,9 @@ async function uploadV2Template(template: any) {
       await templateV2Repository.create(template);
     } else {
       console.log(`Updating existing template '${template.name}'`);
-      await templateV2Repository.update(existingTemplate.id, template);
+      // Make sure inputs and description will be removed if not provided in the template file
+      const update = { description: null, inputs: null, ...template };
+      await templateV2Repository.update(existingTemplate.id, update);
     }
   } catch (err) {
     throw new Error(`Error creating or updating template: ${JSON.stringify(err.response)}`);
