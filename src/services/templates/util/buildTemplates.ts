@@ -151,6 +151,7 @@ function replaceVariables(outputs: Record<string, any>, variables: Record<string
 }
 
 function resolveVariableValue(value: string): string {
+  // Expecting only the environment variable in here, not a string that contains the environment variable
   if (!value.startsWith('$')) { return value; }
 
   // Replace both ${VAR} and $VAR
