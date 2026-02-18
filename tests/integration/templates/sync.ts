@@ -232,6 +232,31 @@ describe('exh templates sync', () => {
       });
     });
 
+    it('Allows no defined outputs in the template.json when a file in the folder to be used as an output exists', async () => {
+      const dirPath = await tempDir.createDirectory('a-dir-template');
+      await tempDir.createJsonFile('a-dir-template/template', {
+        description: 'A simple template',
+        inputs: {
+          field1: { type: 'string' },
+        },
+      });
+      await tempDir.createFile('a-dir-template/body.html', '<h1>Hello world</h1>');
+
+      await handler({ template: dirPath });
+
+      expectConsoleLogToContain('Creating', 'a-dir-template');
+      expect(v2RepositoryMock.createSpy).toHaveBeenCalledWith({
+        name: 'a-dir-template',
+        description: 'A simple template',
+        inputs: {
+          field1: { type: 'string' },
+        },
+        outputs: {
+          body: '<h1>Hello world</h1>',
+        },
+      });
+    });
+
     it('Throws an error for an invalid template file', async () => {
       const filePath = await tempDir.createJsonFile('invalidTemplate', {
         description: 'Invalid template',
@@ -241,6 +266,16 @@ describe('exh templates sync', () => {
 
       await expect(handler({ template: filePath }))
         .rejects.toThrow(/invalidTemplate\.json: "inputs" must be object/);
+    });
+
+    it('Throws when no outputs are defined', async () => {
+      const filePath = await tempDir.createJsonFile('invalidTemplate', {
+        description: 'Invalid template',
+        inputs: { name: { type: 'string' } },
+      });
+
+      await expect(handler({ template: filePath }))
+        .rejects.toThrow(/Template 'invalidTemplate' must have at least one output defined!/);
     });
   });
 
