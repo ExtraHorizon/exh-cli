@@ -40,9 +40,8 @@ async function buildTemplate(name: string, templateFilesByName: any, callChain =
     templateConfig = { ...templateFile, name };
   }
 
-  // V2 templates should have at least 1 output defined
-  if (!isV1Template(templateConfig) && Object.keys(templateConfig.outputs || {}).length < 1) {
-    throw new Error(`Template '${name}' must have at least one output defined!`);
+  if (!isV1Template(templateConfig)) {
+    validateV2Template(templateConfig);
   }
 
   return templateConfig;
@@ -174,6 +173,25 @@ function resolveVariableValue(value: string): string {
   }
 
   return resolved;
+}
+
+function validateV2Template(template: any) {
+    // Templates names must be "safe strings"
+    if(!/^[A-Za-z][A-Za-z0-9_-]{0,49}$/.test(template.name)) {
+      throw new Error(`Template name '${template.name}' is invalid! Template names must start with a letter and can only contain letters, numbers, underscores and hyphens, and be at most 50 characters long.`);
+    }
+
+    // Templates must have at least one output
+    if (Object.keys(template.outputs || {}).length < 1) {
+      throw new Error(`Template '${template.name}' must have at least one output defined!`);
+    }
+
+    // Output names must be "safe strings"
+    for (const outputName of Object.keys(template.outputs)) {
+      if (!/^[A-Za-z][A-Za-z0-9_-]{0,49}$/.test(outputName)) {
+        throw new Error(`Output name '${outputName}' is invalid! Output names must start with a letter and can only contain letters, numbers, underscores and hyphens, and be at most 50 characters long.`);
+      }
+    }
 }
 
 function v1ExtendingV2Error(extendsTemplate: string, callChain: string[]) {
