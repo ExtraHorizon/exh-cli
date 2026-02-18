@@ -22,15 +22,21 @@ async function buildTemplate(name: string, templateFilesByName: any, callChain =
     throw new Error(`Template file dependency ${name} not found!`);
   }
 
+  let templateConfig;
   if (templateFile.extends_template) {
-    return await extendV1Template(name, templateFilesByName, newCallChain);
+    templateConfig = await extendV1Template(name, templateFilesByName, newCallChain);
+  } else if (templateFile.extendsTemplate) {
+    templateConfig = await extendV2Template(name, templateFilesByName, newCallChain);
+  } else {
+    templateConfig = { ...templateFile, name };
   }
 
-  if (templateFile.extendsTemplate) {
-    return await extendV2Template(name, templateFilesByName, newCallChain);
+  // V2 templates should have at least 1 output defined
+  if (!isV1Template(templateConfig) && Object.keys(templateConfig.outputs || {}).length < 1) {
+    throw new Error(`Template '${name}' must have at least one output defined!`);
   }
 
-  return { ...templateFile, name };
+  return templateConfig;
 }
 
 async function extendV1Template(name: string, templateFilesByName: any, callChain: string[]) {
