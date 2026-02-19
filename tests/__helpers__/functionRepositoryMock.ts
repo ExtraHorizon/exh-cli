@@ -20,6 +20,7 @@ export const functionRepositoryMock = () => {
 
   const removeSpy = jest.spyOn(functionRepository, 'remove')
     .mockResolvedValue({ affectedRecords: 1 });
+
   return {
     functionConfig,
     existingFunction,

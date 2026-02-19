@@ -6,7 +6,21 @@ export type DispatcherRepositoryMock = ReturnType<typeof dispatcherRepositoryMoc
 export const dispatcherRepositoryMock = () => {
   const existingDispatcher = generateDispatcher();
 
-  jest.spyOn(dispatcherRepository, 'findAll')
+  const createSpy = jest.spyOn(dispatcherRepository, 'create')
+    .mockImplementation(async data => ({
+      ...data,
+      id: 'new-dispatcher-id',
+      actions: data.actions?.map(action => ({
+        ...action,
+        id: 'new-action-id',
+        updateTimestamp: new Date(),
+        creationTimestamp: new Date(),
+      })),
+      updateTimestamp: new Date(),
+      creationTimestamp: new Date(),
+    }));
+
+  const findAllSpy = jest.spyOn(dispatcherRepository, 'findAll')
     .mockResolvedValue([existingDispatcher, generateDispatcher()]);
 
   const updateDispatcherSpy = jest.spyOn(dispatcherRepository, 'update')
@@ -23,6 +37,8 @@ export const dispatcherRepositoryMock = () => {
 
   return {
     existingDispatcher,
+    createSpy,
+    findAllSpy,
     updateDispatcherSpy,
     removeDispatcherSpy,
     updateActionSpy,
