@@ -34,7 +34,7 @@ export async function createTempDirectoryManager() {
       }
 
       const newDir = join(dir, name);
-      await mkdir(newDir);
+      await mkdir(newDir, { recursive: true });
 
       return newDir;
     },

@@ -2,7 +2,6 @@ import * as path from 'path';
 import * as chalk from 'chalk';
 import { sdkMock } from '../../../__mocks__/@extrahorizon/javascript-sdk';
 import { handler } from '../../../src/commands/tasks/sync';
-import * as functionRepository from '../../../src/repositories/functions';
 import * as userRepository from '../../../src/repositories/user';
 import { mockAuthRepository } from '../../__helpers__/authRepositoryMock';
 import { spyOnConsole } from '../../__helpers__/consoleSpy';
@@ -172,14 +171,13 @@ describe('exh tasks sync', () => {
       updateTimestamp: '2024-01-23T13:59:02.554Z',
     }];
 
-    const findSpy = jest.spyOn(functionRepository, 'find')
-      .mockResolvedValueOnce(existingFunctions);
+    functionMock.findSpy.mockResolvedValueOnce(existingFunctions);
 
     const taskConfigPath = await tempDirectoryManager.createTempJsonFile(functionMock.functionConfig);
     await tempDirectoryManager.createTempJsFile('index', functionCode);
 
     await handler({ path: taskConfigPath });
-    expect(findSpy).toHaveBeenCalledTimes(1);
+    expect(functionMock.findSpy).toHaveBeenCalledTimes(1);
     expect(functionMock.findByNameSpy).toHaveBeenCalledTimes(1);
     expect(functionMock.updateSpy).toHaveBeenCalledTimes(1);
     expectConsoleLogToContain(chalk.green('Successfully updated task', functionMock.functionConfig.name));
