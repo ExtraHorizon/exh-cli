@@ -37,7 +37,10 @@
       "properties": {
         "version": { "const": 2 },
         "$schema": { "type": "string" },
-        "description": { "type": "string" },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
         "extendsTemplate": { "type": "string" },
         "inputs": {
           "type": "object",
@@ -45,7 +48,10 @@
         },
         "outputs": {
           "type": "object",
-          "additionalProperties": { "type": "string" }
+          "additionalProperties": {
+            "type": "string",
+            "minLength": 1
+          }
         },
         "variables": {
           "type": "object",
