@@ -17,6 +17,7 @@ yargs(hideBin(process.argv))
       isEqual(argv._, ['data', 'schemas', 'init']) ||
       isEqual(argv._, ['data', 'schemas', 'verify']) ||
       isEqual(argv._, ['tasks', 'create-repo']) ||
+      isEqual(argv._, ['templates', 'init']) ||
       isEqual(argv._, ['completion']) ||
       isEqual(argv._, ['generate_completion']) ||
       process.env.NO_SDK
