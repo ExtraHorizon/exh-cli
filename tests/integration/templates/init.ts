@@ -33,7 +33,7 @@ describe('exh templates init', () => {
         },
       },
       outputs: {
-        subject: 'Password reset for {{@inputs.first_name}}',
+        subject: 'Welcome {{@inputs.first_name}}',
       },
       $schema: 'https://swagger.extrahorizon.com/cli/1.13.0/config-json-schemas/Template.json',
     });
