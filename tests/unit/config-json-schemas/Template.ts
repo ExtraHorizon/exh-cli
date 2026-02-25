@@ -27,8 +27,8 @@ describe('Template.json JSON Schema definition', () => {
       },
     },
     outputs: {
-      subject: '',
-      body: '',
+      subject: 'Hello',
+      body: 'World',
     },
   };
 
@@ -66,8 +66,8 @@ describe('Template.json JSON Schema definition', () => {
       },
     },
     fields: {
-      subject: '',
-      body: '',
+      subject: 'Hello',
+      body: 'World',
     },
   };
 
@@ -92,11 +92,25 @@ describe('Template.json JSON Schema definition', () => {
       const invalidOutputs = {
         ...minimalTemplateV2,
         outputs: {
-          subject: '',
+          subject: 'Hello',
           body: 123,
         },
       };
       expect(() => ajvValidate(templateConfigSchema, invalidOutputs)).toThrow(/"outputs.body" must be string/);
+    });
+
+    it('Throws for an empty description or output string', () => {
+      const emptyDescription = {
+        ...minimalTemplateV2,
+        description: '',
+      };
+      expect(() => ajvValidate(templateConfigSchema, emptyDescription)).toThrow(/"description" must NOT have fewer than 1 characters/);
+
+      const emptyOutput = {
+        ...minimalTemplateV2,
+        outputs: { subject: '' },
+      };
+      expect(() => ajvValidate(templateConfigSchema, emptyOutput)).toThrow(/"outputs.subject" must NOT have fewer than 1 characters/);
     });
 
     it('Throws for additional properties on the template object', () => {

@@ -26,6 +26,11 @@ describe('Dispatchers.json JSON Schema definition', () => {
   const fullMailAction: any = {
     ...minimalMailAction,
     description: 'A full mail action config',
+    recipients: {
+      ...minimalMailAction.recipients,
+      cc: ['example@example.com'],
+      bcc: ['example@example.com'],
+    },
   };
 
   const fullTaskAction: any = {
