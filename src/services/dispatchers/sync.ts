@@ -1,9 +1,7 @@
-import { readFile } from 'fs/promises';
 import { Dispatcher, DispatcherCreation, rqlBuilder } from '@extrahorizon/javascript-sdk';
 import { blue, green, yellow } from 'chalk';
-import * as dispatcherSchema from '../config-json-schemas/Dispatchers.json';
-import { ajvValidate } from '../helpers/util';
-import * as dispatcherRepository from '../repositories/dispatchers';
+import * as dispatcherRepository from '../../repositories/dispatchers';
+import { readAndValidateDispatcherConfig } from './util/readDispatcherFile';
 
 export const cliManagedTag = 'EXH_CLI_MANAGED';
 
@@ -114,24 +112,4 @@ async function synchronizeActions(localDispatcher: DispatcherCreation, exhDispat
       console.groupEnd();
     }
   }
-}
-
-type DispatchersFile = DispatcherCreation[] | { dispatchers: DispatcherCreation[]; };
-
-async function readAndValidateDispatcherConfig(path: string) {
-  let config: any;
-  try {
-    const buffer = await readFile(path);
-    config = JSON.parse(buffer.toString());
-  } catch (error) {
-    throw new Error(`Failed to read Dispatchers from ${path}: ${error.message}`);
-  }
-
-  ajvValidate<DispatchersFile>(dispatcherSchema, config);
-
-  if (Array.isArray(config)) {
-    return config;
-  }
-
-  return config.dispatchers;
 }
