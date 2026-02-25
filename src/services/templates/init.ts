@@ -22,9 +22,6 @@ function createTemplate(name: string) {
       first_name: {
         type: 'string',
       },
-      url: {
-        type: 'string',
-      },
     },
     outputs: {
       subject: 'Welcome {{@inputs.first_name}}',
