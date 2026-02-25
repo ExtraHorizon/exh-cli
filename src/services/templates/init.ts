@@ -27,7 +27,7 @@ function createTemplate(name: string) {
       },
     },
     outputs: {
-      subject: 'Password reset for {{@inputs.first_name}}',
+      subject: 'Welcome {{@inputs.first_name}}',
     },
     $schema: getSwaggerDocumentationUrl('config-json-schemas/Template.json'),
   };
@@ -37,16 +37,8 @@ function createBody() {
   return `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
   <body>
-    <p>Hello {{@inputs.firstname}},</p>
-
-    <p>Click the link below to reset your password:</p>
-
-    <p>
-      <a href="{{@inputs.url}}">
-        Reset password
-      </a>
-    </p>
-
+    <p>Hello {{@inputs.first_name}},</p>
+    <p>Welcome to our application!</p>
     <p>– The Team</p>
   </body>
 </html>`;
