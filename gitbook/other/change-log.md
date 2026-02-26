@@ -14,7 +14,7 @@
   * `exh templates delete` deletes templates from both template service V1 and template service V2.
   * `exh templates sync` now syncs templates to the template service V2 and template service V1 depending on the properties in the `template.json` file.
 * Added autocomplete support and inline documentation for `template.json`
-  * Via `"$schema": "https://swagger.extrahorizon.com/cli/1.12.0/config-json-schemas/TemplateConfig.json"`
+  * Via `"$schema": "https://swagger.extrahorizon.com/cli/1.12.0/config-json-schemas/Template.json"`
 * Added autocomplete support and inline documentation for `dispatchers.json`
   * Via `"$schema": "https://swagger.extrahorizon.com/cli/1.12.0/config-json-schemas/Dispatchers.json"`
 
