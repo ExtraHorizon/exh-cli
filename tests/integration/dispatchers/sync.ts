@@ -1,7 +1,7 @@
 import * as fs from 'fs/promises';
 import { handler } from '../../../src/commands/dispatchers/sync';
 import * as dispatcherRepository from '../../../src/repositories/dispatchers';
-import { cliManagedTag } from '../../../src/services/dispatchers';
+import { cliManagedTag } from '../../../src/services/dispatchers/sync';
 import { generateMailAction, generateTaskAction } from '../../__helpers__/actions';
 import { dispatcherRepositoryMock, type DispatcherRepositoryMock } from '../../__helpers__/dispatcherRepositoryMock';
 import { generateDispatcher, generateMinimalDispatcher } from '../../__helpers__/dispatchers';
