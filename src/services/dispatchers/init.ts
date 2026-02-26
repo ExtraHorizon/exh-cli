@@ -27,22 +27,14 @@ export async function init(name: string, path: string) {
 
 function createDispatcher(name: string) {
   return {
-    eventType: 'user_deleted',
+    eventType: 'my-custom-event',
     name,
-    description: 'A Dispatcher that handles the user_deleted event',
     actions: [
       {
-        type: ActionType.MAIL,
-        name: 'user_deleted_email_action',
-        description: 'An Action that sends an email when a user is deleted',
-        recipients: {
-          to: ['<TO_EMAIL_PLACEHOLDER>'],
-          cc: ['<CC_EMAIL_PLACEHOLDER>'],
-          bcc: ['<BCC_EMAIL_PLACEHOLDER>'],
-        },
-        templateId: '<TEMPLATE_ID_PLACEHOLDER>',
+        type: ActionType.TASK,
+        name: 'task-action',
+        functionName: 'my-function-name',
       },
     ],
-    tags: [],
   };
 }
