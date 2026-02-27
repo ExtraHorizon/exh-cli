@@ -1,11 +1,12 @@
 import { handler } from '../../../../src/commands/data/schemas/sync';
-import { schemaRepositoryMock } from '../../../__helpers__/schemaRepositoryMock';
+import type { Transition } from '../../../../src/repositories/schemas';
+import { schemaRepositoryMock, type SchemaRepositoryMock } from '../../../__helpers__/schemaRepositoryMock';
 import { defaultSchemaReturnId, minimalSchema, validSchema } from '../../../__helpers__/schemas';
-import { createTempDirectoryManager } from '../../../__helpers__/tempDirectoryManager';
+import { createTempDirectoryManager, type TempDirectoryManager } from '../../../__helpers__/tempDirectoryManager';
 
 describe('exh data schemas sync', () => {
-  let tempDirectoryManager: Awaited<ReturnType<typeof createTempDirectoryManager>>;
-  let repositoryMock: ReturnType<typeof schemaRepositoryMock>;
+  let tempDirectoryManager: TempDirectoryManager;
+  let repositoryMock: SchemaRepositoryMock;
 
   beforeEach(async () => {
     tempDirectoryManager = await createTempDirectoryManager();
@@ -21,7 +22,6 @@ describe('exh data schemas sync', () => {
     const path = await tempDirectoryManager.createTempJsonFile(validSchema);
 
     await handler({
-      sdk: undefined,
       file: path,
       dir: undefined,
       dry: false,
@@ -35,7 +35,7 @@ describe('exh data schemas sync', () => {
     expect(repositoryMock.createPropertySpy).toBeCalledTimes(Object.keys(validSchema.properties).length);
     Object.entries(validSchema.properties).forEach(([key, value]) => {
       expect(repositoryMock.createPropertySpy)
-        .toHaveBeenCalledWith(undefined, expect.any(String), expect.objectContaining({
+        .toHaveBeenCalledWith(expect.any(String), expect.objectContaining({
           configuration: value,
           name: key,
         }));
@@ -43,21 +43,21 @@ describe('exh data schemas sync', () => {
 
     // Transition creation is called for every transition
     expect(repositoryMock.createTransitionSpy).toBeCalledTimes(Object.keys(validSchema.transitions).length);
-    validSchema.transitions.forEach(transition => {
+    validSchema.transitions.forEach((transition: Transition) => {
       expect(repositoryMock.createTransitionSpy)
-        .toHaveBeenCalledWith(undefined, expect.any(String), transition);
+        .toHaveBeenCalledWith(expect.any(String), transition);
     });
 
     // Status creation is called for every status
     expect(repositoryMock.createStatusSpy).toBeCalledTimes(Object.keys(validSchema.statuses).length);
     Object.entries(validSchema.statuses).forEach(([name, value]) => {
       expect(repositoryMock.createStatusSpy)
-        .toHaveBeenCalledWith(undefined, expect.any(String), name, value);
+        .toHaveBeenCalledWith(expect.any(String), name, value);
     });
   });
 
   it('Updates a schema by adding the new property', async () => {
-    repositoryMock.fetchSchemaByNameSpy.mockImplementationOnce(() => Promise.resolve({ id: 'anyid', ...validSchema }));
+    repositoryMock.fetchSchemaByNameSpy.mockResolvedValueOnce({ id: 'anyid', ...validSchema });
 
     const path = await tempDirectoryManager.createTempJsonFile({
       ...validSchema,
@@ -65,7 +65,6 @@ describe('exh data schemas sync', () => {
     });
 
     await handler({
-      sdk: undefined,
       file: path,
       dir: undefined,
       dry: false,
@@ -78,7 +77,7 @@ describe('exh data schemas sync', () => {
     // Property creation is called for the new property
     expect(repositoryMock.createPropertySpy).toBeCalledTimes(1);
     expect(repositoryMock.createPropertySpy)
-      .toHaveBeenCalledWith(undefined, 'anyid', expect.objectContaining({
+      .toHaveBeenCalledWith('anyid', expect.objectContaining({
         configuration: { type: 'string' },
         name: 'newProp',
       }));
@@ -93,14 +92,13 @@ describe('exh data schemas sync', () => {
     const path = await tempDirectoryManager.createTempJsonFile(schemaConfiguration);
 
     await expect(handler({
-      sdk: undefined,
       file: path,
       dir: undefined,
       dry: false,
       ignoreVerificationErrors: false,
     })).resolves.not.toThrow();
 
-    expect(repositoryMock.createSchemaSpy).toHaveBeenCalledWith(undefined, schemaConfiguration.name, schemaConfiguration.description);
+    expect(repositoryMock.createSchemaSpy).toHaveBeenCalledWith(schemaConfiguration.name, schemaConfiguration.description);
     expect(repositoryMock.updateSchemaSpy).not.toHaveBeenCalled();
   });
 
@@ -135,14 +133,13 @@ describe('exh data schemas sync', () => {
     const path = await tempDirectoryManager.createTempJsonFile(schemaConfiguration);
 
     await expect(handler({
-      sdk: undefined,
       file: path,
       dir: undefined,
       dry: false,
       ignoreVerificationErrors: false,
     })).resolves.not.toThrow();
 
-    expect(repositoryMock.updateCreationTransitionSpy).toHaveBeenCalledWith(undefined, defaultSchemaReturnId, {
+    expect(repositoryMock.updateCreationTransitionSpy).toHaveBeenCalledWith(defaultSchemaReturnId, {
       type: 'manual',
       toStatus: 'new',
       // No description property
@@ -227,14 +224,13 @@ describe('exh data schemas sync', () => {
     const path = await tempDirectoryManager.createTempJsonFile(schemaConfiguration);
 
     await expect(handler({
-      sdk: undefined,
       file: path,
       dir: undefined,
       dry: false,
       ignoreVerificationErrors: false,
     })).resolves.not.toThrow();
 
-    expect(repositoryMock.createTransitionSpy).toHaveBeenCalledWith(undefined, defaultSchemaReturnId, {
+    expect(repositoryMock.createTransitionSpy).toHaveBeenCalledWith(defaultSchemaReturnId, {
       type: 'manual',
       name: 'my-transition',
       // No description property
@@ -318,19 +314,18 @@ describe('exh data schemas sync', () => {
     const path = await tempDirectoryManager.createTempJsonFile(schemaConfiguration);
 
     await expect(handler({
-      sdk: undefined,
       file: path,
       dir: undefined,
       dry: false,
       ignoreVerificationErrors: false,
     })).resolves.not.toThrow();
 
-    expect(repositoryMock.createPropertySpy).toHaveBeenCalledWith(undefined, defaultSchemaReturnId, {
+    expect(repositoryMock.createPropertySpy).toHaveBeenCalledWith(defaultSchemaReturnId, {
       name: 'exampleString',
       configuration: { type: 'string' },
     });
 
-    expect(repositoryMock.createPropertySpy).toHaveBeenCalledWith(undefined, defaultSchemaReturnId, {
+    expect(repositoryMock.createPropertySpy).toHaveBeenCalledWith(defaultSchemaReturnId, {
       name: 'exampleArray',
       configuration: {
         type: 'array',
@@ -338,7 +333,7 @@ describe('exh data schemas sync', () => {
       },
     });
 
-    expect(repositoryMock.createPropertySpy).toHaveBeenCalledWith(undefined, defaultSchemaReturnId, {
+    expect(repositoryMock.createPropertySpy).toHaveBeenCalledWith(defaultSchemaReturnId, {
       name: 'exampleObject',
       configuration: {
         type: 'object',
@@ -367,14 +362,13 @@ describe('exh data schemas sync', () => {
     const path = await tempDirectoryManager.createTempJsonFile(schemaConfiguration);
 
     await expect(handler({
-      sdk: undefined,
       file: path,
       dir: undefined,
       dry: false,
       ignoreVerificationErrors: false,
     })).resolves.not.toThrow();
 
-    expect(repositoryMock.createIndexSpy).toHaveBeenCalledWith(undefined, defaultSchemaReturnId, {
+    expect(repositoryMock.createIndexSpy).toHaveBeenCalledWith(defaultSchemaReturnId, {
       name: 'exampleIndex',
       // No description property
       fields: [{

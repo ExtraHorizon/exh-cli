@@ -15,17 +15,19 @@ export const exampleUser = {
   creationTimestamp: new Date(),
 };
 
+export type AuthRepositoryMock = ReturnType<typeof mockAuthRepository>;
+
 export const mockAuthRepository = () => {
   const oAuth1Tokens = generateOAuth1Tokens();
 
   const fetchMeSpy = jest.spyOn(authRepository, 'fetchMe')
-    .mockImplementation(async () => exampleUser);
+    .mockResolvedValue(exampleUser);
 
   const getHostSpy = jest.spyOn(authRepository, 'getHost')
-    .mockImplementation(() => exampleHost);
+    .mockReturnValue(exampleHost);
 
   const createOAuth1TokensSpy = jest.spyOn(authRepository, 'createOAuth1Tokens')
-    .mockImplementationOnce(() => Promise.resolve(generateOAuth1Tokens()));
+    .mockImplementation(async () => generateOAuth1Tokens());
 
   return {
     oAuth1Tokens,

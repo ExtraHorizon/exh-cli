@@ -1,43 +1,44 @@
-import { OAuth1Client, RegisterUserData, rqlBuilder } from '@extrahorizon/javascript-sdk';
+import { RegisterUserData, rqlBuilder } from '@extrahorizon/javascript-sdk';
+import { getSdk } from '../exh';
 
-export async function findUserByEmail(sdk: OAuth1Client, email: string) {
+export async function findUserByEmail(email: string) {
   const rql = rqlBuilder().eq('email', email).build();
-  return await sdk.users.findFirst({ rql });
+  return await getSdk().users.findFirst({ rql });
 }
 
-export async function isEmailAvailable(sdk: OAuth1Client, email: string) {
-  const { emailAvailable } = await sdk.users.isEmailAvailable(email);
+export async function isEmailAvailable(email: string) {
+  const { emailAvailable } = await getSdk().users.isEmailAvailable(email);
   return emailAvailable;
 }
 
-export async function createUser(sdk: OAuth1Client, data: RegisterUserData) {
-  return await sdk.users.createAccount(data);
+export async function createUser(data: RegisterUserData) {
+  return await getSdk().users.createAccount(data);
 }
 
-export async function findGlobalRoleByName(sdk: OAuth1Client, name: string) {
-  return await sdk.users.globalRoles.findByName(name);
+export async function findGlobalRoleByName(name: string) {
+  return await getSdk().users.globalRoles.findByName(name);
 }
 
-export async function createGlobalRole(sdk: OAuth1Client, name: string, description: string) {
-  return await sdk.users.globalRoles.create({ name, description });
+export async function createGlobalRole(name: string, description: string) {
+  return await getSdk().users.globalRoles.create({ name, description });
 }
 
-export async function addPermissionsToGlobalRole(sdk: OAuth1Client, name: string, permissions: string[]) {
-  return await sdk.users.globalRoles.addPermissions(
+export async function addPermissionsToGlobalRole(name: string, permissions: string[]) {
+  return await getSdk().users.globalRoles.addPermissions(
     rqlBuilder().eq('name', name).build(),
     { permissions }
   );
 }
 
-export async function removePermissionsFromGlobalRole(sdk: OAuth1Client, name: string, permissions: string[]) {
-  return await sdk.users.globalRoles.removePermissions(
+export async function removePermissionsFromGlobalRole(name: string, permissions: string[]) {
+  return await getSdk().users.globalRoles.removePermissions(
     rqlBuilder().eq('name', name).build(),
     { permissions }
   );
 }
 
-export async function addGlobalRoleToUser(sdk: OAuth1Client, userId: string, roleId: string) {
-  return await sdk.users.globalRoles.addToUsers(
+export async function addGlobalRoleToUser(userId: string, roleId: string) {
+  return await getSdk().users.globalRoles.addToUsers(
     rqlBuilder().eq('id', userId).build(),
     { roles: [roleId] }
   );

@@ -48,3 +48,4 @@ src/*.js.map
 
 # Test results
 test-results/
+temp/

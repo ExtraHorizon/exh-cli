@@ -1,6 +1,7 @@
-import { OAuth1Client, ObjectId } from '@extrahorizon/javascript-sdk';
+import { ObjectId, rqlBuilder } from '@extrahorizon/javascript-sdk';
+import { getSdk } from '../exh';
 
-interface Transition {
+export interface Transition {
   name: string;
   type: string;
   fromStatuses: string[];
@@ -10,20 +11,25 @@ interface Transition {
   afterActions: { type: string; };
 }
 
-export async function remove(sdk: OAuth1Client, schemaId: ObjectId) {
-  return await sdk.data.schemas.remove(schemaId);
+export async function remove(schemaId: ObjectId) {
+  return await getSdk().data.schemas.remove(schemaId);
 }
 
-export async function disable(sdk: OAuth1Client, schemaId: ObjectId) {
-  return await sdk.data.schemas.disable(schemaId);
+export async function disable(schemaId: ObjectId) {
+  return await getSdk().data.schemas.disable(schemaId);
 }
 
 /**
  * fetch a full schema from the service from a name
  * @param {string} name the name of a schema
  */
-export async function fetchSchemaByName(sdk: OAuth1Client, name: string) {
-  return await sdk.data.schemas.findByName(name);
+export async function fetchSchemaByName(name: string) {
+  return await getSdk().data.schemas.findByName(name);
+}
+
+export async function fetchAll() {
+  const rql = rqlBuilder().select(['id', 'name', 'description']).build();
+  return await getSdk().data.schemas.findAll({ rql });
 }
 
 /**
@@ -31,8 +37,8 @@ export async function fetchSchemaByName(sdk: OAuth1Client, name: string) {
  * @param {string} name         name of the desired schema
  * @param {string} description  description of the schema
  */
-export async function createSchema(sdk: OAuth1Client, name: string, description: string) {
-  return await sdk.data.schemas.create({
+export async function createSchema(name: string, description: string) {
+  return await getSdk().data.schemas.create({
     name,
     description,
   });
@@ -46,8 +52,8 @@ export async function createSchema(sdk: OAuth1Client, name: string, description:
  * @param {number} data.defaultLimit
  * @param {number} data.maximumLimit
  */
-export async function updateSchema(sdk: OAuth1Client, id: string, data: any) {
-  return await sdk.data.schemas.update(id, data);
+export async function updateSchema(id: string, data: any) {
+  return await getSdk().data.schemas.update(id, data);
 }
 
 /**
@@ -58,8 +64,8 @@ export async function updateSchema(sdk: OAuth1Client, id: string, data: any) {
  * @param {object} data.configuration
  * @param {string} data.configuration.type
  */
-export async function createProperty(sdk: OAuth1Client, id: string, data: { name: string; configuration: { type: string; }; }) {
-  const response = await sdk.raw.post(`/data/v1/${id}/properties`, data);
+export async function createProperty(id: string, data: { name: string; configuration: { type: string; }; }) {
+  const response = await getSdk().raw.post(`/data/v1/${id}/properties`, data);
   return response.data;
 }
 
@@ -72,8 +78,8 @@ export async function createProperty(sdk: OAuth1Client, id: string, data: { name
  * @param {object} data.configuration
  * @param {string} data.configuration.type
  */
-export async function updateProperty(sdk: OAuth1Client, id: string, path: string, data: { name: string; configuration: { type: string; }; }) {
-  const response = await sdk.raw.put(`/data/v1/${id}/properties/${path}`, data);
+export async function updateProperty(id: string, path: string, data: { name: string; configuration: { type: string; }; }) {
+  const response = await getSdk().raw.put(`/data/v1/${id}/properties/${path}`, data);
   return response.data;
 }
 
@@ -82,8 +88,8 @@ export async function updateProperty(sdk: OAuth1Client, id: string, path: string
  * @param {string} id   the schema identifier
  * @param {string} path the property path
  */
-export async function deleteProperty(sdk: OAuth1Client, id: string, path: string) {
-  const response = await sdk.raw.delete(`/data/v1/${id}/properties/${path}`);
+export async function deleteProperty(id: string, path: string) {
+  const response = await getSdk().raw.delete(`/data/v1/${id}/properties/${path}`);
   return response.data;
 }
 
@@ -93,8 +99,8 @@ export async function deleteProperty(sdk: OAuth1Client, id: string, path: string
  * @param {*} name  name of the new status
  * @param {*} data  a status object
  */
-export async function createStatus(sdk: OAuth1Client, id: string, name: string, data: object) {
-  const response = await sdk.raw.post(`/data/v1/${id}/statuses`, { name, data });
+export async function createStatus(id: string, name: string, data: object) {
+  const response = await getSdk().raw.post(`/data/v1/${id}/statuses`, { name, data });
   return response.data;
 }
 
@@ -104,8 +110,8 @@ export async function createStatus(sdk: OAuth1Client, id: string, name: string, 
  * @param {*} name  the name of the status to update
  * @param {*} data  a status object
  */
-export async function updateStatus(sdk: OAuth1Client, id: string, name: string, data: object) {
-  const response = await sdk.raw.put(`/data/v1/${id}/statuses/${name}`, { data });
+export async function updateStatus(id: string, name: string, data: object) {
+  const response = await getSdk().raw.put(`/data/v1/${id}/statuses/${name}`, { data });
   return response.data;
 }
 
@@ -114,8 +120,8 @@ export async function updateStatus(sdk: OAuth1Client, id: string, name: string, 
  * @param {*} id    the schema identifier
  * @param {*} name  the name of the status to delete
  */
-export async function deleteStatus(sdk: OAuth1Client, id: string, name: string) {
-  const response = await sdk.raw.delete(`/data/v1/${id}/statuses/${name}`);
+export async function deleteStatus(id: string, name: string) {
+  const response = await getSdk().raw.delete(`/data/v1/${id}/statuses/${name}`);
   return response.data;
 }
 
@@ -138,8 +144,8 @@ export async function deleteStatus(sdk: OAuth1Client, id: string, name: string) 
  * @param {string} id       the schema identifier
  * @param {transition} data the new creationTransition data
  */
-export async function updateCreationTransition(sdk: OAuth1Client, id: string, data: Transition) {
-  const response = await sdk.raw.put(`/data/v1/${id}/creationTransition`, data);
+export async function updateCreationTransition(id: string, data: Transition) {
+  const response = await getSdk().raw.put(`/data/v1/${id}/creationTransition`, data);
   return response.data;
 }
 
@@ -148,8 +154,8 @@ export async function updateCreationTransition(sdk: OAuth1Client, id: string, da
  * @param {string} id       the schema identifier
  * @param {transition} data a transition object
  */
-export async function createTransition(sdk: OAuth1Client, id: string, data:Transition) {
-  const response = await sdk.raw.post(`/data/v1/${id}/transitions`, data);
+export async function createTransition(id: string, data:Transition) {
+  const response = await getSdk().raw.post(`/data/v1/${id}/transitions`, data);
   return response.data;
 }
 
@@ -159,8 +165,8 @@ export async function createTransition(sdk: OAuth1Client, id: string, data:Trans
  * @param {string} transitionId the identifier of the transition to update
  * @param {transition} data     the new transition object data
  */
-export async function updateTransition(sdk: OAuth1Client, schemaId: string, transitionId:string, data:Transition) {
-  const response = await sdk.raw.put(`/data/v1/${schemaId}/transitions/${transitionId}`, data);
+export async function updateTransition(schemaId: string, transitionId:string, data:Transition) {
+  const response = await getSdk().raw.put(`/data/v1/${schemaId}/transitions/${transitionId}`, data);
   return response.data;
 }
 
@@ -169,8 +175,8 @@ export async function updateTransition(sdk: OAuth1Client, schemaId: string, tran
  * @param {string} schemaId     the schema identifier
  * @param {string} transitionId  the identifier for the thransition to remove
  */
-export async function deleteTransition(sdk: OAuth1Client, schemaId:string, transitionId:string) {
-  const response = await sdk.raw.delete(`/data/v1/${schemaId}/transitions/${transitionId}`);
+export async function deleteTransition(schemaId:string, transitionId:string) {
+  const response = await getSdk().raw.delete(`/data/v1/${schemaId}/transitions/${transitionId}`);
   return response.data;
 }
 
@@ -179,8 +185,8 @@ export async function deleteTransition(sdk: OAuth1Client, schemaId:string, trans
  * @param {string} schemaId     the schema identifier
  * @param {string} index      the identifier for the index to remove
  */
-export async function createIndex(sdk: OAuth1Client, schemaId:string, index: any) {
-  const response = await sdk.raw.post(`/data/v1/${schemaId}/indexes`, index);
+export async function createIndex(schemaId:string, index: any) {
+  const response = await getSdk().raw.post(`/data/v1/${schemaId}/indexes`, index);
   return response.data;
 }
 
@@ -189,7 +195,7 @@ export async function createIndex(sdk: OAuth1Client, schemaId:string, index: any
  * @param {string} schemaId     the schema identifier
  * @param {string} indexId      the identifier for the index to remove
  */
-export async function deleteIndex(sdk: OAuth1Client, schemaId:string, indexId:string) {
-  const response = await sdk.raw.delete(`/data/v1/${schemaId}/indexes/${indexId}`);
+export async function deleteIndex(schemaId:string, indexId:string) {
+  const response = await getSdk().raw.delete(`/data/v1/${schemaId}/indexes/${indexId}`);
   return response.data;
 }

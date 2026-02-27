@@ -2,9 +2,11 @@ import { mkdir, readFile, rm, writeFile } from 'fs/promises';
 import { join } from 'path';
 import { generateId } from './utils';
 
+export type TempDirectoryManager = Awaited<ReturnType<typeof createTempDirectoryManager>>;
+
 export async function createTempDirectoryManager() {
-  let dir: string | null = join(__dirname, `temp_${generateId()}`);
-  await mkdir(dir);
+  let dir: string | null = join('./temp/', `temp_${generateId()}`);
+  await mkdir(dir, { recursive: true });
 
   return {
     async createTempJsonFile(content: object) {
@@ -32,12 +34,15 @@ export async function createTempDirectoryManager() {
       }
 
       const newDir = join(dir, name);
-      await mkdir(newDir);
+      await mkdir(newDir, { recursive: true });
 
       return newDir;
     },
     async readJsonFile(name: string) {
       const content = await this.readFile(`${name}.json`);
+      if (content === null) {
+        return null;
+      }
       return JSON.parse(content);
     },
     async readFile(name: string) {
@@ -49,8 +54,8 @@ export async function createTempDirectoryManager() {
       console.log(`Reading file: ${filePath}`);
       try {
         return await readFile(filePath, 'utf-8');
-      } catch (error) {
-        if (error.code === 'ENOENT') {
+      } catch (error: any) {
+        if (error?.code === 'ENOENT') {
           return null;
         }
         throw error;

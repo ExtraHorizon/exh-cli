@@ -1,15 +1,8 @@
-import { existsSync } from 'fs';
 import * as fs from 'fs/promises';
 import * as ospath from 'path';
-import { OAuth1Client } from '@extrahorizon/javascript-sdk';
-import * as chalk from 'chalk';
-import { getRepoConfig, REPO_CONFIG_FILE } from '../helpers/repoConfig';
+import { REPO_CONFIG_FILE } from '../helpers/repoConfig';
 import { epilogue } from '../helpers/util';
-import { sync as syncDispatchers } from '../services/dispatchers';
-import { sync } from '../services/localizations';
-import { syncTargetDir as syncSchemas } from './data/schemas/sync';
-import { handler as syncTask } from './tasks/sync';
-import { handler as syncTemplates } from './templates/sync';
+import * as syncService from '../services/sync';
 
 export const command = 'sync';
 export const desc = 'Sync your ExH configuration to the cloud environment';
@@ -63,7 +56,8 @@ If not, the local directory is assumed with a default configuration which assume
       default: false,
     },
 
-  }).check(async ({ path }) => {
+  })
+  .check(async ({ path }) => {
     if (path !== undefined) {
       try {
         await fs.access(ospath.join(process.cwd(), path, REPO_CONFIG_FILE));
@@ -77,10 +71,7 @@ If not, the local directory is assumed with a default configuration which assume
     return true;
   });
 
-export const handler = async ({
-  sdk, path, schemas, tasks, templates, dispatchers, cleanDispatchers, localizations, ignoreSchemaVerificationErrors,
-}: {
-  sdk: OAuth1Client;
+export const handler = async (options: {
   path?: string;
   schemas?: boolean;
   tasks?: boolean;
@@ -90,58 +81,5 @@ export const handler = async ({
   localizations?: boolean;
   ignoreSchemaVerificationErrors?: boolean;
 }) => {
-  const targetPath = path || '.';
-
-  const cfg = await getRepoConfig(targetPath);
-
-  const syncAll = !(schemas || tasks || templates || dispatchers || localizations);
-
-  /* Sync all schemas */
-  if ((syncAll || schemas) && cfg.schemas) {
-    console.log(chalk.green('\n ⚙️  Syncing schemas ...'));
-    for (const schema of cfg.schemas) {
-      await syncSchemas(sdk, ospath.join(targetPath, schema), undefined, ignoreSchemaVerificationErrors);
-    }
-  }
-
-  /* Sync all templates */
-  if ((syncAll || templates) && cfg.templates) {
-    console.log(chalk.green('\n ⚙️  Syncing templates...'));
-    for (const template of cfg.templates) {
-      await syncTemplates({ sdk, path: ospath.join(targetPath, template), template: null });
-    }
-  }
-
-  /* Sync all tasks */
-  if ((syncAll || tasks) && cfg.tasks) {
-    console.log(chalk.green('\n ⚙️  Syncing tasks...'));
-    for (const task of cfg.tasks) {
-      await syncTask({ sdk, path: ospath.join(targetPath, task) });
-    }
-  }
-
-  /* Sync all localizations */
-  if ((syncAll || localizations) && cfg.localizations) {
-    console.log(chalk.green('\n ⚙️  Syncing localizations...'));
-    for (const localization of cfg.localizations) {
-      await sync(sdk, ospath.join(targetPath, localization));
-    }
-  }
-
-  /* Sync all dispatchers */
-  if ((syncAll || dispatchers)) {
-    // The dispatchers.json file is expected to be always in the root folder of the execution directory or of the provided path
-    const dispatchersPath = ospath.join(targetPath, 'dispatchers.json');
-    const isValidPath = existsSync(dispatchersPath);
-
-    // Simulate a similar behavior as the `cfg = getRepoConfig(..)` does for the other configurations
-    // Only mention a warning if the user explicitly wanted to sync dispatchers
-    if (isValidPath) {
-      console.log(chalk.green('\n ⚙️  Syncing dispatchers...'));
-
-      await syncDispatchers(sdk, dispatchersPath, cleanDispatchers);
-    } else if (dispatchers) {
-      console.log(chalk.yellow('Warning: dispatchers.json not found'));
-    }
-  }
+  await syncService.sync(options);
 };

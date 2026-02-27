@@ -1,6 +1,24 @@
 # Extra Horizon CLI changelog
 
-## v1.11.1
+### v1.12.0
+* Now adding `$schema` as the last property when creating a new schema via `exh data schemas init`
+* The `exh tasks create-repo` command now creates `package.json` and `task-config.json` files with 2 spaces indentation instead of 4 spaces.
+* You no longer need to include the `name` property when defining an index in a schema, as it was never actually used by the backend.
+* Updated the ExH SDK to the latest version
+  * For the features mentioned above
+  * For an `axios` update to resolve a warning about `CVE-2026-25639` (not affecting the CLI)
+* Updated the `qs` package to resolve a warning about `CVE-2026-2391` (not affecting the CLI)
+* Added support for the template service V2 in the all `exh templates` commands.
+  * `exh templates list` lists templates from both template service V1 and template service V2.
+  * `exh templates get` gets templates from both template service V1 and template service V2.
+  * `exh templates delete` deletes templates from both template service V1 and template service V2.
+  * `exh templates sync` now syncs templates to the template service V2 and template service V1 depending on the properties in the `template.json` file.
+* Added autocomplete support and inline documentation for `template.json`
+  * Via `"$schema": "https://swagger.extrahorizon.com/cli/1.12.0/config-json-schemas/Template.json"`
+* Added autocomplete support and inline documentation for `dispatchers.json`
+  * Via `"$schema": "https://swagger.extrahorizon.com/cli/1.12.0/config-json-schemas/Dispatchers.json"`
+
+### v1.11.1
 * Updated the ExH SDK to `8.8.2` to fix a security warning from `qs`
 * Updated the supported Task Service runtime options to include `dotnet10`
 

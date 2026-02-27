@@ -1,6 +1,6 @@
 import * as path from 'path';
-import { compareStatuses, calculateStatusUpdateData } from '../../../../src/commands/data/schemas/sync/statusHelpers';
-import { readJsonFile } from '../../../../src/commands/data/schemas/util/readJson';
+import { compareStatuses, calculateStatusUpdateData } from '../../../../src/services/schemas/sync/statusHelpers';
+import { readJsonFile } from '../../../../src/services/schemas/util/readJson';
 
 describe('Sync - Statuses', () => {
   let cloudSchema;
