@@ -52,38 +52,43 @@ For detailed information regarding the structure of a Dispatcher, please refer t
 
 #### Example
 
-{% tabs %}
-{% tab title="JSON" %}
+{% code title="dispatchers.json" %}
 ```json
-[
-  {
-    "eventType": "my-event-type",
-    "name": "my-unique-dispatcher-name",
-    "description": "A Dispatcher that handles my-event-type",
-    "actions":[
-      {
-        "type": "task",
-        "name": "my-unique-action-name",
-        "description": "A Task Action that handles my-event-type",
-        "functionName": "my-function-name",
-        "data": {
-          "customStringField": "myStringHere",
-          "customNumberField": 42
+{
+  "dispatchers": [
+    {
+      "eventType": "my-event-type",
+      "name": "my-unique-dispatcher-name",
+      "description": "A Dispatcher that handles my-event-type",
+      "actions":[
+        {
+          "type": "task",
+          "name": "my-task-action",
+          "description": "Create a task that handles my-event-type",
+          "functionName": "my-function-name",
+          "data": {
+            "customStringField": "myStringHere",
+            "customNumberField": 42
+          },
+          "startTimestamp": "2024-01-01T00:00:00.000Z",
+          "tags":["tag1", "tag2"]
         },
-        "startTimestamp": "2024-01-01T00:00:00.000Z",
-        "tags":[
-          "tag1",
-          "tag2"
-        ]
-      }
-    ],
-    "tags": [
-      "tag1",
-      "tag2"
-    ]
-  }
-]
+        {
+          "type": "mail",
+          "name": "my-mail-action",
+          "description": "Send an email about my-event-type",
+          "recipients": {
+            "to": ["john.doe@example.com"],
+            "cc": ["jane.doe@example.com"],
+            "bcc": ["bcc@example.com"]
+          },
+          "templateId": "abcdef0123456789abcdef013456789ab"
+        }
+      ],
+      "tags": ["tag1", "tag2"]
+    }
+  ],
+  "$schema": "https://swagger.extrahorizon.com/cli/1.12.0/config-json-schemas/Dispatchers.json"
+}
 ```
-{% endtab %}
-{% endtabs %}
-
+{% endcode %}
