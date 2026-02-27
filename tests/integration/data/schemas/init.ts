@@ -1,9 +1,9 @@
 import { handler } from '../../../../src/commands/data/schemas/init';
 import { ConsoleSpy, spyOnConsole } from '../../../__helpers__/consoleSpy';
-import { createTempDirectoryManager } from '../../../__helpers__/tempDirectoryManager';
+import { createTempDirectoryManager, type TempDirectoryManager } from '../../../__helpers__/tempDirectoryManager';
 
 describe('exh data schemas init', () => {
-  let tempDir: Awaited<ReturnType<typeof createTempDirectoryManager>>;
+  let tempDir: TempDirectoryManager;
   let consoleSpy: ConsoleSpy;
 
   beforeEach(async () => {
@@ -27,7 +27,7 @@ describe('exh data schemas init', () => {
 
     const schemaFileAfter = await tempDir.readJsonFile(name);
     expect(schemaFileAfter).toStrictEqual({
-      $schema: 'https://swagger.extrahorizon.com/cli/1.11.1/config-json-schemas/Schema.json',
+      $schema: 'https://swagger.extrahorizon.com/cli/1.12.0/config-json-schemas/Schema.json',
       name,
       description: `The ${name} schema`,
       createMode: 'allUsers',

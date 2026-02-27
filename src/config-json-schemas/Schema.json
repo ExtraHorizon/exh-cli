@@ -675,7 +675,10 @@
     "Index": {
       "type": "object",
       "properties": {
-        "name": { "type": "string" },
+        "name": {
+          "type": "string",
+          "description": "Deprecated! This property was never actually used."
+        },
         "description": { "type": "string" },
         "fields": {
           "type": "array",
@@ -709,10 +712,7 @@
         }
       },
       "additionalProperties": false,
-      "required": [
-        "name",
-        "fields"
-      ]
+      "required": ["fields"]
     },
 
     "PermissionRequiredAccessMode": {

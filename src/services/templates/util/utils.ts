@@ -1,4 +1,5 @@
 import { readdir, readFile } from 'fs/promises';
+import type { TemplateV1Config } from './models';
 
 export async function listFolderContent(path: string) {
   return await readdir(path);
@@ -16,4 +17,12 @@ export async function readTextFile(path: string) {
 
 export function removeFileNameExtension(fileName: string) {
   return fileName.split('.')[0];
+}
+
+export function isV1Template(template: any): template is TemplateV1Config {
+  return (
+    template.version === 1 ||
+    !!template.schema ||
+    !!template.fields
+  );
 }

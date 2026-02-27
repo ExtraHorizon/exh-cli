@@ -1,22 +1,20 @@
 /* eslint-disable lines-between-class-members */
 import chalk = require('chalk');
 import * as _ from 'lodash';
-import * as schemaRepository from '../../../../repositories/schemas';
+import * as schemaRepository from '../../../repositories/schemas';
 import { compareStatuses, calculateStatusUpdateData } from '../sync/statusHelpers';
 import { stripUnsupportedDescriptionFields } from './stripUnsupportedDescriptionFields';
 
 export class SyncSchema {
-  private sdk: any;
   private dry: boolean;
   private cloudSchema: any = null;
   private localSchema: any = null;
 
-  static createSchemaSync(sdk: any, dry?: boolean): SyncSchema {
-    return new SyncSchema(sdk, dry);
+  static createSchemaSync(dry?: boolean): SyncSchema {
+    return new SyncSchema(dry);
   }
 
-  constructor(sdk: any, dry?: boolean) {
-    this.sdk = sdk;
+  constructor(dry?: boolean) {
     this.dry = dry;
   }
 
@@ -29,14 +27,14 @@ export class SyncSchema {
     }
 
     console.log(`Syncing ${this.localSchema.name}`);
-    this.cloudSchema = await schemaRepository.fetchSchemaByName(this.sdk, this.localSchema.name);
+    this.cloudSchema = await schemaRepository.fetchSchemaByName(this.localSchema.name);
 
     if (!this.cloudSchema) {
       if (this.dry) {
         console.log(`\t-> Will be created: ${chalk.green(this.localSchema.name)}`);
         return;
       }
-      this.cloudSchema = await schemaRepository.createSchema(this.sdk, this.localSchema.name, this.localSchema.description);
+      this.cloudSchema = await schemaRepository.createSchema(this.localSchema.name, this.localSchema.description);
     }
 
     //  root attributes: update
@@ -82,7 +80,7 @@ export class SyncSchema {
     }
 
     if (Object.keys(diff).length > 0) {
-      await schemaRepository.updateSchema(this.sdk, this.cloudSchema.id, diff);
+      await schemaRepository.updateSchema(this.cloudSchema.id, diff);
     }
   }
 
@@ -106,7 +104,7 @@ export class SyncSchema {
     //  add missing
     for (const key of toAdd) {
       console.log(`properties: adding ${key}`);
-      await schemaRepository.createProperty(this.sdk, this.cloudSchema.id, {
+      await schemaRepository.createProperty(this.cloudSchema.id, {
         name: key,
         configuration: this.localSchema.properties[key],
       });
@@ -116,7 +114,6 @@ export class SyncSchema {
     for (const key of toUpdate) {
       console.log(`properties: updating ${key}`);
       await schemaRepository.updateProperty(
-        this.sdk,
         this.cloudSchema.id,
         key,
         this.localSchema.properties[key]
@@ -126,7 +123,7 @@ export class SyncSchema {
     //  delete excess
     for (const key of toRemove) {
       console.log(`properties: removing ${key}`);
-      await schemaRepository.deleteProperty(this.sdk, this.cloudSchema.id, key);
+      await schemaRepository.deleteProperty(this.cloudSchema.id, key);
     }
   }
 
@@ -152,13 +149,13 @@ export class SyncSchema {
 
     for (const key of toAdd) {
       console.log(`statuses: adding ${key}`);
-      await schemaRepository.createStatus(this.sdk, this.cloudSchema.id, key, this.localSchema.statuses[key]);
+      await schemaRepository.createStatus(this.cloudSchema.id, key, this.localSchema.statuses[key]);
     }
 
     for (const key of toUpdate) {
       console.log(`statuses: updating ${key}`);
       const data = calculateStatusUpdateData(this.localSchema.statuses[key], this.cloudSchema.statuses[key]);
-      await schemaRepository.updateStatus(this.sdk, this.cloudSchema.id, key, data);
+      await schemaRepository.updateStatus(this.cloudSchema.id, key, data);
     }
 
     // don't delete yet, first some other data needs to be adjusted
@@ -197,7 +194,7 @@ export class SyncSchema {
       }
 
       console.log('creation transition: updating');
-      await schemaRepository.updateCreationTransition(this.sdk, this.cloudSchema.id, this.localSchema.creationTransition);
+      await schemaRepository.updateCreationTransition(this.cloudSchema.id, this.localSchema.creationTransition);
     }
   }
 
@@ -220,18 +217,18 @@ export class SyncSchema {
     const { toAdd, toRemove, toUpdate } = transitionsDiff;
     for (const transition of toAdd) {
       console.log(`transitions: adding ${transition.name}`);
-      await schemaRepository.createTransition(this.sdk, this.cloudSchema.id, transition);
+      await schemaRepository.createTransition(this.cloudSchema.id, transition);
     }
 
     for (const transition of toUpdate) {
       console.log(`transitions: updating ${transition.name}`);
       const currentTransition = findTransitionByName(transition.name, this.cloudSchema.transitions);
-      await schemaRepository.updateTransition(this.sdk, this.cloudSchema.id, currentTransition.id, transition);
+      await schemaRepository.updateTransition(this.cloudSchema.id, currentTransition.id, transition);
     }
 
     for (const transition of toRemove) {
       console.log(`transitions: removing ${transition.name}`);
-      await schemaRepository.deleteTransition(this.sdk, this.cloudSchema.id, transition.id);
+      await schemaRepository.deleteTransition(this.cloudSchema.id, transition.id);
     }
   }
 
@@ -257,7 +254,7 @@ export class SyncSchema {
     //  delete excess statuses
     for (const key of excessStatuses) {
       console.log(`statuses: removing ${key}`);
-      await schemaRepository.deleteStatus(this.sdk, this.cloudSchema.id, key);
+      await schemaRepository.deleteStatus(this.cloudSchema.id, key);
     }
   }
 
@@ -272,13 +269,13 @@ export class SyncSchema {
     /*  Delete indexes to be deleted */
     for (const idx of removedIndexes) {
       console.log(`Indexes: remove index ${idx.id}`);
-      await schemaRepository.deleteIndex(this.sdk, this.cloudSchema.id, idx.id);
+      await schemaRepository.deleteIndex(this.cloudSchema.id, idx.id);
     }
 
     /* Create new indexes */
     for (const idx of newIndexes) {
       console.log('\t-> Creating new index');
-      await schemaRepository.createIndex(this.sdk, this.cloudSchema.id, idx);
+      await schemaRepository.createIndex(this.cloudSchema.id, idx);
     }
   }
 }

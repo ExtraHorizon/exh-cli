@@ -1,4 +1,4 @@
-import { compareSchemaKey } from '../../../src/commands/data/schemas/util/syncSchema';
+import { compareSchemaKey } from '../../../src/services/schemas/util/syncSchema';
 import { properties, propertiesModified, transitions, transitionsModified } from '../../__helpers__/dataSchema';
 
 describe('Sync schemas', () => {

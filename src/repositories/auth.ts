@@ -1,15 +1,15 @@
-import { OAuth1Client } from '@extrahorizon/javascript-sdk';
+import { getSdk } from '../exh';
 
-export function getHost(sdk: OAuth1Client) {
-  return sdk?.raw?.defaults?.baseURL;
+export function getHost() {
+  return getSdk()?.raw?.defaults?.baseURL;
 }
 
 // TODO: Add this to the SDK
-export async function createOAuth1Tokens(sdk: OAuth1Client, email: string, password: string) {
-  const response = await sdk.raw.post('/auth/v2/oauth1/tokens', { email, password });
+export async function createOAuth1Tokens(email: string, password: string) {
+  const response = await getSdk().raw.post('/auth/v2/oauth1/tokens', { email, password });
   return response.data;
 }
 
-export async function fetchMe(sdk: OAuth1Client) {
-  return await sdk?.users.me();
+export async function fetchMe() {
+  return await getSdk()?.users.me();
 }

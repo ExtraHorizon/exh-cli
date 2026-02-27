@@ -1,44 +1,50 @@
 import * as schemaRepository from '../../src/repositories/schemas';
 import { createEmptySchema } from './schemas';
 
+export type SchemaRepositoryMock = ReturnType<typeof schemaRepositoryMock>;
+
 export const schemaRepositoryMock = () => {
   const removeSchemaSpy = jest.spyOn(schemaRepository, 'remove')
-    .mockImplementation(() => Promise.resolve({ affectedRecords: 1 }));
+    .mockResolvedValue({ affectedRecords: 1 });
 
   const disableSchemaSpy = jest.spyOn(schemaRepository, 'disable')
-    .mockImplementation(() => Promise.resolve({ affectedRecords: 1 }));
+    .mockResolvedValue({ affectedRecords: 1 });
 
   const fetchSchemaByNameSpy = jest.spyOn(schemaRepository, 'fetchSchemaByName')
-    .mockImplementation(() => Promise.resolve(undefined));
+    .mockResolvedValue(undefined);
+
+  const fetchAllSpy = jest.spyOn(schemaRepository, 'fetchAll')
+    .mockResolvedValue([createEmptySchema()]);
 
   const createSchemaSpy = jest.spyOn(schemaRepository, 'createSchema')
-    .mockImplementation((_sdk, name, description) => Promise.resolve(createEmptySchema(name, description)));
+    .mockImplementation(async (name, description) => createEmptySchema(name, description));
 
   const createPropertySpy = jest.spyOn(schemaRepository, 'createProperty')
-    .mockImplementation(() => Promise.resolve({ affectedRecords: 1 }));
+    .mockResolvedValue({ affectedRecords: 1 });
 
   const createStatusSpy = jest.spyOn(schemaRepository, 'createStatus')
-    .mockImplementation(() => Promise.resolve({ affectedRecords: 1 }));
+    .mockResolvedValue({ affectedRecords: 1 });
 
   const updateCreationTransitionSpy = jest.spyOn(schemaRepository, 'updateCreationTransition')
-    .mockImplementation(() => Promise.resolve({ affectedRecords: 1 }));
+    .mockResolvedValue({ affectedRecords: 1 });
 
   const createTransitionSpy = jest.spyOn(schemaRepository, 'createTransition')
-    .mockImplementation((_sdk, _id, data) => Promise.resolve(data));
+    .mockImplementation(async (_id, data) => data);
 
   const createIndexSpy = jest.spyOn(schemaRepository, 'createIndex')
-    .mockImplementation((_sdk, _id, data) => Promise.resolve(data));
+    .mockImplementation(async (_id, data) => data);
 
   const deleteStatusSpy = jest.spyOn(schemaRepository, 'deleteStatus')
-    .mockImplementation(() => Promise.resolve({ affectedRecords: 1 }));
+    .mockResolvedValue({ affectedRecords: 1 });
 
   const updateSchemaSpy = jest.spyOn(schemaRepository, 'updateSchema')
-    .mockImplementation(() => Promise.resolve({ affectedRecords: 1 }));
+    .mockResolvedValue({ affectedRecords: 1 });
 
   return {
     removeSchemaSpy,
     disableSchemaSpy,
     fetchSchemaByNameSpy,
+    fetchAllSpy,
     createSchemaSpy,
     createPropertySpy,
     createStatusSpy,

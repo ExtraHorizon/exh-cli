@@ -1,0 +1,120 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "allOf": [
+    {
+      "oneOf": [
+        { "type": "array" },
+        { "type": "object" }
+      ]
+    },
+    {
+      "if": { "type": "object" },
+      "then": { "$ref": "#/definitions/Wrapper" }
+    },
+    {
+      "if": { "type": "array" },
+      "then": {
+        "type": "array",
+        "items": { "$ref": "#/definitions/Dispatcher" }
+      }
+    }
+  ],
+  "definitions": {
+    "Wrapper": {
+      "type": "object",
+      "required": ["dispatchers"],
+      "properties": {
+        "dispatchers": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/Dispatcher" }
+        },
+        "$schema": { "type": "string" }
+      }
+    },
+    "Dispatcher": {
+      "type": "object",
+      "required": ["eventType", "name", "actions"],
+      "properties": {
+        "eventType": { "type": "string" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "actions": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/definitions/Action" }
+        },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "Action": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["mail", "task"]
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "type": { "const": "mail" }}},
+          "then": { "$ref": "#/definitions/MailAction" }
+        },
+        {
+          "if": { "properties": { "type": { "const": "task" }}},
+          "then": { "$ref": "#/definitions/TaskAction" }
+        }
+      ]
+    },
+    "MailAction": {
+      "type": "object",
+      "required": ["type", "name", "recipients", "templateId"],
+      "properties": {
+        "type": { "const": "mail" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "recipients": {
+          "type": "object",
+          "required": ["to"],
+          "properties": {
+            "to": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "cc": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "bcc": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          }
+        },
+        "templateId": { "type": "string" }
+      }
+    },
+    "TaskAction": {
+      "type": "object",
+      "required": ["type", "name", "functionName"],
+      "properties": {
+        "type": { "const": "task" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "functionName": { "type": "string" },
+        "data": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "startTimestamp": { "type": "string" }
+      }
+    }
+  }
+}

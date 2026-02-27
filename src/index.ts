@@ -21,11 +21,11 @@ yargs(hideBin(process.argv))
       isEqual(argv._, ['generate_completion']) ||
       process.env.NO_SDK
     ) {
-      return { sdk: 'no-sdk', isTTY } as any;
+      return { isTTY } as any;
     }
 
-    const sdk = await sdkAuth();
-    return { sdk, isTTY };
+    await sdkAuth();
+    return { isTTY };
   })
   .commandDir('commands')
   .scriptName('exh')

@@ -5,10 +5,14 @@ export function spyOnConsole() {
 
   return {
     consoleLogSpy,
-    expectConsoleLogToContain(expected: string) {
-      expect(consoleLogSpy.mock.calls).toContainEqual(
-        expect.arrayContaining([expect.stringContaining(expected)])
-      );
+    expectConsoleLogToContain(...expected: any[]) {
+      for (const part of expected) {
+        const expectedCondition = typeof part === 'string' ? expect.stringContaining(part) : part;
+
+        expect(consoleLogSpy.mock.calls).toContainEqual(
+          expect.arrayContaining([expectedCondition])
+        );
+      }
     },
   };
 }

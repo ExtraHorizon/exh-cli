@@ -6,25 +6,25 @@ export const userRepositoryMock = (functionName: string, permissions: string[]) 
   const globalRole = generateFunctionGlobalRole(functionName, permissions);
 
   const isEmailAvailableSpy = jest.spyOn(userRepository, 'isEmailAvailable')
-    .mockImplementationOnce(() => Promise.resolve(true));
+    .mockResolvedValue(true);
 
   const findUserByEmailSpy = jest.spyOn(userRepository, 'findUserByEmail')
-    .mockImplementationOnce(() => Promise.resolve(undefined));
+    .mockResolvedValue(undefined);
 
   const createUserSpy = jest.spyOn(userRepository, 'createUser')
-    .mockImplementationOnce(() => Promise.resolve(user));
+    .mockResolvedValue(user);
 
   const findGlobalRoleByNameSpy = jest.spyOn(userRepository, 'findGlobalRoleByName')
-    .mockImplementationOnce(() => Promise.resolve(undefined));
+    .mockResolvedValue(undefined);
 
   const createGlobalRoleSpy = jest.spyOn(userRepository, 'createGlobalRole')
-    .mockImplementationOnce(() => Promise.resolve(globalRole));
+    .mockResolvedValue(globalRole);
 
   const addPermissionsToGlobalRoleSpy = jest.spyOn(userRepository, 'addPermissionsToGlobalRole')
-    .mockImplementationOnce(() => Promise.resolve({ affectedRecords: 1 }));
+    .mockResolvedValue({ affectedRecords: 1 });
 
   const addGlobalRoleToUserSpy = jest.spyOn(userRepository, 'addGlobalRoleToUser')
-    .mockImplementationOnce(() => Promise.resolve({ affectedRecords: 1 }));
+    .mockResolvedValue({ affectedRecords: 1 });
 
   return {
     user,

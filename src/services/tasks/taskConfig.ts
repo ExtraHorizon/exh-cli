@@ -1,9 +1,8 @@
 import { AssertionError } from 'assert';
 import * as fs from 'fs/promises';
 import * as ospath from 'path';
-import Ajv from 'ajv';
 import * as taskConfigSchema from '../../config-json-schemas/TaskConfig.json';
-import { getAjvErrorStrings } from '../../helpers/util';
+import { ajvValidate } from '../../helpers/util';
 
 export enum permissionModes {
   permissionRequired = 'permissionRequired',
@@ -71,13 +70,8 @@ function replaceConfigVariables(config: any): any {
   return result;
 }
 
-export async function validateConfig(config: TaskConfig) {
-  const validate = new Ajv().compile(taskConfigSchema);
-  const valid = validate(config);
-  if (!valid) {
-    const errors = getAjvErrorStrings(validate.errors);
-    throw new Error(errors[0] || 'Unknown config validation error');
-  }
+export async function validateConfig(config: any) {
+  ajvValidate<TaskConfig>(taskConfigSchema, config);
 
   try {
     await fs.access(config.path);

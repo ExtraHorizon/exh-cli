@@ -1,6 +1,7 @@
 import { exec } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
+import Ajv from 'ajv';
 import * as chalk from 'chalk';
 import * as yargs from 'yargs';
 import { EXH_CONFIG_FILE } from '../constants';
@@ -91,6 +92,15 @@ export function getSwaggerDocumentationUrl(subPath: string) {
   }
 
   throw new Error(`Unknown CLI version format: ${packageVersion}`);
+}
+
+export function ajvValidate<T>(schema: any, data: any): asserts data is T {
+  const validate = new Ajv().compile(schema);
+  const valid = validate(data);
+  if (!valid) {
+    const errors = getAjvErrorStrings(validate.errors);
+    throw new Error(errors[0] || 'Unknown config validation error');
+  }
 }
 
 export function getAjvErrorStrings(errors: any[]) {
