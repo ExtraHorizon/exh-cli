@@ -1,5 +1,7 @@
 # Extra Horizon CLI changelog
 
+### v1.13.0
+
 ### v1.12.0
 * Now adding `$schema` as the last property when creating a new schema via `exh data schemas init`
 * The `exh tasks create-repo` command now creates `package.json` and `task-config.json` files with 2 spaces indentation instead of 4 spaces.
