@@ -59,7 +59,7 @@ describe('SettingsConfig.json JSON Schema definition', () => {
     expect(() => ajvValidate(settingsConfigSchema, settings)).not.toThrow();
   });
 
-  it('Rejects a settings object with invalid properties', () => {
+  it('Throws for a settings object with invalid properties', () => {
     const settings = {
       invalidProperty: 'not allowed',
     };
@@ -67,7 +67,7 @@ describe('SettingsConfig.json JSON Schema definition', () => {
     expect(() => ajvValidate(settingsConfigSchema, settings)).toThrow(/must NOT have additional properties/);
   });
 
-  it('Rejects a settings object with invalid users configuration', () => {
+  it('Throws for a settings object with invalid users configuration', () => {
     const settings = {
       users: {
         passwordPolicy: {
@@ -79,7 +79,7 @@ describe('SettingsConfig.json JSON Schema definition', () => {
     expect(() => ajvValidate(settingsConfigSchema, settings)).toThrow(/must be integer/);
   });
 
-  it('Rejects a settings object with invalid files configuration', () => {
+  it('Throws for a settings object with invalid files configuration', () => {
     const settings = {
       files: {
         disableForceDownloadForMimeTypes: 'not an array',
@@ -87,5 +87,26 @@ describe('SettingsConfig.json JSON Schema definition', () => {
     };
 
     expect(() => ajvValidate(settingsConfigSchema, settings)).toThrow(/must be array/);
+  });
+
+  it('Throw for for a settings object with an empty string in disableForceDownloadForMimeTypes', () => {
+    const settings = {
+      files: {
+        disableForceDownloadForMimeTypes: [''],
+      },
+    };
+
+    expect(() => ajvValidate(settingsConfigSchema, settings)).toThrow(/must NOT have fewer than 3 characters/);
+  });
+
+  it('Throw for for a settings object with a string that is too long in disableForceDownloadForMimeTypes', () => {
+    const longString = 'a'.repeat(256);
+    const settings = {
+      files: {
+        disableForceDownloadForMimeTypes: [longString],
+      },
+    };
+
+    expect(() => ajvValidate(settingsConfigSchema, settings)).toThrow(/must NOT have more than 255 characters/);
   });
 });
