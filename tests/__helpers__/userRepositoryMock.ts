@@ -26,6 +26,36 @@ export const userRepositoryMock = (functionName: string, permissions: string[]) 
   const addGlobalRoleToUserSpy = jest.spyOn(userRepository, 'addGlobalRoleToUser')
     .mockResolvedValue({ affectedRecords: 1 });
 
+  const updateVerificationSettingsSpy = jest.spyOn(userRepository, 'updateVerificationSettings')
+    .mockResolvedValue({
+      enablePinCodeActivationRequests: true,
+      enablePinCodeForgotPasswordRequests: true,
+      limitHashActivationRequests: true,
+      limitHashForgotPasswordRequests: true,
+    });
+
+  const updateEmailTemplatesSpy = jest.spyOn(userRepository, 'updateEmailTemplates')
+    .mockResolvedValue({
+      activationEmailTemplateId: '69a837094548684b3d64c9f1',
+      reactivationEmailTemplateId: '69a837094548684b3d64c9f3',
+      passwordResetEmailTemplateId: '69a837094548684b3d64c9f4',
+      oidcUnlinkEmailTemplateId: '69a837094548684b3d64c9f5',
+      oidcUnlinkPinEmailTemplateId: '69a837094548684b3d64c9f5',
+      activationPinEmailTemplateId: '69a837094548684b3d64c9f1',
+      reactivationPinEmailTemplateId: '69a837094548684b3d64c9f3',
+      passwordResetPinEmailTemplateId: '69a837094548684b3d64c9f4',
+    });
+
+  const updatePasswordPolicySpy = jest.spyOn(userRepository, 'updatePasswordPolicy')
+    .mockResolvedValue({
+      minimumLength: 3,
+      maximumLength: 18,
+      upperCaseRequired: true,
+      lowerCaseRequired: true,
+      symbolRequired: true,
+      numberRequired: true,
+    });
+
   return {
     user,
     globalRole,
@@ -36,5 +66,8 @@ export const userRepositoryMock = (functionName: string, permissions: string[]) 
     createGlobalRoleSpy,
     addPermissionsToGlobalRoleSpy,
     addGlobalRoleToUserSpy,
+    updateVerificationSettingsSpy,
+    updateEmailTemplatesSpy,
+    updatePasswordPolicySpy,
   };
 };

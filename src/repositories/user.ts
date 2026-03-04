@@ -1,4 +1,4 @@
-import { RegisterUserData, rqlBuilder } from '@extrahorizon/javascript-sdk';
+import { EmailTemplates, PasswordPolicy, RegisterUserData, rqlBuilder } from '@extrahorizon/javascript-sdk';
 import { getSdk } from '../exh';
 
 export async function findUserByEmail(email: string) {
@@ -42,4 +42,18 @@ export async function addGlobalRoleToUser(userId: string, roleId: string) {
     rqlBuilder().eq('id', userId).build(),
     { roles: [roleId] }
   );
+}
+
+// TODO: replace with VerificationSettings type when it's exported from the SDK
+export async function updateVerificationSettings(settings: Record<string, string>) {
+  return await getSdk().users.settings.updateVerificationSettings(settings);
+}
+
+export async function updateEmailTemplates(emailTemplates: Partial<EmailTemplates>) {
+  return await getSdk().users.setEmailTemplates(emailTemplates);
+}
+
+export async function updatePasswordPolicy(passwordPolicy: Partial<PasswordPolicy>) {
+  // @ts-expect-error - TODO: the SDK should allow partial updates for password policy, but currently requires all fields to be set
+  return await getSdk().users.updatePasswordPolicy(passwordPolicy);
 }
