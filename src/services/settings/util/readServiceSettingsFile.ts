@@ -20,7 +20,8 @@ export interface ServiceSettingsFile {
   };
   files: FileServiceSettingsUpdate;
 }
-export async function readAndValidateDispatcherConfig(path: string) {
+
+export async function readAndValidateServiceSettingsConfig(path: string) {
   let config: any;
   try {
     const buffer = await readFile(path);

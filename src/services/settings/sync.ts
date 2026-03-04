@@ -3,12 +3,12 @@ import { blue, green, yellow } from 'chalk';
 import { updateFileServiceSettings } from '../../repositories/files';
 import * as templateV2Repository from '../../repositories/templatesV2';
 import { updateEmailTemplates, updatePasswordPolicy, updateVerificationSettings } from '../../repositories/user';
-import { readAndValidateDispatcherConfig, ServiceSettingsFile } from './util/readServiceSettingsFile';
+import { readAndValidateServiceSettingsConfig, ServiceSettingsFile } from './util/readServiceSettingsFile';
 
 export async function sync(path: string) {
   console.log(yellow(`Synchronizing Service Settings from ${path}`));
 
-  const serviceSettings = await readAndValidateDispatcherConfig(path);
+  const serviceSettings = await readAndValidateServiceSettingsConfig(path);
 
   await syncUserSettings(serviceSettings?.users);
   await syncFileServiceSettings(serviceSettings?.files);
