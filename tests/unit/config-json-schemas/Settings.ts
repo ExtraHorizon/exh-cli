@@ -44,14 +44,14 @@ describe('SettingsConfig.json JSON Schema definition', () => {
     expect(() => ajvValidate(settingsConfigSchema, {})).not.toThrow();
   });
 
-  it('Accepts a settings object with only users configuration', () => {
+  it('Accepts a settings object with only a users configuration', () => {
     const settings = {
       users: fullSettings.users,
     };
     expect(() => ajvValidate(settingsConfigSchema, settings)).not.toThrow();
   });
 
-  it('Accepts a settings object with only files configuration', () => {
+  it('Accepts a settings object with only a files configuration', () => {
     const settings = {
       files: fullSettings.files,
     };
