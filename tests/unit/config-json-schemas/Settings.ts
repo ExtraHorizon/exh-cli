@@ -1,0 +1,91 @@
+import * as templateConfigSchema from '../../../src/config-json-schemas/SettingsConfig.json';
+import { ajvValidate } from '../../../src/helpers/util';
+
+describe('SettingsConfig.json JSON Schema definition', () => {
+  const fullSettings = {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    users: {
+      passwordPolicy: {
+        minimumLength: 8,
+        maximumLength: 32,
+        numberRequired: true,
+        symbolRequired: true,
+        uppercaseRequired: true,
+        lowercaseRequired: true,
+      },
+      emailTemplates: {
+        activationEmailTemplateId: 'activation-template',
+        reactivationEmailTemplateId: 'reactivation-template',
+        passwordResetEmailTemplateId: 'reset-template',
+        oidcUnlinkEmailTemplateId: 'oidc-unlink-template',
+        oidcUnlinkPinEmailTemplateId: 'oidc-unlink-pin-template',
+        activationPinEmailTemplateId: 'activation-pin-template',
+        reactivationPinEmailTemplateId: 'reactivation-pin-template',
+        passwordResetPinEmailTemplateId: 'reset-pin-template',
+      },
+      verification: {
+        enablePinCodeActivationRequests: true,
+        enablePinCodeForgotPasswordRequests: false,
+      },
+    },
+    files: {
+      disableForceDownloadForMimeTypes: [
+        'application/pdf',
+        'image/png',
+      ],
+    },
+  };
+
+  it('Accepts a full settings objects', () => {
+    expect(() => ajvValidate(templateConfigSchema, fullSettings)).not.toThrow();
+  });
+
+  it('Accepts an empty settings object', () => {
+    expect(() => ajvValidate(templateConfigSchema, {})).not.toThrow();
+  });
+
+  it('Accepts a settings object with only users configuration', () => {
+    const settings = {
+      users: fullSettings.users,
+    };
+    expect(() => ajvValidate(templateConfigSchema, settings)).not.toThrow();
+  });
+
+  it('Accepts a settings object with only files configuration', () => {
+    const settings = {
+      files: fullSettings.files,
+    };
+
+    expect(() => ajvValidate(templateConfigSchema, settings)).not.toThrow();
+  });
+
+  it('Rejects a settings object with invalid properties', () => {
+    const settings = {
+      invalidProperty: 'not allowed',
+    };
+
+    expect(() => ajvValidate(templateConfigSchema, settings)).toThrow(/must NOT have additional properties/);
+  });
+
+  it('Rejects a settings object with invalid users configuration', () => {
+    const settings = {
+      users: {
+        passwordPolicy: {
+          minimumLength: 'not a number',
+        },
+      },
+    };
+
+    expect(() => ajvValidate(templateConfigSchema, settings)).toThrow(/must be integer/);
+  });
+
+  it('Rejects a settings object with invalid files configuration', () => {
+    const settings = {
+      files: {
+        disableForceDownloadForMimeTypes: 'not an array',
+      },
+    };
+
+    expect(() => ajvValidate(templateConfigSchema, settings)).toThrow(/must be array/);
+  });
+});
