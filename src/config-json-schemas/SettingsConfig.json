@@ -25,75 +25,75 @@
               "minimum": 3
             },
             "numberRequired": {
-              "description": "The password must contain at least one numeric character (0-9).",
+              "description": "A password must contain at least one numeric character (0-9).",
               "type": "boolean"
             },
             "symbolRequired": {
-              "description": "The password must contain at least one symbol (~`!@#$%^&*()_-+={[}]|\\:;\"'<,>.?/).",
+              "description": "A password must contain at least one symbol (~`!@#$%^&*()_-+={[}]|\\:;\"'<,>.?/).",
               "type": "boolean"
             },
             "uppercaseRequired": {
-              "description": "The password must contain at least one uppercase letter (A-Z).",
+              "description": "A password must contain at least one uppercase letter (A-Z).",
               "type": "boolean"
             },
             "lowercaseRequired": {
-              "description": "The password must contain at least one lowercase letter (a-z).",
+              "description": "A password must contain at least one lowercase letter (a-z).",
               "type": "boolean"
             }
           }
         },
         "emailTemplates": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-              "activationEmailTemplateId": {
-                "description": "The ID or name of the email template used for account activation emails.",
-                "type": "string",
-                "minLength": 1
-              },
-              "reactivationEmailTemplateId": {
-                "description": "The ID or name of the email template used for account reactivation emails.",
-                "type": "string",
-                "minLength": 1
-              },
-              "passwordResetEmailTemplateId": {
-                "description": "The ID or name of the email template used for password reset emails.",
-                "type": "string",
-                "minLength": 1
-              },
-              "oidcUnlinkEmailTemplateId": {
-                "description": "The ID or name of the email template used for OIDC unlinking emails.",
-                "type": "string",
-                "minLength": 1
-              },
-              "oidcUnlinkPinEmailTemplateId": {
-                "description": "The ID or name of the email template used for OIDC unlinking PIN emails.",
-                "type": "string",
-                "minLength": 1
-              },
-              "activationPinEmailTemplateId": {
-                "description": "The ID or name of the email template used for account activation PIN emails.",
-                "type": "string",
-                "minLength": 1
-              },
-              "reactivationPinEmailTemplateId": {
-                "description": "The ID or name of the email template used for account reactivation PIN emails.",
-                "type": "string",
-                "minLength": 1
-              },
-              "passwordResetPinEmailTemplateId": {
-                "description": "The ID or name of the email template used for password reset PIN emails.",
-                "type": "string",
-                "minLength": 1
-              }
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "activationEmailTemplateId": {
+              "description": "The ID or name of the email template used for account activation emails.",
+              "type": "string",
+              "minLength": 1
+            },
+            "reactivationEmailTemplateId": {
+              "description": "The ID or name of the email template used for account reactivation emails.",
+              "type": "string",
+              "minLength": 1
+            },
+            "passwordResetEmailTemplateId": {
+              "description": "The ID or name of the email template used for password reset emails.",
+              "type": "string",
+              "minLength": 1
+            },
+            "oidcUnlinkEmailTemplateId": {
+              "description": "The ID or name of the email template used for OIDC unlinking emails.",
+              "type": "string",
+              "minLength": 1
+            },
+            "oidcUnlinkPinEmailTemplateId": {
+              "description": "The ID or name of the email template used for OIDC unlinking PIN emails.",
+              "type": "string",
+              "minLength": 1
+            },
+            "activationPinEmailTemplateId": {
+              "description": "The ID or name of the email template used for account activation PIN emails.",
+              "type": "string",
+              "minLength": 1
+            },
+            "reactivationPinEmailTemplateId": {
+              "description": "The ID or name of the email template used for account reactivation PIN emails.",
+              "type": "string",
+              "minLength": 1
+            },
+            "passwordResetPinEmailTemplateId": {
+              "description": "The ID or name of the email template used for password reset PIN emails.",
+              "type": "string",
+              "minLength": 1
             }
+          }
         },
         "verification": {
           "type": "object",
           "additionalProperties": false,
           "properties": {
             "enablePinCodeActivationRequests": {
-              "description": "A PIN code can be for account activation instead of an activation link.",
+              "description": "A PIN code can be used for account activation instead of an activation link.",
               "type": "boolean"
             },
             "enablePinCodeForgotPasswordRequests": {
@@ -109,13 +109,13 @@
       "additionalProperties": false,
       "properties": {
         "disableForceDownloadForMimeTypes": {
-            "description": "All files will have a Content-Disposition header with the Attachment value when fetched, unless their MIME type matches a type in this array exactly. The Attachment value ensures files are downloaded rather than displayed directly in the browser, enhancing protection against potential XSS vulnerabilities. The value */* can be used to allow any file to be displayed by browsers, use at your own discretion.",
-            "type": "array",
-            "items": {
-                "type": "string",
-                "minLength": 3,
-                "maxLength": 255
-            }
+          "description": "All files will have a Content-Disposition header with the Attachment value when fetched, unless their MIME type matches a type in this array exactly. The Attachment value ensures files are downloaded rather than displayed directly in the browser, enhancing protection against potential XSS vulnerabilities. The value */* can be used to allow any file to be displayed by browsers, use at your own discretion.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 255
+          }
         }
       }
     }

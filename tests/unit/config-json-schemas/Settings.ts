@@ -1,4 +1,4 @@
-import * as templateConfigSchema from '../../../src/config-json-schemas/SettingsConfig.json';
+import * as settingsConfigSchema from '../../../src/config-json-schemas/SettingsConfig.json';
 import { ajvValidate } from '../../../src/helpers/util';
 
 describe('SettingsConfig.json JSON Schema definition', () => {
@@ -36,19 +36,19 @@ describe('SettingsConfig.json JSON Schema definition', () => {
     },
   };
 
-  it('Accepts a full settings objects', () => {
-    expect(() => ajvValidate(templateConfigSchema, fullSettings)).not.toThrow();
+  it('Accepts a full settings object', () => {
+    expect(() => ajvValidate(settingsConfigSchema, fullSettings)).not.toThrow();
   });
 
   it('Accepts an empty settings object', () => {
-    expect(() => ajvValidate(templateConfigSchema, {})).not.toThrow();
+    expect(() => ajvValidate(settingsConfigSchema, {})).not.toThrow();
   });
 
   it('Accepts a settings object with only users configuration', () => {
     const settings = {
       users: fullSettings.users,
     };
-    expect(() => ajvValidate(templateConfigSchema, settings)).not.toThrow();
+    expect(() => ajvValidate(settingsConfigSchema, settings)).not.toThrow();
   });
 
   it('Accepts a settings object with only files configuration', () => {
@@ -56,7 +56,7 @@ describe('SettingsConfig.json JSON Schema definition', () => {
       files: fullSettings.files,
     };
 
-    expect(() => ajvValidate(templateConfigSchema, settings)).not.toThrow();
+    expect(() => ajvValidate(settingsConfigSchema, settings)).not.toThrow();
   });
 
   it('Rejects a settings object with invalid properties', () => {
@@ -64,7 +64,7 @@ describe('SettingsConfig.json JSON Schema definition', () => {
       invalidProperty: 'not allowed',
     };
 
-    expect(() => ajvValidate(templateConfigSchema, settings)).toThrow(/must NOT have additional properties/);
+    expect(() => ajvValidate(settingsConfigSchema, settings)).toThrow(/must NOT have additional properties/);
   });
 
   it('Rejects a settings object with invalid users configuration', () => {
@@ -76,7 +76,7 @@ describe('SettingsConfig.json JSON Schema definition', () => {
       },
     };
 
-    expect(() => ajvValidate(templateConfigSchema, settings)).toThrow(/must be integer/);
+    expect(() => ajvValidate(settingsConfigSchema, settings)).toThrow(/must be integer/);
   });
 
   it('Rejects a settings object with invalid files configuration', () => {
@@ -86,6 +86,6 @@ describe('SettingsConfig.json JSON Schema definition', () => {
       },
     };
 
-    expect(() => ajvValidate(templateConfigSchema, settings)).toThrow(/must be array/);
+    expect(() => ajvValidate(settingsConfigSchema, settings)).toThrow(/must be array/);
   });
 });
