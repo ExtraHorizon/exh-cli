@@ -47,42 +47,42 @@
           "additionalProperties": false,
           "properties": {
             "activationEmailTemplateId": {
-              "description": "The ID or name of the email template used for account activation emails.",
+              "description": "The name of the email template used for account activation emails.",
               "type": "string",
               "minLength": 1
             },
             "reactivationEmailTemplateId": {
-              "description": "The ID or name of the email template used for account reactivation emails.",
+              "description": "The name of the email template used for account reactivation emails.",
               "type": "string",
               "minLength": 1
             },
             "passwordResetEmailTemplateId": {
-              "description": "The ID or name of the email template used for password reset emails.",
+              "description": "The name of the email template used for password reset emails.",
               "type": "string",
               "minLength": 1
             },
             "oidcUnlinkEmailTemplateId": {
-              "description": "The ID or name of the email template used for OIDC unlinking emails.",
+              "description": "The name of the email template used for OIDC unlinking emails.",
               "type": "string",
               "minLength": 1
             },
             "oidcUnlinkPinEmailTemplateId": {
-              "description": "The ID or name of the email template used for OIDC unlinking PIN emails.",
+              "description": "The name of the email template used for OIDC unlinking PIN emails.",
               "type": "string",
               "minLength": 1
             },
             "activationPinEmailTemplateId": {
-              "description": "The ID or name of the email template used for account activation PIN emails.",
+              "description": "The name of the email template used for account activation PIN emails.",
               "type": "string",
               "minLength": 1
             },
             "reactivationPinEmailTemplateId": {
-              "description": "The ID or name of the email template used for account reactivation PIN emails.",
+              "description": "The name of the email template used for account reactivation PIN emails.",
               "type": "string",
               "minLength": 1
             },
             "passwordResetPinEmailTemplateId": {
-              "description": "The ID or name of the email template used for password reset PIN emails.",
+              "description": "The name of the email template used for password reset PIN emails.",
               "type": "string",
               "minLength": 1
             }
