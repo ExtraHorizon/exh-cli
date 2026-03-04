@@ -1,12 +1,12 @@
 import { readFile } from 'fs/promises';
-import { FileServiceSettingsUpdate, PasswordPolicy } from '@extrahorizon/javascript-sdk';
+import { FileServiceSettingsUpdate, PasswordPolicy, VerificationSettings } from '@extrahorizon/javascript-sdk';
 import * as serviceSettingsSchema from '../../../config-json-schemas/SettingsConfig.json';
 import { ajvValidate } from '../../../helpers/util';
 
 export interface ServiceSettingsFile {
   users: {
     passwordPolicy: Partial<PasswordPolicy>;
-    verification: Record<string, string>; // TODO: replace with VerificationSettings type when it's exported from the SDK
+    verification: Partial<Pick<VerificationSettings, 'enablePinCodeActivationRequests' | 'enablePinCodeForgotPasswordRequests'>>;
     emailTemplates: Partial<{
       activationEmailTemplateName: string;
       reactivationEmailTemplateName: string;
