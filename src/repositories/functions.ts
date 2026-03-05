@@ -9,7 +9,7 @@ export async function find() {
 
 export async function findByName(name: string) {
   try {
-    return getSdk().tasks.functions.getByName(name);
+    return await getSdk().tasks.functions.getByName(name);
   } catch (e) {
     if (e instanceof ResourceUnknownError) {
       return undefined;
