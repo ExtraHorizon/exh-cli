@@ -19,11 +19,12 @@ async function syncUserSettings(userServiceSettings?: ServiceSettingsFile['users
   if (!userServiceSettings) {
     return;
   }
-  console.group(blue('Sync user service settings:'));
+  console.group(blue('Syncing user service settings:'));
   await syncPasswordPolicy(userServiceSettings.passwordPolicy);
   await syncEmailTemplates(userServiceSettings.emailTemplates);
   await syncVerificationSettings(userServiceSettings.verification);
   console.groupEnd();
+  console.log(green('✓ Synced user service settings'));
 }
 
 async function syncFileServiceSettings(fileServiceSettings?: ServiceSettingsFile['files']) {
@@ -32,8 +33,8 @@ async function syncFileServiceSettings(fileServiceSettings?: ServiceSettingsFile
   }
   console.group(blue('Syncing file service Settings:'));
   await updateFileServiceSettings(fileServiceSettings);
-  console.log(green('✓ Synced general file service settings'));
   console.groupEnd();
+  console.log(green('✓ Synced file service settings'));
 }
 
 async function syncPasswordPolicy(passwordPolicy?: ServiceSettingsFile['users']['passwordPolicy']) {
@@ -41,6 +42,7 @@ async function syncPasswordPolicy(passwordPolicy?: ServiceSettingsFile['users'][
     return;
   }
 
+  console.group(blue('Syncing password policy'));
   await updatePasswordPolicy(passwordPolicy);
   console.log(green('✓ Synced password policy'));
 }
@@ -56,6 +58,7 @@ async function syncEmailTemplates(emailTemplateNames?: ServiceSettingsFile['user
     return;
   }
 
+  console.group(blue('Syncing email templates'));
   await updateEmailTemplates(emailTemplates);
   console.log(green('✓ Synced email templates'));
 }
@@ -65,6 +68,7 @@ async function syncVerificationSettings(verificationSettings?: ServiceSettingsFi
     return;
   }
 
+  console.group(blue('Syncing verification settings'));
   await updateVerificationSettings(verificationSettings);
   console.log(green('✓ Synced verification settings'));
 }
