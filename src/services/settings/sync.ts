@@ -6,7 +6,7 @@ import { updateEmailTemplates, updatePasswordPolicy, updateVerificationSettings 
 import { readAndValidateServiceSettingsConfig, ServiceSettingsFile } from './util/readServiceSettingsFile';
 
 export async function sync(path: string) {
-  console.log(yellow(`Synchronizing Service Settings from ${path}`));
+  console.log(yellow('Synchronizing Service Settings'));
 
   const serviceSettings = await readAndValidateServiceSettingsConfig(path);
 

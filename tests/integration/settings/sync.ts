@@ -1,18 +1,18 @@
 import * as fs from 'fs/promises';
 import { handler } from '../../../src/commands/settings/sync';
-import { fileServiceRepositoryMock } from '../../__helpers__/fileRepositoryMock';
-import { templateV2RepositoryMock } from '../../__helpers__/templateV2RepositoryMock';
-import { userRepositoryMock } from '../../__helpers__/userRepositoryMock';
+import { fileServiceRepositoryMock as mockFileRepository, type FileRepositoryMock } from '../../__helpers__/fileRepositoryMock';
+import { templateV2RepositoryMock as mockTemplateRepository, type TemplateV2RepositoryMock } from '../../__helpers__/templateV2RepositoryMock';
+import { userRepositoryMock as mockUserRepository, type UserRepositoryMock } from '../../__helpers__/userRepositoryMock';
 
 describe('exh settings sync', () => {
-  let userServiceMock: ReturnType<typeof userRepositoryMock>;
-  let fileServiceMock: ReturnType<typeof fileServiceRepositoryMock>;
-  let templateServiceV2Mock: ReturnType<typeof templateV2RepositoryMock>;
+  let userServiceMock: UserRepositoryMock;
+  let fileServiceMock: FileRepositoryMock;
+  let templateServiceV2Mock: TemplateV2RepositoryMock;
 
   beforeAll(() => {
-    userServiceMock = userRepositoryMock('hello', []);
-    fileServiceMock = fileServiceRepositoryMock();
-    templateServiceV2Mock = templateV2RepositoryMock();
+    userServiceMock = mockUserRepository();
+    fileServiceMock = mockFileRepository();
+    templateServiceV2Mock = mockTemplateRepository();
   });
 
   afterEach(() => {
@@ -30,7 +30,7 @@ describe('exh settings sync', () => {
         },
       }));
 
-    await handler({ file: 'service-settings.json' });
+    await handler();
 
     expect(userServiceMock.updatePasswordPolicySpy).toHaveBeenCalledTimes(1);
     expect(userServiceMock.updatePasswordPolicySpy).toHaveBeenCalledWith(
@@ -49,7 +49,7 @@ describe('exh settings sync', () => {
         },
       }));
 
-    await handler({ file: 'service-settings.json' });
+    await handler();
 
     expect(fileServiceMock.updateFileServiceSettings).toHaveBeenCalledTimes(1);
     expect(fileServiceMock.updateFileServiceSettings).toHaveBeenCalledWith(
@@ -80,7 +80,7 @@ describe('exh settings sync', () => {
       outputs: {},
     });
 
-    await handler({ file: 'service-settings.json' });
+    await handler();
 
     expect(userServiceMock.updateEmailTemplatesSpy).toHaveBeenCalledTimes(1);
     expect(userServiceMock.updateEmailTemplatesSpy).toHaveBeenCalledWith({
@@ -107,7 +107,7 @@ describe('exh settings sync', () => {
       outputs: {},
     });
 
-    await handler({ file: 'service-settings.json' });
+    await handler();
 
     expect(userServiceMock.updateEmailTemplatesSpy).toHaveBeenCalledTimes(1);
     expect(userServiceMock.updateEmailTemplatesSpy).toHaveBeenCalledWith(
@@ -127,7 +127,7 @@ describe('exh settings sync', () => {
         },
       }));
 
-    await handler({ file: 'service-settings.json' });
+    await handler();
 
     expect(userServiceMock.updateVerificationSettingsSpy).toHaveBeenCalledTimes(1);
     expect(userServiceMock.updateVerificationSettingsSpy).toHaveBeenCalledWith(

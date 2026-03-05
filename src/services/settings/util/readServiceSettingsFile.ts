@@ -4,21 +4,21 @@ import * as serviceSettingsSchema from '../../../config-json-schemas/SettingsCon
 import { ajvValidate } from '../../../helpers/util';
 
 export interface ServiceSettingsFile {
-  users: {
-    passwordPolicy: Partial<PasswordPolicy>;
-    verification: Partial<Pick<VerificationSettings, 'enablePinCodeActivationRequests' | 'enablePinCodeForgotPasswordRequests'>>;
-    emailTemplates: Partial<{
-      activationEmailTemplateName: string;
-      reactivationEmailTemplateName: string;
-      passwordResetEmailTemplateName: string;
-      oidcUnlinkEmailTemplateName: string;
-      oidcUnlinkPinEmailTemplateName: string;
-      activationPinEmailTemplateName: string;
-      reactivationPinEmailTemplateName: string;
-      passwordResetPinEmailTemplateName: string;
+  users?: {
+    passwordPolicy?: Partial<PasswordPolicy>;
+    verification?: Partial<Pick<VerificationSettings, 'enablePinCodeActivationRequests' | 'enablePinCodeForgotPasswordRequests'>>;
+    emailTemplates?: Partial<{
+      activationEmailTemplateName?: string;
+      reactivationEmailTemplateName?: string;
+      passwordResetEmailTemplateName?: string;
+      oidcUnlinkEmailTemplateName?: string;
+      oidcUnlinkPinEmailTemplateName?: string;
+      activationPinEmailTemplateName?: string;
+      reactivationPinEmailTemplateName?: string;
+      passwordResetPinEmailTemplateName?: string;
     }>;
   };
-  files: FileServiceSettingsUpdate;
+  files?: FileServiceSettingsUpdate;
 }
 
 export async function readAndValidateServiceSettingsConfig(path: string) {

@@ -1,10 +1,8 @@
 import * as userRepository from '../../src/repositories/user';
-import { generateFunctionGlobalRole, generateFunctionUser } from './users';
 
-export const userRepositoryMock = (functionName: string, permissions: string[]) => {
-  const user = generateFunctionUser(functionName);
-  const globalRole = generateFunctionGlobalRole(functionName, permissions);
+export type UserRepositoryMock = ReturnType<typeof userRepositoryMock>;
 
+export const userRepositoryMock = () => {
   const isEmailAvailableSpy = jest.spyOn(userRepository, 'isEmailAvailable')
     .mockResolvedValue(true);
 
@@ -12,13 +10,32 @@ export const userRepositoryMock = (functionName: string, permissions: string[]) 
     .mockResolvedValue(undefined);
 
   const createUserSpy = jest.spyOn(userRepository, 'createUser')
-    .mockResolvedValue(user);
+    .mockResolvedValue({
+      id: '69a837094548684b3d64c9aa',
+      firstName: 'Test',
+      lastName: 'User',
+      email: 'testUser@extrahorizon.com',
+      phoneNumber: '0000000000',
+      language: 'EN',
+      activation: false,
+      timeZone: 'Europe/Brussels',
+      updateTimestamp: new Date(),
+      creationTimestamp: new Date(),
+      roles: [],
+    });
 
   const findGlobalRoleByNameSpy = jest.spyOn(userRepository, 'findGlobalRoleByName')
     .mockResolvedValue(undefined);
 
   const createGlobalRoleSpy = jest.spyOn(userRepository, 'createGlobalRole')
-    .mockResolvedValue(globalRole);
+    .mockResolvedValue({
+      id: '6853c7e0fad1584e3a11287d',
+      name: 'testRole',
+      description: 'A created test role',
+      permissions: [],
+      updateTimestamp: new Date(),
+      creationTimestamp: new Date(),
+    });
 
   const addPermissionsToGlobalRoleSpy = jest.spyOn(userRepository, 'addPermissionsToGlobalRole')
     .mockResolvedValue({ affectedRecords: 1 });
@@ -57,8 +74,6 @@ export const userRepositoryMock = (functionName: string, permissions: string[]) 
     });
 
   return {
-    user,
-    globalRole,
     isEmailAvailableSpy,
     findUserByEmailSpy,
     createUserSpy,
