@@ -10,8 +10,8 @@ describe('SettingsConfig.json JSON Schema definition', () => {
         maximumLength: 32,
         numberRequired: true,
         symbolRequired: true,
-        uppercaseRequired: true,
-        lowercaseRequired: true,
+        upperCaseRequired: true,
+        lowerCaseRequired: true,
       },
       emailTemplates: {
         activationEmailTemplateName: 'activation-template',

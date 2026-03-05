@@ -91,7 +91,7 @@ export async function sync({
     const isValidPath = existsSync(serviceSettingsPath);
 
     // Simulate a similar behavior as the `cfg = getRepoConfig(..)` does for the other configurations
-    // Only mention a warning if the user explicitly wanted to sync dispatchers
+    // Only mention a warning if the user explicitly wanted to sync service settings
     if (isValidPath) {
       console.log(chalk.green('\n ⚙️  Syncing service settings...'));
 

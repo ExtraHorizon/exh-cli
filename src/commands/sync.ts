@@ -84,6 +84,7 @@ export const handler = async (options: {
   dispatchers?: boolean;
   cleanDispatchers?: boolean;
   localizations?: boolean;
+  settings?: boolean;
   ignoreSchemaVerificationErrors?: boolean;
 }) => {
   await syncService.sync(options);

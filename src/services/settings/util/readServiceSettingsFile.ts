@@ -8,14 +8,14 @@ export interface ServiceSettingsFile {
     passwordPolicy?: Partial<PasswordPolicy>;
     verification?: Partial<Pick<VerificationSettings, 'enablePinCodeActivationRequests' | 'enablePinCodeForgotPasswordRequests'>>;
     emailTemplates?: Partial<{
-      activationEmailTemplateName?: string;
-      reactivationEmailTemplateName?: string;
-      passwordResetEmailTemplateName?: string;
-      oidcUnlinkEmailTemplateName?: string;
-      oidcUnlinkPinEmailTemplateName?: string;
-      activationPinEmailTemplateName?: string;
-      reactivationPinEmailTemplateName?: string;
-      passwordResetPinEmailTemplateName?: string;
+      activationEmailTemplateName: string;
+      reactivationEmailTemplateName: string;
+      passwordResetEmailTemplateName: string;
+      oidcUnlinkEmailTemplateName: string;
+      oidcUnlinkPinEmailTemplateName: string;
+      activationPinEmailTemplateName: string;
+      reactivationPinEmailTemplateName: string;
+      passwordResetPinEmailTemplateName: string;
     }>;
   };
   files?: FileServiceSettingsUpdate;

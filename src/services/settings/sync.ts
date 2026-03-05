@@ -15,18 +15,18 @@ export async function sync(path: string) {
   console.log(green('✓ Synced service settings'));
 }
 
-async function syncUserSettings(settings?: ServiceSettingsFile['users']) {
-  if (!settings) {
+async function syncUserSettings(userServiceSettings?: ServiceSettingsFile['users']) {
+  if (!userServiceSettings) {
     return;
   }
   console.group(blue('Sync user service settings:'));
-  await syncPasswordPolicy(settings.passwordPolicy);
-  await syncEmailTemplates(settings.emailTemplates);
-  await syncVerificationSettings(settings.verification);
+  await syncPasswordPolicy(userServiceSettings.passwordPolicy);
+  await syncEmailTemplates(userServiceSettings.emailTemplates);
+  await syncVerificationSettings(userServiceSettings.verification);
   console.groupEnd();
 }
 
-async function syncFileServiceSettings(fileServiceSettings: ServiceSettingsFile['files']) {
+async function syncFileServiceSettings(fileServiceSettings?: ServiceSettingsFile['files']) {
   if (!fileServiceSettings || Object.keys(fileServiceSettings).length === 0) {
     return;
   }
@@ -36,7 +36,7 @@ async function syncFileServiceSettings(fileServiceSettings: ServiceSettingsFile[
   console.groupEnd();
 }
 
-async function syncPasswordPolicy(passwordPolicy?: Partial<ServiceSettingsFile['users']['passwordPolicy']>) {
+async function syncPasswordPolicy(passwordPolicy?: ServiceSettingsFile['users']['passwordPolicy']) {
   if (!passwordPolicy || Object.keys(passwordPolicy).length === 0) {
     return;
   }
@@ -45,7 +45,7 @@ async function syncPasswordPolicy(passwordPolicy?: Partial<ServiceSettingsFile['
   console.log(green('✓ Synced password policy'));
 }
 
-async function syncEmailTemplates(emailTemplateNames?: Partial<ServiceSettingsFile['users']['emailTemplates']>) {
+async function syncEmailTemplates(emailTemplateNames?: ServiceSettingsFile['users']['emailTemplates']) {
   if (!emailTemplateNames || Object.keys(emailTemplateNames).length === 0) {
     return;
   }
@@ -69,7 +69,7 @@ async function syncVerificationSettings(verificationSettings?: ServiceSettingsFi
   console.log(green('✓ Synced verification settings'));
 }
 
-async function convertEmailTemplateNamesToIds(emailTemplateNames: Partial<ServiceSettingsFile['users']['emailTemplates']>) {
+async function convertEmailTemplateNamesToIds(emailTemplateNames: ServiceSettingsFile['users']['emailTemplates']) {
   const emailTemplates: Partial<EmailTemplates> = {};
 
   const templateNameIdMap = {

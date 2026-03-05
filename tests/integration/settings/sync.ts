@@ -2,6 +2,7 @@ import * as fs from 'fs/promises';
 import { handler } from '../../../src/commands/settings/sync';
 import { spyOnConsole } from '../../__helpers__/consoleSpy';
 import { fileServiceRepositoryMock as mockFileRepository, type FileRepositoryMock } from '../../__helpers__/fileRepositoryMock';
+import { generateTemplateV2 } from '../../__helpers__/templates';
 import { templateV2RepositoryMock as mockTemplateRepository, type TemplateV2RepositoryMock } from '../../__helpers__/templateV2RepositoryMock';
 import { userRepositoryMock as mockUserRepository, type UserRepositoryMock } from '../../__helpers__/userRepositoryMock';
 
@@ -63,7 +64,7 @@ describe('exh settings sync', () => {
   });
 
   it('Ignores non-existing templates', async () => {
-    const templateId = '69a837094548684b3d64c9aa';
+    const template = generateTemplateV2();
     jest.spyOn(fs, 'readFile')
       .mockResolvedValueOnce(JSON.stringify({
         users: {
@@ -75,25 +76,19 @@ describe('exh settings sync', () => {
       }));
 
     templateServiceV2Mock.findByNameSpy.mockResolvedValueOnce(null);
-    templateServiceV2Mock.findByNameSpy.mockResolvedValueOnce({
-      id: templateId,
-      creationTimestamp: new Date(),
-      updateTimestamp: new Date(),
-      name: 'hello',
-      outputs: {},
-    });
+    templateServiceV2Mock.findByNameSpy.mockResolvedValueOnce(template);
 
     await handler();
 
     expectConsoleLogToContain('⚠️  Template with name "activationEmailTemplate" not found. Skipping activationEmailTemplateId.');
     expect(userServiceMock.updateEmailTemplatesSpy).toHaveBeenCalledTimes(1);
     expect(userServiceMock.updateEmailTemplatesSpy).toHaveBeenCalledWith({
-      reactivationPinEmailTemplateId: templateId,
+      reactivationPinEmailTemplateId: template.id,
     });
   });
 
   it('Updates the email templates', async () => {
-    const templateId = '69a837094548684b3d64c9aa';
+    const template = generateTemplateV2();
     jest.spyOn(fs, 'readFile')
       .mockResolvedValueOnce(JSON.stringify({
         users: {
@@ -103,20 +98,14 @@ describe('exh settings sync', () => {
         },
       }));
 
-    templateServiceV2Mock.findByNameSpy.mockResolvedValueOnce({
-      id: templateId,
-      creationTimestamp: new Date(),
-      updateTimestamp: new Date(),
-      name: 'hello',
-      outputs: {},
-    });
+    templateServiceV2Mock.findByNameSpy.mockResolvedValueOnce(template);
 
     await handler();
 
     expect(userServiceMock.updateEmailTemplatesSpy).toHaveBeenCalledTimes(1);
     expect(userServiceMock.updateEmailTemplatesSpy).toHaveBeenCalledWith(
       expect.objectContaining({
-        activationEmailTemplateId: templateId,
+        activationEmailTemplateId: template.id,
       })
     );
   });
