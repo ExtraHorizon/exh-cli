@@ -18,7 +18,7 @@ describe('repoConfig', () => {
     await tempDir.createDirectory('tasks');
     await tempDir.createDirectory('localizations');
 
-    const config = await getRepoConfig(tempDir.getPath());
+    const config = getRepoConfig(tempDir.getPath());
     expect(config).toStrictEqual({
       schemas: ['schemas'],
       templates: ['templates'],
@@ -41,7 +41,7 @@ describe('repoConfig', () => {
     };
     await tempDir.createJsonFile('repo-config', fileConfig);
 
-    const config = await getRepoConfig(tempDir.getPath());
+    const config = getRepoConfig(tempDir.getPath());
     expect(config).toStrictEqual(fileConfig);
   });
 
@@ -60,7 +60,7 @@ describe('repoConfig', () => {
 
     await tempDir.createJsonFile('repo-config', fileConfig);
 
-    const config = await getRepoConfig(tempDir.getPath());
+    const config = getRepoConfig(tempDir.getPath());
     expect(config).toStrictEqual({
       schemas: ['myCustomSchemas'],
       templates: ['myCustomTemplates'],
@@ -73,7 +73,7 @@ describe('repoConfig', () => {
     const badConfig = { schemas: 'not-an-array', templates: [], tasks: [], localizations: [] };
     await tempDir.createJsonFile('repo-config', badConfig);
 
-    await expect(getRepoConfig(tempDir.getPath())).rejects.toThrow('Not an array');
+    expect(() => getRepoConfig(tempDir.getPath())).toThrow('Not an array');
   });
 
   it('Throws if a path is not a directory', async () => {
@@ -81,6 +81,6 @@ describe('repoConfig', () => {
     const fileConfig = { schemas: ['foo'], templates: [], tasks: [], localizations: [] };
     await tempDir.createJsonFile('repo-config', fileConfig);
 
-    await expect(getRepoConfig(tempDir.getPath())).rejects.toThrow('foo is not a directory');
+    expect(() => getRepoConfig(tempDir.getPath())).toThrow('foo is not a directory');
   });
 });

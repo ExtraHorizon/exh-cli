@@ -32,7 +32,7 @@ export async function sync({
 }) {
   const targetPath = path || '.';
 
-  const cfg = await getRepoConfig(targetPath);
+  const cfg = getRepoConfig(targetPath);
 
   const syncAll = !(schemas || tasks || templates || dispatchers || localizations || settings);
 
