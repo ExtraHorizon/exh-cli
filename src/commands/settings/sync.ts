@@ -1,13 +1,17 @@
-import * as path from 'node:path';
 import { Argv } from 'yargs';
 import { epilogue } from '../../helpers/util';
 import * as serviceSettingService from '../../services/settings';
 
 export const command = 'sync';
 export const desc = 'Synchronize Service Settings';
-export const builder = (yargs: Argv) => epilogue(yargs).options({});
+export const builder = (yargs: Argv) => epilogue(yargs).options({
+  file: {
+    demandOption: true,
+    describe: 'Path to the file containing the Service Settings configuration',
+    type: 'string',
+  },
+});
 
-export const handler = async () => {
-  const filePath = path.join(process.cwd(), 'service-settings.json');
-  await serviceSettingService.sync(filePath);
+export const handler = async ({ file }: { file: string; }) => {
+  await serviceSettingService.sync(file);
 };
