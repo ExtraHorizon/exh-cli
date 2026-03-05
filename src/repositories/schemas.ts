@@ -1,15 +1,13 @@
-import { ObjectId, rqlBuilder } from '@extrahorizon/javascript-sdk';
+import {
+  ObjectId,
+  rqlBuilder,
+  StatusData,
+  CreationTransition,
+  IndexInput,
+  TransitionInput,
+  TypeConfiguration,
+} from '@extrahorizon/javascript-sdk';
 import { getSdk } from '../exh';
-
-export interface Transition {
-  name: string;
-  type: string;
-  fromStatuses: string[];
-  toStatus: string;
-  conditions: { type: string; };
-  actions: { type: string; };
-  afterActions: { type: string; };
-}
 
 export async function remove(schemaId: ObjectId) {
   return await getSdk().data.schemas.remove(schemaId);
@@ -64,9 +62,8 @@ export async function updateSchema(id: string, data: any) {
  * @param {object} data.configuration
  * @param {string} data.configuration.type
  */
-export async function createProperty(id: string, data: { name: string; configuration: { type: string; }; }) {
-  const response = await getSdk().raw.post(`/data/v1/${id}/properties`, data);
-  return response.data;
+export async function createProperty(id: string, data: { name: string; configuration: TypeConfiguration; }) {
+  return await getSdk().data.properties.create(id, data);
 }
 
 /**
@@ -78,9 +75,8 @@ export async function createProperty(id: string, data: { name: string; configura
  * @param {object} data.configuration
  * @param {string} data.configuration.type
  */
-export async function updateProperty(id: string, path: string, data: { name: string; configuration: { type: string; }; }) {
-  const response = await getSdk().raw.put(`/data/v1/${id}/properties/${path}`, data);
-  return response.data;
+export async function updateProperty(id: string, path: string, data: TypeConfiguration) {
+  return await getSdk().data.properties.update(id, path, data);
 }
 
 /**
@@ -89,8 +85,7 @@ export async function updateProperty(id: string, path: string, data: { name: str
  * @param {string} path the property path
  */
 export async function deleteProperty(id: string, path: string) {
-  const response = await getSdk().raw.delete(`/data/v1/${id}/properties/${path}`);
-  return response.data;
+  return await getSdk().data.properties.remove(id, path);
 }
 
 /**
@@ -99,9 +94,8 @@ export async function deleteProperty(id: string, path: string) {
  * @param {*} name  name of the new status
  * @param {*} data  a status object
  */
-export async function createStatus(id: string, name: string, data: object) {
-  const response = await getSdk().raw.post(`/data/v1/${id}/statuses`, { name, data });
-  return response.data;
+export async function createStatus(id: string, name: string, data: StatusData) {
+  return getSdk().data.statuses.create(id, { name, data });
 }
 
 /**
@@ -110,9 +104,8 @@ export async function createStatus(id: string, name: string, data: object) {
  * @param {*} name  the name of the status to update
  * @param {*} data  a status object
  */
-export async function updateStatus(id: string, name: string, data: object) {
-  const response = await getSdk().raw.put(`/data/v1/${id}/statuses/${name}`, { data });
-  return response.data;
+export async function updateStatus(id: string, name: string, data: StatusData) {
+  return getSdk().data.statuses.update(id, name, data);
 }
 
 /**
@@ -121,8 +114,7 @@ export async function updateStatus(id: string, name: string, data: object) {
  * @param {*} name  the name of the status to delete
  */
 export async function deleteStatus(id: string, name: string) {
-  const response = await getSdk().raw.delete(`/data/v1/${id}/statuses/${name}`);
-  return response.data;
+  return getSdk().data.statuses.remove(id, name);
 }
 
 /**
@@ -144,9 +136,8 @@ export async function deleteStatus(id: string, name: string) {
  * @param {string} id       the schema identifier
  * @param {transition} data the new creationTransition data
  */
-export async function updateCreationTransition(id: string, data: Transition) {
-  const response = await getSdk().raw.put(`/data/v1/${id}/creationTransition`, data);
-  return response.data;
+export async function updateCreationTransition(id: string, data: CreationTransition) {
+  return getSdk().data.transitions.updateCreation(id, data);
 }
 
 /**
@@ -154,20 +145,18 @@ export async function updateCreationTransition(id: string, data: Transition) {
  * @param {string} id       the schema identifier
  * @param {transition} data a transition object
  */
-export async function createTransition(id: string, data:Transition) {
-  const response = await getSdk().raw.post(`/data/v1/${id}/transitions`, data);
-  return response.data;
+export async function createTransition(id: string, data:TransitionInput) {
+  return getSdk().data.transitions.create(id, data);
 }
 
 /**
- * update an exisiting transition
+ * update an existing transition
  * @param {string} schemaId     the schema identifier
  * @param {string} transitionId the identifier of the transition to update
  * @param {transition} data     the new transition object data
  */
-export async function updateTransition(schemaId: string, transitionId:string, data:Transition) {
-  const response = await getSdk().raw.put(`/data/v1/${schemaId}/transitions/${transitionId}`, data);
-  return response.data;
+export async function updateTransition(schemaId: string, transitionId:string, data:TransitionInput) {
+  return getSdk().data.transitions.update(schemaId, transitionId, data);
 }
 
 /**
@@ -176,8 +165,7 @@ export async function updateTransition(schemaId: string, transitionId:string, da
  * @param {string} transitionId  the identifier for the thransition to remove
  */
 export async function deleteTransition(schemaId:string, transitionId:string) {
-  const response = await getSdk().raw.delete(`/data/v1/${schemaId}/transitions/${transitionId}`);
-  return response.data;
+  return getSdk().data.transitions.remove(schemaId, transitionId);
 }
 
 /**
@@ -185,9 +173,8 @@ export async function deleteTransition(schemaId:string, transitionId:string) {
  * @param {string} schemaId     the schema identifier
  * @param {string} index      the identifier for the index to remove
  */
-export async function createIndex(schemaId:string, index: any) {
-  const response = await getSdk().raw.post(`/data/v1/${schemaId}/indexes`, index);
-  return response.data;
+export async function createIndex(schemaId:string, index: IndexInput) {
+  return getSdk().data.indexes.create(schemaId, index);
 }
 
 /**
@@ -196,6 +183,5 @@ export async function createIndex(schemaId:string, index: any) {
  * @param {string} indexId      the identifier for the index to remove
  */
 export async function deleteIndex(schemaId:string, indexId:string) {
-  const response = await getSdk().raw.delete(`/data/v1/${schemaId}/indexes/${indexId}`);
-  return response.data;
+  return getSdk().data.indexes.remove(indexId, schemaId);
 }

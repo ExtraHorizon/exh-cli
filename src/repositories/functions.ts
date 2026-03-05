@@ -1,52 +1,32 @@
+import { FunctionCreation, ResourceUnknownError } from '@extrahorizon/javascript-sdk';
 import { getSdk } from '../exh';
-import { permissionModes } from '../services/tasks/taskConfig';
 
-export interface FunctionCreation {
-  name: string;
-  description: string;
-  entryPoint: string;
-  code: string;
-  runtime: string;
-  timeLimit?: number;
-  memoryLimit?: number;
-  environmentVariables?: Record<string, any>;
-  executionOptions?: {
-    permissionMode?: permissionModes;
-    defaultPriority?: number;
-  };
-  retryPolicy?: {
-    enabled: boolean;
-    errorsToRetry: string[];
-  };
-}
 export async function find() {
   // This endpoint does not consider RQL
-  const response = await getSdk().raw.get('/tasks/v1/functions');
-  return response.data.data;
+  const response = await getSdk().tasks.functions.find();
+  return response.data;
 }
 
 export async function findByName(name: string) {
-  const response = await getSdk().raw.get(`/tasks/v1/functions/${name}`, { customResponseKeys: ['*'] })
-    .catch(e => e);
+  try {
+    return getSdk().tasks.functions.getByName(name);
+  } catch (e) {
+    if (e instanceof ResourceUnknownError) {
+      return undefined;
+    }
 
-  if (response.status === 404) {
-    return undefined;
+    throw e;
   }
-
-  return response.data;
 }
 
 export async function create(data: FunctionCreation) {
-  const response = await getSdk().raw.post('/tasks/v1/functions', data);
-  return response.data;
+  return getSdk().tasks.functions.create(data);
 }
 
-export async function update(data: FunctionCreation) {
-  const response = await getSdk().raw.put(`/tasks/v1/functions/${data.name}`, data);
-  return response.data;
+export async function update(data: Partial<FunctionCreation>) {
+  return getSdk().tasks.functions.update(data.name, data);
 }
 
 export async function remove(name: string) {
-  const response = await getSdk().raw.delete(`/tasks/v1/functions/${name}`);
-  return response.data;
+  return getSdk().tasks.functions.remove(name);
 }

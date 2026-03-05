@@ -1,7 +1,7 @@
 import * as fs from 'fs/promises';
+import { FunctionCreation } from '@extrahorizon/javascript-sdk';
 import * as chalk from 'chalk';
 import * as functionRepository from '../../repositories/functions';
-import { FunctionCreation } from '../../repositories/functions';
 import { getValidatedConfigIterator, TaskConfig } from '../../services/tasks/taskConfig';
 import { syncFunctionUser, zipFileFromDirectory } from '../../services/tasks/util';
 

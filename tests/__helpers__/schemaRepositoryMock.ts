@@ -1,5 +1,6 @@
 import * as schemaRepository from '../../src/repositories/schemas';
 import { createEmptySchema } from './schemas';
+import { generateId } from './utils';
 
 export type SchemaRepositoryMock = ReturnType<typeof schemaRepositoryMock>;
 
@@ -29,10 +30,10 @@ export const schemaRepositoryMock = () => {
     .mockResolvedValue({ affectedRecords: 1 });
 
   const createTransitionSpy = jest.spyOn(schemaRepository, 'createTransition')
-    .mockImplementation(async (_id, data) => data);
+    .mockImplementation(async (_id, _data) => ({ affectedRecords: 1 }));
 
   const createIndexSpy = jest.spyOn(schemaRepository, 'createIndex')
-    .mockImplementation(async (_id, data) => data);
+    .mockImplementation(async (_id, data) => ({ id: generateId(), name: generateId(), ...data }));
 
   const deleteStatusSpy = jest.spyOn(schemaRepository, 'deleteStatus')
     .mockResolvedValue({ affectedRecords: 1 });
