@@ -5,6 +5,7 @@ import { getRepoConfig } from '../helpers/repoConfig';
 import * as dispatcherService from '../services/dispatchers';
 import * as localizationService from '../services/localizations';
 import * as schemaService from '../services/schemas';
+import * as settingsService from '../services/settings';
 import * as taskService from '../services/tasks';
 import * as templateService from '../services/templates';
 
@@ -16,6 +17,7 @@ export async function sync({
   dispatchers,
   cleanDispatchers,
   localizations,
+  settings,
   ignoreSchemaVerificationErrors,
 }: {
   path?: string;
@@ -25,13 +27,14 @@ export async function sync({
   dispatchers?: boolean;
   cleanDispatchers?: boolean;
   localizations?: boolean;
+  settings?: boolean;
   ignoreSchemaVerificationErrors?: boolean;
 }) {
   const targetPath = path || '.';
 
   const cfg = await getRepoConfig(targetPath);
 
-  const syncAll = !(schemas || tasks || templates || dispatchers || localizations);
+  const syncAll = !(schemas || tasks || templates || dispatchers || localizations || settings);
 
   /* Sync all schemas */
   if ((syncAll || schemas) && cfg.schemas) {
@@ -79,6 +82,22 @@ export async function sync({
       await dispatcherService.sync(dispatchersPath, cleanDispatchers);
     } else if (dispatchers) {
       console.log(chalk.yellow('Warning: dispatchers.json not found'));
+    }
+  }
+
+  if (syncAll || settings) {
+    // The service-settings.json file is expected to be always in the root folder of the execution directory or of the provided path
+    const serviceSettingsPath = ospath.join(targetPath, 'service-settings.json');
+    const isValidPath = existsSync(serviceSettingsPath);
+
+    // Simulate a similar behavior as the `cfg = getRepoConfig(..)` does for the other configurations
+    // Only mention a warning if the user explicitly wanted to sync service settings
+    if (isValidPath) {
+      console.log(chalk.green('\n ⚙️  Syncing service settings...'));
+
+      await settingsService.sync(serviceSettingsPath);
+    } else if (settings) {
+      console.log(chalk.yellow('Warning: service-settings.json not found'));
     }
   }
 }

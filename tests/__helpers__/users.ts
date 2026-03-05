@@ -1,4 +1,4 @@
-import { UserData } from '@extrahorizon/javascript-sdk';
+import { EmailTemplates, PasswordPolicy, UserData, VerificationSettings } from '@extrahorizon/javascript-sdk';
 import { generateId } from './utils';
 
 export const generateFunctionUser = (functionName: string): UserData => ({
@@ -22,4 +22,54 @@ export const generateFunctionGlobalRole = (functionName: string, permissions: st
   permissions: permissions.map(permission => ({ name: permission, description: permission })),
   updateTimestamp: new Date(),
   creationTimestamp: new Date(),
+});
+
+export const generateTestUser = (): UserData => ({
+  id: generateId(),
+  firstName: 'Test',
+  lastName: 'User',
+  email: 'test_user@extrahorizon.com',
+  phoneNumber: '0000000000',
+  language: 'EN',
+  activation: false,
+  timeZone: 'Europe/Brussels',
+  updateTimestamp: new Date(),
+  creationTimestamp: new Date(),
+  roles: [],
+});
+
+export const generateTestGlobalRole = () => ({
+  id: generateId(),
+  name: 'testRole',
+  description: 'A test role created for testing purposes',
+  permissions: [],
+  updateTimestamp: new Date(),
+  creationTimestamp: new Date(),
+});
+
+export const generateVerificationSettings = (): VerificationSettings => ({
+  enablePinCodeActivationRequests: true,
+  enablePinCodeForgotPasswordRequests: true,
+  limitHashActivationRequests: true,
+  limitHashForgotPasswordRequests: true,
+});
+
+export const generateEmailTemplates = (): EmailTemplates => ({
+  activationEmailTemplateId: '69a837094548684b3d64c9f1',
+  reactivationEmailTemplateId: '69a837094548684b3d64c9f3',
+  passwordResetEmailTemplateId: '69a837094548684b3d64c9f4',
+  oidcUnlinkEmailTemplateId: '69a837094548684b3d64c9f5',
+  oidcUnlinkPinEmailTemplateId: '69a837094548684b3d64c9f5',
+  activationPinEmailTemplateId: '69a837094548684b3d64c9f1',
+  reactivationPinEmailTemplateId: '69a837094548684b3d64c9f3',
+  passwordResetPinEmailTemplateId: '69a837094548684b3d64c9f4',
+});
+
+export const generatePasswordPolicy = (): PasswordPolicy => ({
+  minimumLength: 3,
+  maximumLength: 18,
+  upperCaseRequired: true,
+  lowerCaseRequired: true,
+  symbolRequired: true,
+  numberRequired: true,
 });

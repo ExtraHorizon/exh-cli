@@ -62,11 +62,12 @@ describe('exh tasks sync', () => {
   });
 
   it('Creates a Function with a managed user', async () => {
-    const permissions: string[] = [];
-
     functionMock = functionRepositoryMock();
-    const userMock = userRepositoryMock(functionMock.functionConfig.name, permissions);
+    const userMock = userRepositoryMock();
     const authMock = mockAuthRepository();
+
+    const functionUser = generateFunctionUser(functionMock.functionConfig.name);
+    userMock.createUserSpy.mockResolvedValue(functionUser);
 
     const functionConfig = {
       ...functionMock.functionConfig,
@@ -99,7 +100,7 @@ describe('exh tasks sync', () => {
     expect(groupSpy).toHaveBeenCalledWith(chalk.white(`🔄  Syncing role: exh.tasks.${functionConfig.name}`));
     expectConsoleLogToContain(chalk.green('✅  Successfully synced role'));
 
-    expect(groupSpy).toHaveBeenCalledWith(chalk.white(`🔄  Syncing user: ${userMock.user.email.toLowerCase()}`));
+    expect(groupSpy).toHaveBeenCalledWith(chalk.white(`🔄  Syncing user: ${functionUser.email.toLowerCase()}`));
     expectConsoleLogToContain(chalk.green('✅  Successfully synced user'));
   });
 
@@ -316,7 +317,7 @@ describe('exh tasks sync', () => {
 
   it('Supports not defining environment variables when using executionCredentials', async () => {
     functionMock = functionRepositoryMock();
-    userRepositoryMock(functionMock.functionConfig.name, []);
+    userRepositoryMock();
     mockAuthRepository();
 
     delete functionMock.functionConfig.environment;

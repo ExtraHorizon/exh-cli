@@ -32,11 +32,11 @@
               "description": "A password must contain at least one symbol (~`!@#$%^&*()_-+={[}]|\\:;\"'<,>.?/).",
               "type": "boolean"
             },
-            "uppercaseRequired": {
+            "upperCaseRequired": {
               "description": "A password must contain at least one uppercase letter (A-Z).",
               "type": "boolean"
             },
-            "lowercaseRequired": {
+            "lowerCaseRequired": {
               "description": "A password must contain at least one lowercase letter (a-z).",
               "type": "boolean"
             }

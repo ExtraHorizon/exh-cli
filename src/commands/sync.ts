@@ -10,7 +10,7 @@ export const builder = (yargs: any) => epilogue(yargs)
   .options({
     path: {
       demandOption: false,
-      describe: `Path to folder which needs to be synchronized. The target folder should contain a ${REPO_CONFIG_FILE} file. 
+      describe: `Path to folder which needs to be synchronized. The target folder should contain a ${REPO_CONFIG_FILE} file.
 If not, the local directory is assumed with a default configuration which assumes tasks are in a 'tasks' folder, schemas in  a 'schemas' folder, etc...`,
       type: 'string',
     },
@@ -49,13 +49,18 @@ If not, the local directory is assumed with a default configuration which assume
       type: 'boolean',
       default: false,
     },
+    settings: {
+      demandOption: false,
+      describe: 'Sync service settings only',
+      type: 'boolean',
+      default: false,
+    },
     ignoreSchemaVerificationErrors: {
       demandOption: false,
       describe: 'Allow schema synchronization to proceed with validation errors.',
       type: 'boolean',
       default: false,
     },
-
   })
   .check(async ({ path }) => {
     if (path !== undefined) {
@@ -79,6 +84,7 @@ export const handler = async (options: {
   dispatchers?: boolean;
   cleanDispatchers?: boolean;
   localizations?: boolean;
+  settings?: boolean;
   ignoreSchemaVerificationErrors?: boolean;
 }) => {
   await syncService.sync(options);

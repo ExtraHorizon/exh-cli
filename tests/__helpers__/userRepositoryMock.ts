@@ -1,10 +1,12 @@
 import * as userRepository from '../../src/repositories/user';
-import { generateFunctionGlobalRole, generateFunctionUser } from './users';
+import {
+  generateEmailTemplates,
+  generatePasswordPolicy, generateTestGlobalRole, generateTestUser, generateVerificationSettings,
+} from './users';
 
-export const userRepositoryMock = (functionName: string, permissions: string[]) => {
-  const user = generateFunctionUser(functionName);
-  const globalRole = generateFunctionGlobalRole(functionName, permissions);
+export type UserRepositoryMock = ReturnType<typeof userRepositoryMock>;
 
+export const userRepositoryMock = () => {
   const isEmailAvailableSpy = jest.spyOn(userRepository, 'isEmailAvailable')
     .mockResolvedValue(true);
 
@@ -12,13 +14,13 @@ export const userRepositoryMock = (functionName: string, permissions: string[]) 
     .mockResolvedValue(undefined);
 
   const createUserSpy = jest.spyOn(userRepository, 'createUser')
-    .mockResolvedValue(user);
+    .mockResolvedValue(generateTestUser());
 
   const findGlobalRoleByNameSpy = jest.spyOn(userRepository, 'findGlobalRoleByName')
     .mockResolvedValue(undefined);
 
   const createGlobalRoleSpy = jest.spyOn(userRepository, 'createGlobalRole')
-    .mockResolvedValue(globalRole);
+    .mockResolvedValue(generateTestGlobalRole());
 
   const addPermissionsToGlobalRoleSpy = jest.spyOn(userRepository, 'addPermissionsToGlobalRole')
     .mockResolvedValue({ affectedRecords: 1 });
@@ -26,9 +28,16 @@ export const userRepositoryMock = (functionName: string, permissions: string[]) 
   const addGlobalRoleToUserSpy = jest.spyOn(userRepository, 'addGlobalRoleToUser')
     .mockResolvedValue({ affectedRecords: 1 });
 
+  const updateVerificationSettingsSpy = jest.spyOn(userRepository, 'updateVerificationSettings')
+    .mockResolvedValue(generateVerificationSettings());
+
+  const updateEmailTemplatesSpy = jest.spyOn(userRepository, 'updateEmailTemplates')
+    .mockResolvedValue(generateEmailTemplates());
+
+  const updatePasswordPolicySpy = jest.spyOn(userRepository, 'updatePasswordPolicy')
+    .mockResolvedValue(generatePasswordPolicy());
+
   return {
-    user,
-    globalRole,
     isEmailAvailableSpy,
     findUserByEmailSpy,
     createUserSpy,
@@ -36,5 +45,8 @@ export const userRepositoryMock = (functionName: string, permissions: string[]) 
     createGlobalRoleSpy,
     addPermissionsToGlobalRoleSpy,
     addGlobalRoleToUserSpy,
+    updateVerificationSettingsSpy,
+    updateEmailTemplatesSpy,
+    updatePasswordPolicySpy,
   };
 };
