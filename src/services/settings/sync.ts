@@ -6,19 +6,20 @@ import { updateEmailTemplates, updatePasswordPolicy, updateVerificationSettings 
 import { readAndValidateServiceSettingsConfig, ServiceSettingsFile } from './util/readServiceSettingsFile';
 
 export async function sync(path: string) {
-  console.log(yellow('Synchronizing Service Settings'));
+  console.log(yellow('Syncing service settings'));
 
   const serviceSettings = await readAndValidateServiceSettingsConfig(path);
 
   await syncUserSettings(serviceSettings?.users);
   await syncFileServiceSettings(serviceSettings?.files);
+  console.log(green('✓ Synced service settings'));
 }
 
 async function syncUserSettings(settings?: ServiceSettingsFile['users']) {
   if (!settings) {
     return;
   }
-  console.group(blue('Sync User Service Settings:'));
+  console.group(blue('Sync user service settings:'));
   await syncPasswordPolicy(settings.passwordPolicy);
   await syncEmailTemplates(settings.emailTemplates);
   await syncVerificationSettings(settings.verification);
@@ -26,17 +27,17 @@ async function syncUserSettings(settings?: ServiceSettingsFile['users']) {
 }
 
 async function syncFileServiceSettings(fileServiceSettings: ServiceSettingsFile['files']) {
-  if (!fileServiceSettings) {
+  if (!fileServiceSettings || Object.keys(fileServiceSettings).length === 0) {
     return;
   }
-  console.group(blue('Sync File Service Settings:'));
+  console.group(blue('Syncing file service Settings:'));
   await updateFileServiceSettings(fileServiceSettings);
   console.log(green('✓ Synced general file service settings'));
   console.groupEnd();
 }
 
 async function syncPasswordPolicy(passwordPolicy?: Partial<ServiceSettingsFile['users']['passwordPolicy']>) {
-  if (!passwordPolicy) {
+  if (!passwordPolicy || Object.keys(passwordPolicy).length === 0) {
     return;
   }
 
@@ -45,18 +46,22 @@ async function syncPasswordPolicy(passwordPolicy?: Partial<ServiceSettingsFile['
 }
 
 async function syncEmailTemplates(emailTemplateNames?: Partial<ServiceSettingsFile['users']['emailTemplates']>) {
-  if (!emailTemplateNames) {
+  if (!emailTemplateNames || Object.keys(emailTemplateNames).length === 0) {
     return;
   }
 
   const emailTemplates = await convertEmailTemplateNamesToIds(emailTemplateNames);
+
+  if (Object.keys(emailTemplates).length === 0) {
+    return;
+  }
 
   await updateEmailTemplates(emailTemplates);
   console.log(green('✓ Synced email templates'));
 }
 
 async function syncVerificationSettings(verificationSettings?: ServiceSettingsFile['users']['verification']) {
-  if (!verificationSettings) {
+  if (!verificationSettings || Object.keys(verificationSettings).length === 0) {
     return;
   }
 

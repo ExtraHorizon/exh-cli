@@ -1,10 +1,13 @@
 import * as fs from 'fs/promises';
 import { handler } from '../../../src/commands/settings/sync';
+import { spyOnConsole } from '../../__helpers__/consoleSpy';
 import { fileServiceRepositoryMock as mockFileRepository, type FileRepositoryMock } from '../../__helpers__/fileRepositoryMock';
 import { templateV2RepositoryMock as mockTemplateRepository, type TemplateV2RepositoryMock } from '../../__helpers__/templateV2RepositoryMock';
 import { userRepositoryMock as mockUserRepository, type UserRepositoryMock } from '../../__helpers__/userRepositoryMock';
 
 describe('exh settings sync', () => {
+  const { expectConsoleLogToContain } = spyOnConsole();
+
   let userServiceMock: UserRepositoryMock;
   let fileServiceMock: FileRepositoryMock;
   let templateServiceV2Mock: TemplateV2RepositoryMock;
@@ -82,6 +85,7 @@ describe('exh settings sync', () => {
 
     await handler();
 
+    expectConsoleLogToContain('⚠️  Template with name "activationEmailTemplate" not found. Skipping activationEmailTemplateId.');
     expect(userServiceMock.updateEmailTemplatesSpy).toHaveBeenCalledTimes(1);
     expect(userServiceMock.updateEmailTemplatesSpy).toHaveBeenCalledWith({
       reactivationPinEmailTemplateId: templateId,
