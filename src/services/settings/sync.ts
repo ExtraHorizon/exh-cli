@@ -42,7 +42,7 @@ async function syncPasswordPolicy(passwordPolicy?: ServiceSettingsFile['users'][
     return;
   }
 
-  console.group(blue('Syncing password policy'));
+  console.log(blue('Syncing password policy'));
   await updatePasswordPolicy(passwordPolicy);
   console.log(green('✓ Synced password policy'));
 }
@@ -58,7 +58,7 @@ async function syncEmailTemplates(emailTemplateNames?: ServiceSettingsFile['user
     return;
   }
 
-  console.group(blue('Syncing email templates'));
+  console.log(blue('Syncing email templates'));
   await updateEmailTemplates(emailTemplates);
   console.log(green('✓ Synced email templates'));
 }
@@ -68,7 +68,7 @@ async function syncVerificationSettings(verificationSettings?: ServiceSettingsFi
     return;
   }
 
-  console.group(blue('Syncing verification settings'));
+  console.log(blue('Syncing verification settings'));
   await updateVerificationSettings(verificationSettings);
   console.log(green('✓ Synced verification settings'));
 }
