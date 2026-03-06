@@ -30,7 +30,7 @@ export const schemaRepositoryMock = () => {
     .mockResolvedValue({ affectedRecords: 1 });
 
   const createTransitionSpy = jest.spyOn(schemaRepository, 'createTransition')
-    .mockImplementation(async (_id, _data) => ({ affectedRecords: 1 }));
+    .mockImplementation(async (_id, data) => ({ id: generateId(), ...data }));
 
   const createIndexSpy = jest.spyOn(schemaRepository, 'createIndex')
     .mockImplementation(async (_id, data) => ({ id: generateId(), name: generateId(), ...data }));
