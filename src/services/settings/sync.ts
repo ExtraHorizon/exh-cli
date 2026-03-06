@@ -16,7 +16,7 @@ export async function sync(path: string) {
 }
 
 async function syncUserSettings(userServiceSettings?: ServiceSettingsFile['users']) {
-  if (!userServiceSettings) {
+  if (!userServiceSettings || Object.keys(userServiceSettings).length === 0) {
     return;
   }
   console.group(blue('Syncing user service settings:'));
