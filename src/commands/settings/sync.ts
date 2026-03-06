@@ -6,9 +6,10 @@ export const command = 'sync';
 export const desc = 'Synchronize Service Settings';
 export const builder = (yargs: Argv) => epilogue(yargs).options({
   file: {
-    demandOption: true,
+    demandOption: false,
     describe: 'Path to the file containing the Service Settings configuration',
     type: 'string',
+    default: './service-settings.json',
   },
 });
 
