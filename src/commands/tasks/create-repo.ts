@@ -20,8 +20,13 @@ export const builder = (yargs: any) => epilogue(yargs)
       type: 'boolean',
       default: false,
     },
+    path: {
+      description: 'the path where the new repo/task should be created',
+      type: 'string',
+      default: './',
+    },
   });
 
-export const handler = async ({ name, repo, git }) => {
-  await tasksService.createRepo({ name, repo, git });
+export const handler = async ({ name, repo, git, path }) => {
+  await tasksService.createRepo({ name, repo, git, path });
 };
