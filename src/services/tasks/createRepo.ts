@@ -45,7 +45,7 @@ async function changePackageFile(repoPath: string, name: string) {
     pkg.name = name;
     await writeFile(`${repoPath}/package.json`, JSON.stringify(pkg, null, 2));
   } catch (err) {
-    console.log('WARN: package.json not found. (possibly not a javascript repository');
+    console.log('WARN: package.json not found. (possibly not a javascript repository)');
   }
 
   try {
@@ -54,5 +54,7 @@ async function changePackageFile(repoPath: string, name: string) {
     taskConfig.name = name;
     taskConfig.description = `${name} task`;
     await writeFile(`${repoPath}/task-config.json`, JSON.stringify(taskConfig, null, 2));
-  } catch (err) { /* */ }
+  } catch (err) {
+    console.log('WARN: task-config.json not found.');
+  }
 }
