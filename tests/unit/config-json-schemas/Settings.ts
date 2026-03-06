@@ -1,7 +1,7 @@
-import * as settingsConfigSchema from '../../../src/config-json-schemas/SettingsConfig.json';
+import * as settingsConfigSchema from '../../../src/config-json-schemas/ServiceSettings.json';
 import { ajvValidate } from '../../../src/helpers/util';
 
-describe('SettingsConfig.json JSON Schema definition', () => {
+describe('ServiceSettings.json JSON Schema definition', () => {
   const fullSettings = {
     $schema: 'http://json-schema.org/draft-07/schema#',
     users: {

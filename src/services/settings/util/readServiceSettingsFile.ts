@@ -1,6 +1,6 @@
 import { readFile } from 'fs/promises';
 import { FileServiceSettingsUpdate, PasswordPolicy, VerificationSettings } from '@extrahorizon/javascript-sdk';
-import * as serviceSettingsSchema from '../../../config-json-schemas/SettingsConfig.json';
+import * as serviceSettingsSchema from '../../../config-json-schemas/ServiceSettings.json';
 import { ajvValidate } from '../../../helpers/util';
 
 export interface ServiceSettingsFile {
