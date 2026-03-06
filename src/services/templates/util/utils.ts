@@ -20,7 +20,6 @@ export function removeFileNameExtension(fileName: string) {
 }
 
 export function isV1Template(template: any): template is TemplateV1Config {
-  console.log(template, !!template.schema || !!template.fields);
   return (
     !!template.schema ||
     !!template.fields
