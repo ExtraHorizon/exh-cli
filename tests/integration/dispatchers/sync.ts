@@ -1,20 +1,26 @@
-import * as fs from 'fs/promises';
 import { handler } from '../../../src/commands/dispatchers/sync';
 import * as dispatcherRepository from '../../../src/repositories/dispatchers';
 import { cliManagedTag } from '../../../src/services/dispatchers/sync';
 import { generateMailAction, generateTaskAction } from '../../__helpers__/actions';
 import { dispatcherRepositoryMock, type DispatcherRepositoryMock } from '../../__helpers__/dispatcherRepositoryMock';
 import { generateDispatcher, generateMinimalDispatcher } from '../../__helpers__/dispatchers';
+import { createTempDirectoryManager, type TempDirectoryManager } from '../../__helpers__/tempDirectoryManager';
 
 describe('exh dispatchers sync', () => {
   let repositoryMock: DispatcherRepositoryMock;
+  let tempDirectoryManager: TempDirectoryManager;
 
   beforeAll(() => {
     repositoryMock = dispatcherRepositoryMock();
   });
 
-  afterEach(() => {
+  beforeEach(async () => {
+    tempDirectoryManager = await createTempDirectoryManager();
+  });
+
+  afterEach(async () => {
     jest.clearAllMocks();
+    await tempDirectoryManager.removeDirectory();
   });
 
   it('Throws for a Dispatcher without a name', async () => {
@@ -22,10 +28,9 @@ describe('exh dispatchers sync', () => {
       name: undefined,
     });
 
-    jest.spyOn(fs, 'readFile')
-      .mockResolvedValueOnce(JSON.stringify([dispatcher]));
+    const dispatcherFile = await tempDirectoryManager.createJsonFile('dispatchers', [dispatcher]);
 
-    await expect(handler({ file: '', clean: false }))
+    await expect(handler({ file: dispatcherFile, clean: false }))
       .rejects.toThrow('"0" must have required property \'name\'');
   });
 
@@ -34,23 +39,21 @@ describe('exh dispatchers sync', () => {
       actions: [generateTaskAction({ name: undefined })],
     });
 
-    jest.spyOn(fs, 'readFile')
-      .mockResolvedValueOnce(JSON.stringify([dispatcher]));
+    const dispatcherFile = await tempDirectoryManager.createJsonFile('dispatchers', [dispatcher]);
 
-    await expect(handler({ file: '', clean: false }))
+    await expect(handler({ file: dispatcherFile, clean: false }))
       .rejects.toThrow('"0.actions.0" must have required property \'name\'');
   });
 
   it('Creates a Dispatcher with all fields set', async () => {
     const dispatcher = generateDispatcher();
 
-    jest.spyOn(fs, 'readFile')
-      .mockResolvedValueOnce(JSON.stringify([dispatcher]));
+    const dispatcherFile = await tempDirectoryManager.createJsonFile('dispatchers', [dispatcher]);
 
     const createDispatcherSpy = jest.spyOn(dispatcherRepository, 'create')
       .mockResolvedValueOnce(dispatcher);
 
-    await handler({ file: '', clean: false });
+    await handler({ file: dispatcherFile, clean: false });
 
     expect(createDispatcherSpy).toHaveBeenCalledTimes(1);
     expect(createDispatcherSpy).toHaveBeenCalledWith(
@@ -64,14 +67,13 @@ describe('exh dispatchers sync', () => {
   it('Creates a Dispatcher with minimal fields set', async () => {
     const minimalDispatcher = generateMinimalDispatcher();
 
-    jest.spyOn(fs, 'readFile')
-      .mockResolvedValueOnce(JSON.stringify([minimalDispatcher]));
+    const dispatcherFile = await tempDirectoryManager.createJsonFile('dispatchers', [minimalDispatcher]);
 
     const createDispatcherSpy = jest.spyOn(dispatcherRepository, 'create')
       // @ts-expect-error The minimal dispatcher does not satisfy the Dispatcher type, but is not relevant for the test case
       .mockResolvedValueOnce(minimalDispatcher);
 
-    await handler({ file: '', clean: false });
+    await handler({ file: dispatcherFile, clean: false });
 
     expect(createDispatcherSpy).toHaveBeenCalledTimes(1);
     expect(createDispatcherSpy).toHaveBeenCalledWith(
@@ -85,13 +87,12 @@ describe('exh dispatchers sync', () => {
   it('Updates an existing Dispatcher', async () => {
     const dispatcher = generateDispatcher({ tags: [cliManagedTag, 'Tag1', 'Tag2'] });
 
-    jest.spyOn(fs, 'readFile')
-      .mockResolvedValueOnce(JSON.stringify([dispatcher]));
+    const dispatcherFile = await tempDirectoryManager.createJsonFile('dispatchers', [dispatcher]);
 
     jest.spyOn(dispatcherRepository, 'findAll')
       .mockResolvedValueOnce([dispatcher, generateDispatcher()]);
 
-    await handler({ file: '', clean: false });
+    await handler({ file: dispatcherFile, clean: false });
 
     expect(repositoryMock.updateDispatcherSpy).toHaveBeenCalledTimes(1);
     expect(repositoryMock.updateDispatcherSpy).toHaveBeenCalledWith(
@@ -107,13 +108,12 @@ describe('exh dispatchers sync', () => {
     const dispatcher = generateDispatcher({ tags: [] });
     expect(dispatcher.tags).not.toContain('EXH_CLI_MANAGED');
 
-    jest.spyOn(fs, 'readFile')
-      .mockResolvedValueOnce(JSON.stringify([dispatcher]));
+    const dispatcherFile = await tempDirectoryManager.createJsonFile('dispatchers', [dispatcher]);
 
     jest.spyOn(dispatcherRepository, 'create')
       .mockResolvedValueOnce(dispatcher);
 
-    await handler({ file: '', clean: false });
+    await handler({ file: dispatcherFile, clean: false });
 
     expect(dispatcherRepository.create).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -124,10 +124,9 @@ describe('exh dispatchers sync', () => {
   });
 
   it('Updates the Actions of an existing Dispatcher', async () => {
-    jest.spyOn(fs, 'readFile')
-      .mockResolvedValueOnce(JSON.stringify([repositoryMock.existingDispatcher]));
+    const dispatcherFile = await tempDirectoryManager.createJsonFile('dispatchers', [repositoryMock.existingDispatcher]);
 
-    await handler({ file: '', clean: false });
+    await handler({ file: dispatcherFile, clean: false });
 
     // The existing dispatcher has 2 actions, thus we expect the updateActionSpy to be called twice
     expect(repositoryMock.updateActionSpy).toHaveBeenCalledTimes(2);
@@ -146,10 +145,9 @@ describe('exh dispatchers sync', () => {
     jest.spyOn(dispatcherRepository, 'findAll')
       .mockResolvedValueOnce([dispatcherWithExcessAction]);
 
-    jest.spyOn(fs, 'readFile')
-      .mockResolvedValueOnce(JSON.stringify([localDispatcher]));
+    const dispatcherFile = await tempDirectoryManager.createJsonFile('dispatchers', [localDispatcher]);
 
-    await handler({ file: '', clean: false });
+    await handler({ file: dispatcherFile, clean: false });
     expect(repositoryMock.removeActionSpy).toHaveBeenCalledTimes(1);
     expect(repositoryMock.removeActionSpy).toHaveBeenCalledWith(dispatcherWithExcessAction.id, excessAction.id);
   });
@@ -157,13 +155,12 @@ describe('exh dispatchers sync', () => {
   it('Removes Dispatchers that has been created with the CLI but is no longer present in the local file', async () => {
     const dispatcherToDelete = generateDispatcher();
 
-    jest.spyOn(fs, 'readFile')
-      .mockResolvedValueOnce(JSON.stringify([repositoryMock.existingDispatcher]));
+    const dispatcherFile = await tempDirectoryManager.createJsonFile('dispatchers', [repositoryMock.existingDispatcher]);
 
     jest.spyOn(dispatcherRepository, 'findAll')
       .mockResolvedValue([repositoryMock.existingDispatcher, dispatcherToDelete]);
 
-    await handler({ file: '', clean: true });
+    await handler({ file: dispatcherFile, clean: true });
 
     expect(repositoryMock.removeDispatcherSpy).toHaveBeenCalledTimes(1);
     expect(repositoryMock.removeDispatcherSpy).toHaveBeenCalledWith(dispatcherToDelete.id);
@@ -172,13 +169,12 @@ describe('exh dispatchers sync', () => {
   it('Removes Dispatchers only when the clean argument is provided', async () => {
     const dispatcherToDelete = generateDispatcher();
 
-    jest.spyOn(fs, 'readFile')
-      .mockResolvedValueOnce(JSON.stringify([repositoryMock.existingDispatcher]));
+    const dispatcherFile = await tempDirectoryManager.createJsonFile('dispatchers', [repositoryMock.existingDispatcher]);
 
     jest.spyOn(dispatcherRepository, 'findAll')
       .mockResolvedValue([repositoryMock.existingDispatcher, dispatcherToDelete]);
 
-    await handler({ file: '', clean: false });
+    await handler({ file: dispatcherFile, clean: false });
 
     expect(repositoryMock.removeDispatcherSpy).toHaveBeenCalledTimes(0);
   });
