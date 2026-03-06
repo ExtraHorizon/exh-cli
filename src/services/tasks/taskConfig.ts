@@ -1,39 +1,31 @@
 import { AssertionError } from 'assert';
 import * as fs from 'fs/promises';
 import * as ospath from 'path';
+import { FunctionCreation, FunctionPermissionMode } from '@extrahorizon/javascript-sdk';
 import * as taskConfigSchema from '../../config-json-schemas/TaskConfig.json';
 import { ajvValidate } from '../../helpers/util';
 
-export enum permissionModes {
-  permissionRequired = 'permissionRequired',
-  allUsers = 'allUsers',
-  public = 'public',
-}
-
 export interface TaskConfig {
-  name?: string;
+  name?: FunctionCreation['name'];
   path?: string;
-  entryPoint?: string;
-  runtime?: string;
-  description?: string;
-  timeLimit?: number;
-  memoryLimit?: number;
+  entryPoint?: FunctionCreation['entryPoint'];
+  runtime?: FunctionCreation['runtime'];
+  description?: FunctionCreation['description'];
+  timeLimit?: FunctionCreation['timeLimit'];
+  memoryLimit?: FunctionCreation['memoryLimit'];
   environment?: Record<string, string>;
-  executionPermission?: permissionModes;
+  executionPermission?: FunctionPermissionMode;
   defaultPriority?: number;
-  retryPolicy?: {
-    enabled: boolean;
-    errorsToRetry: string[];
-  };
+  retryPolicy?: FunctionCreation['retryPolicy'];
   executionCredentials?: {
     email?: string;
     permissions: string[];
   };
 }
 
-export function assertExecutionPermission(mode: string): asserts mode is permissionModes | undefined {
-  if (mode !== undefined && !Object.values(permissionModes).includes(mode as permissionModes)) {
-    throw new AssertionError({ message: `executionPermission incorrect. Should be one of ${Object.values(permissionModes).join(',')}` });
+export function assertExecutionPermission(mode: string): asserts mode is FunctionPermissionMode | undefined {
+  if (mode !== undefined && !Object.values(FunctionPermissionMode).includes(mode as FunctionPermissionMode)) {
+    throw new AssertionError({ message: `executionPermission incorrect. Should be one of ${Object.values(FunctionPermissionMode).join(',')}` });
   }
 }
 
