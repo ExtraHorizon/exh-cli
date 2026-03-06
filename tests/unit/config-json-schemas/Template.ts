@@ -31,7 +31,7 @@ describe('Template.json JSON Schema definition', () => {
       body: 'World',
     },
   };
-  
+
   describe('TemplateV2', () => {
     it('Accepts a minimal v2 template', () => {
       expect(() => ajvValidate(templateConfigSchema, minimalTemplateV2)).not.toThrow();
