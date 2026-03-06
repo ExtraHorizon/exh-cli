@@ -28,9 +28,7 @@
   "definitions": {
     "TypeConfigurationV2": {
       "type": "object",
-      "required": [
-        "type"
-      ],
+      "required": [ "type" ],
       "properties": {
         "type": {
           "enum": [ "object",  "array",  "string",  "number", "boolean"  ]
@@ -44,22 +42,16 @@
               "type": { "const": "object" }
             }
           },
-          "then": {
-            "$ref": "#/definitions/ObjectConfigurationV2"
-          }
+          "then": { "$ref": "#/definitions/ObjectConfigurationV2" }
         },
         {
           "if": {
             "type": "object",
             "properties": {
-              "type": {
-                "const": "array"
-              }
+              "type": { "const": "array" }
             }
           },
-          "then": {
-            "$ref": "#/definitions/ArrayConfigurationV2"
-          }
+          "then": { "$ref": "#/definitions/ArrayConfigurationV2" }
         },
         {
           "if": {
@@ -68,9 +60,7 @@
               "type": { "const": "string" }
             }
           },
-          "then": {
-            "$ref": "#/definitions/StringConfigurationV2"
-          }
+          "then": { "$ref": "#/definitions/StringConfigurationV2" }
         },
         {
           "if": {
@@ -79,9 +69,7 @@
               "type": { "const": "number" }
             }
           },
-          "then": {
-            "$ref": "#/definitions/NumberConfigurationV2"
-          }
+          "then": { "$ref": "#/definitions/NumberConfigurationV2" }
         },
         {
           "if": {
@@ -90,19 +78,14 @@
               "type": { "const": "boolean" }
             }
           },
-          "then": {
-            "$ref": "#/definitions/BooleanConfigurationV2"
-          }
+          "then": { "$ref": "#/definitions/BooleanConfigurationV2" }
         }
       ]
     },
     "ObjectConfigurationV2": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "type",
-        "properties"
-      ],
+      "required": [ "type", "properties" ],
       "properties": {
         "type": { "const": "object" },
         "properties": {
