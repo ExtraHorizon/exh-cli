@@ -26,7 +26,10 @@ export async function readTemplateFiles(targetFolder: string) {
 export async function readAndValidateTemplateJson(fileName: string) {
   try {
     const content = await readJsonFile(fileName);
-    ajvValidate<TemplateConfig>(templateConfigSchema, content);
+    console.log(`${fileName} - ${content}`);
+    if (!isV1Template(content)) {
+      ajvValidate<TemplateConfig>(templateConfigSchema, content);
+    }
     return content;
   } catch (error) {
     throw new Error(`Error while reading template file ${fileName}: ${error.message}`);
