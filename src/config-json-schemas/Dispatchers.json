@@ -71,7 +71,11 @@
     },
     "MailAction": {
       "type": "object",
-      "required": ["type", "name", "recipients", "templateId"],
+      "required": ["type", "name", "recipients"],
+      "anyOf": [
+        { "required": ["templateId"] },
+        { "required": ["templateName"] }
+      ],
       "properties": {
         "type": { "const": "mail" },
         "name": { "type": "string" },

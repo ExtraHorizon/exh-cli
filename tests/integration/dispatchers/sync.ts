@@ -108,6 +108,27 @@ describe('exh dispatchers sync', () => {
     );
   });
 
+  it('Uses templateName to override an existing templateId on mail action', async () => {
+    const originalTemplateId = generateId();
+    const resolvedTemplateId = generateId();
+    const dispatcher = generateMinimalDispatcher();
+    dispatcher.actions = [generateMailAction({ templateId: originalTemplateId, templateName: 'TestTemplate' })];
+
+    const dispatcherFile = await tempDirectoryManager.createJsonFile('dispatchers', [dispatcher]);
+
+    templateV2RepositoryMock.findByNameSpy
+      .mockResolvedValueOnce(generateTemplateV2({ id: resolvedTemplateId }));
+
+    await handler({ file: dispatcherFile, clean: false });
+
+    expect(templateV2RepositoryMock.findByNameSpy).toHaveBeenCalledWith('TestTemplate');
+    expect(repositoryMock.createSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        actions: [expect.objectContaining({ templateId: resolvedTemplateId })],
+      })
+    );
+  });
+
   it('Throws if templateName does not exist for mail action', async () => {
     const dispatcher = generateMinimalDispatcher();
     dispatcher.actions = [generateMailAction({ templateName: 'MissingTemplate' })];
@@ -147,7 +168,6 @@ describe('exh dispatchers sync', () => {
 
     const dispatcherFile = await tempDirectoryManager.createJsonFile('dispatchers', [dispatcher]);
 
-    console.log(JSON.stringify(dispatcher, null, 2));
     jest.spyOn(dispatcherRepository, 'findAll')
       .mockResolvedValueOnce([dispatcher]);
 
