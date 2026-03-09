@@ -1,7 +1,8 @@
 import * as fs from 'fs/promises';
 import * as chalk from 'chalk';
 import { EXH_CONFIG_FILE_DIR, EXH_CONFIG_FILE } from '../constants';
-import { sdkInitOnly } from '../exh';
+import { initSdk } from '../exh';
+import { createAuthenticatedClientWithPassword } from '../helpers/client';
 import * as authRepository from '../repositories/auth';
 
 export async function login(
@@ -12,11 +13,12 @@ export async function login(
   consumerSecret: string
 ) {
   // authenticate
-  const sdk = sdkInitOnly(host, consumerKey, consumerSecret);
-  const response = await sdk.auth.authenticate({
-    email,
-    password,
-  });
+  const { tokenData, client } = await createAuthenticatedClientWithPassword(
+    { host, consumerKey, consumerSecret },
+    { email, password }
+  );
+
+  initSdk(client);
 
   /* Create directory if it doesn't exist yet */
   try {
@@ -28,8 +30,8 @@ export async function login(
   await fs.writeFile(EXH_CONFIG_FILE, `API_HOST=${host}
 API_OAUTH_CONSUMER_KEY=${consumerKey}
 API_OAUTH_CONSUMER_SECRET=${consumerSecret}
-API_OAUTH_TOKEN=${response.token}
-API_OAUTH_TOKEN_SECRET=${response.tokenSecret}
+API_OAUTH_TOKEN=${tokenData.token}
+API_OAUTH_TOKEN_SECRET=${tokenData.tokenSecret}
 `);
   console.log(chalk.green('Wrote credentials to', EXH_CONFIG_FILE));
 }

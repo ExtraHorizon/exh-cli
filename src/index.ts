@@ -4,7 +4,7 @@ import * as tty from 'tty';
 import { isEqual } from 'lodash';
 import * as yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
-import { sdkAuth } from './exh';
+import { initAuthenticatedSdkFromEnv } from './exh';
 
 /* eslint-disable @typescript-eslint/no-floating-promises */
 yargs(hideBin(process.argv))
@@ -26,7 +26,7 @@ yargs(hideBin(process.argv))
       return { isTTY } as any;
     }
 
-    await sdkAuth();
+    await initAuthenticatedSdkFromEnv();
     return { isTTY };
   })
   .commandDir('commands')

@@ -1,33 +1,25 @@
-import { createOAuth1Client, OAuth1Client } from '@extrahorizon/javascript-sdk';
+import { OAuth1Client } from '@extrahorizon/javascript-sdk';
+import {
+  createAuthenticatedClientWithToken, getClientParametersFromEnv, getTokensFromEnv,
+} from './helpers/client';
 import { loadAndAssertCredentials } from './helpers/util';
 
 let sdk: OAuth1Client = null;
 
-export function sdkInitOnly(apiHost: string, consumerKey: string, consumerSecret: string) {
-  sdk = createOAuth1Client({
-    consumerKey,
-    consumerSecret,
-    host: apiHost,
-  });
-
+export function initSdk(newSdk: OAuth1Client) {
+  sdk = newSdk;
   return sdk;
 }
 
-export async function sdkAuth() {
+export async function initAuthenticatedSdkFromEnv() {
   loadAndAssertCredentials();
 
-  sdk = createOAuth1Client({
-    host: process.env.API_HOST,
-    consumerKey: process.env.API_OAUTH_CONSUMER_KEY,
-    consumerSecret: process.env.API_OAUTH_CONSUMER_SECRET,
-  });
-
   try {
-    // authenticate
-    await sdk.auth.authenticate({
-      token: process.env.API_OAUTH_TOKEN,
-      tokenSecret: process.env.API_OAUTH_TOKEN_SECRET,
-    });
+    const result = await createAuthenticatedClientWithToken(
+      getClientParametersFromEnv(),
+      getTokensFromEnv()
+    );
+    sdk = result.client;
   } catch (err) {
     throw new Error(`Failed to authenticate. All credentials found but some might be wrong or no longer valid.\nError was: "${err}"`);
   }
@@ -40,12 +32,4 @@ export function getSdk() {
     throw new Error('SDK not initialized. Please call sdkAuth() or sdkInitOnly() first.');
   }
   return sdk;
-}
-
-export function getNewSdkInstance() {
-  return createOAuth1Client({
-    host: process.env.API_HOST,
-    consumerKey: process.env.API_OAUTH_CONSUMER_KEY,
-    consumerSecret: process.env.API_OAUTH_CONSUMER_SECRET,
-  });
 }

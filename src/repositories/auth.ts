@@ -1,11 +1,16 @@
-import { getNewSdkInstance, getSdk } from '../exh';
+import { getSdk } from '../exh';
+import { getClientParametersFromEnv, createAuthenticatedClientWithPassword } from '../helpers/client';
 
 export function getHost() {
   return getSdk()?.raw?.defaults?.baseURL;
 }
 
 export async function createOAuth1Tokens(email: string, password: string) {
-  return getNewSdkInstance().auth.authenticate({ email, password });
+  const result = await createAuthenticatedClientWithPassword(
+    getClientParametersFromEnv(),
+    { email, password }
+  );
+  return result.tokenData;
 }
 
 export async function fetchMe() {
