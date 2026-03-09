@@ -1,5 +1,4 @@
 import { handler } from '../../../src/commands/dispatchers/sync';
-import * as dispatcherRepository from '../../../src/repositories/dispatchers';
 import { cliManagedTag } from '../../../src/services/dispatchers/sync';
 import { generateMailAction, generateTaskAction } from '../../__helpers__/actions';
 import { dispatcherRepositoryMock as mockDispatcherRepository, type DispatcherRepositoryMock } from '../../__helpers__/dispatcherRepositoryMock';
@@ -109,8 +108,7 @@ describe('exh dispatchers sync', () => {
 
     const dispatcherFile = await tempDirectoryManager.createJsonFile('dispatchers', [dispatcher]);
 
-    templateV2RepositoryMock.findByNameSpy
-      .mockResolvedValueOnce(generateTemplateV2({ id: resolvedTemplateId }));
+    templateV2RepositoryMock.findByNameSpy.mockResolvedValueOnce(generateTemplateV2({ id: resolvedTemplateId }));
 
     await handler({ file: dispatcherFile, clean: false });
 
@@ -139,8 +137,7 @@ describe('exh dispatchers sync', () => {
 
     const dispatcherFile = await tempDirectoryManager.createJsonFile('dispatchers', [dispatcher]);
 
-    dispatcherRepositoryMock.findAllSpy
-      .mockResolvedValueOnce([dispatcher, generateDispatcher()]);
+    dispatcherRepositoryMock.findAllSpy.mockResolvedValueOnce([dispatcher, generateDispatcher()]);
 
     await handler({ file: dispatcherFile, clean: false });
 
@@ -161,8 +158,7 @@ describe('exh dispatchers sync', () => {
 
     const dispatcherFile = await tempDirectoryManager.createJsonFile('dispatchers', [dispatcher]);
 
-    dispatcherRepositoryMock.findAllSpy
-      .mockResolvedValueOnce([dispatcher]);
+    dispatcherRepositoryMock.findAllSpy.mockResolvedValueOnce([dispatcher]);
 
     templateV2RepositoryMock.findByNameSpy.mockResolvedValueOnce(generateTemplateV2({ id: templateId }));
 
@@ -186,7 +182,7 @@ describe('exh dispatchers sync', () => {
 
     await handler({ file: dispatcherFile, clean: false });
 
-    expect(dispatcherRepository.create).toHaveBeenCalledWith(
+    expect(dispatcherRepositoryMock.createSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         name: dispatcher.name,
         tags: expect.arrayContaining(['EXH_CLI_MANAGED']),
@@ -213,8 +209,7 @@ describe('exh dispatchers sync', () => {
       actions: [...existingActions, excessAction],
     };
 
-    dispatcherRepositoryMock.findAllSpy
-      .mockResolvedValueOnce([dispatcherWithExcessAction]);
+    dispatcherRepositoryMock.findAllSpy.mockResolvedValueOnce([dispatcherWithExcessAction]);
 
     const dispatcherFile = await tempDirectoryManager.createJsonFile('dispatchers', [localDispatcher]);
 
@@ -228,8 +223,7 @@ describe('exh dispatchers sync', () => {
 
     const dispatcherFile = await tempDirectoryManager.createJsonFile('dispatchers', [dispatcherRepositoryMock.existingDispatcher]);
 
-    dispatcherRepositoryMock.findAllSpy
-      .mockResolvedValue([dispatcherRepositoryMock.existingDispatcher, dispatcherToDelete]);
+    dispatcherRepositoryMock.findAllSpy.mockResolvedValueOnce([dispatcherRepositoryMock.existingDispatcher, dispatcherToDelete]);
 
     await handler({ file: dispatcherFile, clean: true });
 
@@ -242,8 +236,7 @@ describe('exh dispatchers sync', () => {
 
     const dispatcherFile = await tempDirectoryManager.createJsonFile('dispatchers', [dispatcherRepositoryMock.existingDispatcher]);
 
-    dispatcherRepositoryMock.findAllSpy
-      .mockResolvedValueOnce([dispatcherRepositoryMock.existingDispatcher, dispatcherToDelete]);
+    dispatcherRepositoryMock.findAllSpy.mockResolvedValueOnce([dispatcherRepositoryMock.existingDispatcher, dispatcherToDelete]);
 
     await handler({ file: dispatcherFile, clean: false });
 
