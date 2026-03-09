@@ -29,7 +29,7 @@ export async function initAuthenticatedSdkFromEnv() {
 
 export function getSdk() {
   if (!sdk) {
-    throw new Error('SDK not initialized. Please call sdkAuth() or sdkInitOnly() first.');
+    throw new Error('SDK not initialized. Please call initAuthenticatedSdkFromEnv() or initSdk() first.');
   }
   return sdk;
 }
