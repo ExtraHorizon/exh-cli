@@ -52,7 +52,8 @@ export async function syncFunctionUser(data: { taskName: string; targetEmail?: s
     console.log(chalk.white('⚙️  Creating the user...'));
 
     user = await userRepository.createUser({
-      firstName: `${taskName}`,
+      activationMode: 'manual',
+      firstName: taskName,
       lastName: 'exh.tasks',
       email,
       password,
