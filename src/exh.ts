@@ -41,3 +41,11 @@ export function getSdk() {
   }
   return sdk;
 }
+
+export function getNewSdkInstance() {
+  return createOAuth1Client({
+    host: process.env.API_HOST,
+    consumerKey: process.env.API_OAUTH_CONSUMER_KEY,
+    consumerSecret: process.env.API_OAUTH_CONSUMER_SECRET,
+  });
+}
