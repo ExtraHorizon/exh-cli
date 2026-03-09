@@ -143,7 +143,7 @@ describe('Dispatchers.json JSON Schema definition', () => {
       expect(() => ajvValidate(dispatchersConfigSchema, [dispatcher])).toThrow(/must have required property 'recipients'/);
     });
 
-    it('Throws when templateId and templateName are both present in a mail action', () => {
+    it('Throws when templateId and templateName are both missing in a mail action', () => {
       const mailActionNoTemplate = { ...minimalMailAction };
       delete mailActionNoTemplate.templateId;
       delete mailActionNoTemplate.templateName;
