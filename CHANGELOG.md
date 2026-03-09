@@ -1,6 +1,17 @@
 # Extra Horizon CLI changelog
 
 ### v1.13.0
+* Introduced `exh settings sync`, by default enabling synchronization of service settings from a `service-settings.json` file.
+* Added `exh dispatchers init`, which creates a dispatcher in a new `dispatchers.json` file or appends a new dispatcher to an existing configuration.
+* Added `exh templates init`, generating a basic email template in the `./templates` directory.
+* Introduced `exh tasks init`, replacing `exh tasks create-repo` for task creation.
+  * Aligned behavior with other `init` commands by initializing new tasks in the `./tasks` directory by default.
+* Added support for a `templateName` field in mail actions within dispatchers.
+  * The CLI automatically resolves the template id based on the provided template name.
+* Removed validation for v1 templates, focusing on improved support for v2 templates in JetBrains IDEs using the provided JSON schemas via `$schema`.
+* Updated `exh tasks sync` to create users with `activationMode: 'manual'`, preventing unnecessary activation emails.
+* Deprecated `exh tasks create-repo` in favor of the new `exh tasks init` command.
+* Deprecated the use of `templateId` in mail actions, recommending `templateName` instead.
 
 ### v1.12.0
 * Now adding `$schema` as the last property when creating a new schema via `exh data schemas init`
