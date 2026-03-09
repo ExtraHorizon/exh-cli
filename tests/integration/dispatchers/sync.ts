@@ -5,13 +5,18 @@ import { generateMailAction, generateTaskAction } from '../../__helpers__/action
 import { dispatcherRepositoryMock, type DispatcherRepositoryMock } from '../../__helpers__/dispatcherRepositoryMock';
 import { generateDispatcher, generateMinimalDispatcher } from '../../__helpers__/dispatchers';
 import { createTempDirectoryManager, type TempDirectoryManager } from '../../__helpers__/tempDirectoryManager';
+import { generateTemplateV2 } from '../../__helpers__/templates';
+import { templateV2RepositoryMock as mockTemplateRepository, type TemplateV2RepositoryMock } from '../../__helpers__/templateV2RepositoryMock';
+import { generateId } from '../../__helpers__/utils';
 
 describe('exh dispatchers sync', () => {
   let repositoryMock: DispatcherRepositoryMock;
+  let templateV2RepositoryMock: TemplateV2RepositoryMock;
   let tempDirectoryManager: TempDirectoryManager;
 
   beforeAll(() => {
     repositoryMock = dispatcherRepositoryMock();
+    templateV2RepositoryMock = mockTemplateRepository();
   });
 
   beforeEach(async () => {
@@ -84,6 +89,37 @@ describe('exh dispatchers sync', () => {
     );
   });
 
+  it('Creates a dispatcher with a mail action with a templateName', async () => {
+    const templateId = generateId();
+    const dispatcher = generateMinimalDispatcher();
+    dispatcher.actions = [generateMailAction({ templateName: 'TestTemplate' })];
+
+    const dispatcherFile = await tempDirectoryManager.createJsonFile('dispatchers', [dispatcher]);
+
+    templateV2RepositoryMock.findByNameSpy.mockResolvedValueOnce(generateTemplateV2({ id: templateId }));
+
+    await handler({ file: dispatcherFile, clean: false });
+
+    expect(templateV2RepositoryMock.findByNameSpy).toHaveBeenCalledWith('TestTemplate');
+    expect(repositoryMock.createSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        actions: [expect.objectContaining({ templateId })],
+      })
+    );
+  });
+
+  it('Throws if templateName does not exist for mail action', async () => {
+    const dispatcher = generateMinimalDispatcher();
+    dispatcher.actions = [generateMailAction({ templateName: 'MissingTemplate' })];
+
+    const dispatcherFile = await tempDirectoryManager.createJsonFile('dispatchers', [dispatcher]);
+
+    templateV2RepositoryMock.findByNameSpy.mockResolvedValueOnce(undefined);
+
+    await expect(handler({ file: dispatcherFile, clean: false }))
+      .rejects.toThrow(`Template "MissingTemplate" not found for Action "${dispatcher.actions[0].name}"`);
+  });
+
   it('Updates an existing Dispatcher', async () => {
     const dispatcher = generateDispatcher({ tags: [cliManagedTag, 'Tag1', 'Tag2'] });
 
@@ -101,6 +137,31 @@ describe('exh dispatchers sync', () => {
         name: dispatcher.name,
         tags: dispatcher.tags,
       })
+    );
+  });
+
+  it('Updates a dispatcher with a mail action with a templateName', async () => {
+    const templateId = generateId();
+    const dispatcher = generateDispatcher({ tags: [cliManagedTag, 'Tag1', 'Tag2'] });
+    dispatcher.actions = [generateMailAction({ templateName: 'TestTemplate' })];
+
+    const dispatcherFile = await tempDirectoryManager.createJsonFile('dispatchers', [dispatcher]);
+
+    console.log(JSON.stringify(dispatcher, null, 2));
+    jest.spyOn(dispatcherRepository, 'findAll')
+      .mockResolvedValueOnce([dispatcher]);
+
+    templateV2RepositoryMock.findByNameSpy.mockResolvedValueOnce(generateTemplateV2({ id: templateId }));
+
+    await handler({ file: dispatcherFile, clean: false });
+
+    expect(templateV2RepositoryMock.findByNameSpy).toHaveBeenCalledWith('TestTemplate');
+    expect(repositoryMock.updateActionSpy).toHaveBeenCalledWith(
+      dispatcher.id,
+      dispatcher.actions[0].id,
+      expect.objectContaining(
+        { templateId }
+      )
     );
   });
 

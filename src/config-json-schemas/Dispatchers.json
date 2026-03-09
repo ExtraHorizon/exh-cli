@@ -94,7 +94,14 @@
             }
           }
         },
-        "templateId": { "type": "string" }
+        "templateId": {
+          "description": "The id of a template, has lower precedence than the templateName field if both are provided",
+          "type": "string"
+        },
+        "templateName": {
+          "description": "The name of a V2 template, has precedence over the templateId field if both are provided",
+          "type": "string"
+        }
       }
     },
     "TaskAction": {
