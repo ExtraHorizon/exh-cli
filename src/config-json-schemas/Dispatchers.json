@@ -71,7 +71,11 @@
     },
     "MailAction": {
       "type": "object",
-      "required": ["type", "name", "recipients", "templateId"],
+      "required": ["type", "name", "recipients"],
+      "anyOf": [
+        { "required": ["templateId"] },
+        { "required": ["templateName"] }
+      ],
       "properties": {
         "type": { "const": "mail" },
         "name": { "type": "string" },
@@ -94,7 +98,15 @@
             }
           }
         },
-        "templateId": { "type": "string" }
+        "templateId": {
+          "deprecated": true,
+          "description": "Deprecated, use templateName instead to target a V2 template by its name.",
+          "type": "string"
+        },
+        "templateName": {
+          "description": "The name of a V2 template",
+          "type": "string"
+        }
       }
     },
     "TaskAction": {

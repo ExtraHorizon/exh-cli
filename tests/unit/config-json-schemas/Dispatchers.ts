@@ -141,14 +141,45 @@ describe('Dispatchers.json JSON Schema definition', () => {
         actions: [mailActionNoRecipients],
       };
       expect(() => ajvValidate(dispatchersConfigSchema, [dispatcher])).toThrow(/must have required property 'recipients'/);
+    });
 
-      const mailActionNoTemplateId = { ...minimalMailAction };
-      delete mailActionNoTemplateId.templateId;
+    it('Throws when templateId and templateName are both missing in a mail action', () => {
+      const mailActionNoTemplate = { ...minimalMailAction };
+      delete mailActionNoTemplate.templateId;
+      delete mailActionNoTemplate.templateName;
+
       const dispatcher2 = {
         ...minimalDispatcher,
-        actions: [mailActionNoTemplateId],
+        actions: [mailActionNoTemplate],
       };
-      expect(() => ajvValidate(dispatchersConfigSchema, [dispatcher2])).toThrow(/must have required property 'templateId'/);
+
+      expect(() => ajvValidate(dispatchersConfigSchema, [dispatcher2])).toThrow();
+    });
+
+    it('Allows only a templateName', () => {
+      const mailAction = { ...minimalMailAction };
+      delete mailAction.templateId;
+      mailAction.templateName = 'myTemplate';
+
+      const dispatcher2 = {
+        ...minimalDispatcher,
+        actions: [mailAction],
+      };
+
+      expect(() => ajvValidate(dispatchersConfigSchema, [dispatcher2])).not.toThrow();
+    });
+
+    it('Allows only a templateId', () => {
+      const mailAction = { ...minimalMailAction };
+      delete mailAction.templateName;
+      mailAction.templateId = 'myTemplate';
+
+      const dispatcher2 = {
+        ...minimalDispatcher,
+        actions: [mailAction],
+      };
+
+      expect(() => ajvValidate(dispatchersConfigSchema, [dispatcher2])).not.toThrow();
     });
   });
 
