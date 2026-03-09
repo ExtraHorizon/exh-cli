@@ -2,7 +2,7 @@ import * as chalk from 'chalk';
 import * as functionRepository from '../../repositories/functions';
 
 export { sync } from './sync';
-export { createRepo } from './createRepo';
+export { init } from './init';
 export { assertExecutionPermission } from './taskConfig';
 
 export async function list(isTTY: boolean) {

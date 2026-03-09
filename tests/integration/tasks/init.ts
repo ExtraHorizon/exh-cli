@@ -1,8 +1,8 @@
-import { handler } from '../../../src/commands/tasks/create-repo';
+import { handler } from '../../../src/commands/tasks/init';
 import { spyOnConsole } from '../../__helpers__/consoleSpy';
 import { createTempDirectoryManager, type TempDirectoryManager } from '../../__helpers__/tempDirectoryManager';
 
-describe('exh tasks create-repo', () => {
+describe('exh tasks init', () => {
   const { expectConsoleLogToContain } = spyOnConsole();
   let tempDir: TempDirectoryManager;
 
@@ -19,7 +19,6 @@ describe('exh tasks create-repo', () => {
     await handler({
       name: 'my-task',
       repo: 'https://github.com/ExtraHorizon/template-task',
-      git: false,
       path: tempDir.getPath(),
     });
 
