@@ -3,7 +3,14 @@ import { join } from 'path';
 import * as chalk from 'chalk';
 import { asyncExec, getSwaggerDocumentationUrl } from '../../helpers/util';
 
-export async function createRepo({ name, repo, git, path }) {
+interface InitFunctionOptions {
+  name: string;
+  repo: string;
+  path: string;
+  git?: boolean;
+}
+
+export async function init({ name, repo, git, path }: InitFunctionOptions) {
   /*
     0. Check if git is installed.
     1. Clone template task repo
@@ -16,7 +23,7 @@ export async function createRepo({ name, repo, git, path }) {
     console.log(chalk.red('Git is not installed. Please install git first.'));
   }
 
-  console.log(`Creating new repo ${chalk.green(name)}...`);
+  console.log(`Creating new task ${chalk.green(name)}...`);
   try {
     const repoPath = join(path || '', name);
 
@@ -34,7 +41,7 @@ export async function createRepo({ name, repo, git, path }) {
     }
     console.log('Done! 🎉');
   } catch (err) {
-    console.log(chalk.red('Failed to create repo'));
+    console.log(chalk.red('Failed to create task'));
     console.log(err);
   }
 }
