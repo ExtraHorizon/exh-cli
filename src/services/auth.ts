@@ -1,7 +1,7 @@
 import * as fs from 'fs/promises';
+import { createOAuth1Client } from '@extrahorizon/javascript-sdk';
 import * as chalk from 'chalk';
 import { EXH_CONFIG_FILE_DIR, EXH_CONFIG_FILE } from '../constants';
-import { sdkInitOnly } from '../exh';
 import * as authRepository from '../repositories/auth';
 
 export async function login(
@@ -11,8 +11,12 @@ export async function login(
   consumerKey: string,
   consumerSecret: string
 ) {
-  // authenticate
-  const sdk = sdkInitOnly(host, consumerKey, consumerSecret);
+  const sdk = createOAuth1Client({
+    consumerKey,
+    consumerSecret,
+    host,
+  });
+
   const response = await sdk.auth.authenticate({
     email,
     password,
