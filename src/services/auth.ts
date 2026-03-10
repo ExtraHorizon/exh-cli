@@ -1,7 +1,5 @@
-import * as fs from 'fs/promises';
 import { createOAuth1Client } from '@extrahorizon/javascript-sdk';
-import * as chalk from 'chalk';
-import { EXH_CONFIG_FILE_DIR, EXH_CONFIG_FILE } from '../constants';
+import { writeCredentialsToFile } from '../exh';
 import * as authRepository from '../repositories/auth';
 
 export async function login(
@@ -22,20 +20,7 @@ export async function login(
     password,
   });
 
-  /* Create directory if it doesn't exist yet */
-  try {
-    await fs.stat(EXH_CONFIG_FILE_DIR);
-  } catch (err) {
-    await fs.mkdir(EXH_CONFIG_FILE_DIR);
-  }
-
-  await fs.writeFile(EXH_CONFIG_FILE, `API_HOST=${host}
-API_OAUTH_CONSUMER_KEY=${consumerKey}
-API_OAUTH_CONSUMER_SECRET=${consumerSecret}
-API_OAUTH_TOKEN=${response.token}
-API_OAUTH_TOKEN_SECRET=${response.tokenSecret}
-`);
-  console.log(chalk.green('Wrote credentials to', EXH_CONFIG_FILE));
+  writeCredentialsToFile(host, consumerKey, consumerSecret, response.token, response.tokenSecret);
 }
 
 export async function whoami() {
