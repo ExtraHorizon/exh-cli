@@ -6,9 +6,10 @@ export const command = 'sync';
 export const desc = 'Synchronize Dispatchers, if a declared Dispatcher does not exist, it will be created';
 export const builder = (yargs: Argv) => epilogue(yargs).options({
   file: {
-    demandOption: true,
+    demandOption: false,
     describe: 'Path to the file containing the Dispatcher(s) configuration',
     type: 'string',
+    default: './dispatchers.json',
   },
   clean: {
     demandOption: false,

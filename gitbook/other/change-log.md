@@ -10,6 +10,7 @@
   * The CLI automatically resolves the template id based on the provided template name.
 * Removed validation for v1 templates, focusing on improved support for v2 templates in JetBrains IDEs using the provided JSON schemas via `$schema`.
 * Updated `exh tasks sync` to create users with `activationMode: 'manual'`, preventing unnecessary activation emails.
+* Made file argument optional for `exh dispatchers sync`, defaults to `./dispatchers.json` when no file argument is provided.
 * Deprecated `exh tasks create-repo` in favor of the new `exh tasks init` command.
 * Deprecated the use of `templateId` in mail actions, recommending `templateName` instead.
 
