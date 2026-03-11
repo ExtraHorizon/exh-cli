@@ -12,7 +12,7 @@ export const builder = (yargs: any) => epilogue(yargs)
   })
   .options({
     file: {
-      description: 'Path to the file containing the Dispatcher(s) configuration',
+      description: 'Path to the file where the new Dispatcher should be added',
       type: 'string',
       default: './dispatchers.json',
     },
