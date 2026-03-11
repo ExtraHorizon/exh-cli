@@ -19,7 +19,7 @@ describe('exh dispatchers init', () => {
   });
 
   it('Creates a Dispatcher', async () => {
-    const filePath = `${tempDir.getPath()}/dispatchers.json`;
+    const filePath = tempDir.getPath('dispatchers.json');
     const name = 'test-dispatcher';
 
     await handler({ name, file: filePath });
@@ -48,7 +48,7 @@ describe('exh dispatchers init', () => {
   });
 
   it('Updates an existing Dispatcher file', async () => {
-    const filePath = `${tempDir.getPath()}/dispatchers.json`;
+    const filePath = tempDir.getPath('dispatchers.json');
 
     await handler({ name: 'first-dispatcher', file: filePath });
     consoleSpy.expectConsoleLogToContain(`✅  Successfully created ${filePath}`);
@@ -100,7 +100,7 @@ describe('exh dispatchers init', () => {
   });
 
   it('Throws an error when providing an invalid Dispatcher file path', async () => {
-    const filePath = `${tempDir.getPath()}/dispatchers.json`;
+    const filePath = tempDir.getPath('dispatchers.json');
 
     const fileContentWithoutDispatchersArray = { $schema: 'https://swagger.extrahorizon.com/cli/1.13.0/config-json-schemas/Dispatchers.json' };
     await writeFile(filePath, JSON.stringify(fileContentWithoutDispatchersArray, null, 2));
