@@ -11,13 +11,13 @@ export const builder = (yargs: any) => epilogue(yargs)
     type: 'string',
   })
   .options({
-    path: {
-      description: 'The path to the folder where the Dispatchers file should be created',
+    file: {
+      description: 'Path to the file where the new Dispatcher should be added',
       type: 'string',
-      default: './',
+      default: './dispatchers.json',
     },
   });
 
-export const handler = async function init({ name, path }: { name: string; path: string; }) {
-  await dispatcherService.init(name, path);
+export const handler = async function init({ name, file }: { name: string; file: string; }) {
+  await dispatcherService.init(name, file);
 };

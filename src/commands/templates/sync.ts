@@ -9,12 +9,12 @@ export const builder = (yargs: any) => epilogue(yargs)
   .options({
     path: {
       demandOption: false,
-      describe: 'Directory containing the templates which need to be synced',
+      description: 'Directory containing the templates which need to be synced',
       type: 'string',
     },
     template: {
       demandOption: false,
-      describe: 'Template file to sync',
+      description: 'Template file to sync',
       type: 'string',
     },
   })

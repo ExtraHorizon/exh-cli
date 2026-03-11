@@ -19,12 +19,12 @@ describe('exh dispatchers init', () => {
   });
 
   it('Creates a Dispatcher', async () => {
-    const path = tempDir.getPath();
+    const filePath = tempDir.getPath('dispatchers.json');
     const name = 'test-dispatcher';
 
-    await handler({ name, path });
+    await handler({ name, file: filePath });
 
-    consoleSpy.expectConsoleLogToContain(`✅  Successfully created ${path}/dispatchers.json`);
+    consoleSpy.expectConsoleLogToContain(`✅  Successfully created ${filePath}`);
 
     const dispatcherFileAfter = await tempDir.readJsonFile('dispatchers');
     expect(dispatcherFileAfter).toStrictEqual(
@@ -48,13 +48,13 @@ describe('exh dispatchers init', () => {
   });
 
   it('Updates an existing Dispatcher file', async () => {
-    const path = tempDir.getPath();
+    const filePath = tempDir.getPath('dispatchers.json');
 
-    await handler({ name: 'first-dispatcher', path });
-    consoleSpy.expectConsoleLogToContain(`✅  Successfully created ${path}/dispatchers.json`);
+    await handler({ name: 'first-dispatcher', file: filePath });
+    consoleSpy.expectConsoleLogToContain(`✅  Successfully created ${filePath}`);
 
-    await handler({ name: 'second-dispatcher', path });
-    consoleSpy.expectConsoleLogToContain(`✅  Successfully updated ${path}/dispatchers.json`);
+    await handler({ name: 'second-dispatcher', file: filePath });
+    consoleSpy.expectConsoleLogToContain(`✅  Successfully updated ${filePath}`);
 
     const dispatcherFileAfter = await tempDir.readJsonFile('dispatchers');
     expect(dispatcherFileAfter).toStrictEqual(
@@ -90,23 +90,23 @@ describe('exh dispatchers init', () => {
   });
 
   it('Creates the parent directory if it does not exist', async () => {
-    const path = tempDir.getPath('dispatchers/');
+    const filePath = tempDir.getPath('dispatchers/dispatchers.json');
     const name = 'test-dispatcher';
 
-    await handler({ name, path });
+    await handler({ name, file: filePath });
 
     const dispatcherFileAfter = await tempDir.readJsonFile('dispatchers/dispatchers');
     expect(dispatcherFileAfter).not.toBeNull();
   });
 
   it('Throws an error when providing an invalid Dispatcher file path', async () => {
-    const path = tempDir.getPath();
+    const filePath = tempDir.getPath('dispatchers.json');
 
     const fileContentWithoutDispatchersArray = { $schema: 'https://swagger.extrahorizon.com/cli/1.13.0/config-json-schemas/Dispatchers.json' };
-    await writeFile(`${path}/dispatchers.json`, JSON.stringify(fileContentWithoutDispatchersArray, null, 2));
+    await writeFile(filePath, JSON.stringify(fileContentWithoutDispatchersArray, null, 2));
 
     const name = 'test-dispatcher';
-    const promise = handler({ name, path });
+    const promise = handler({ name, file: filePath });
     await expect(promise).rejects.toThrow("must have required property 'dispatchers'");
   });
 });
