@@ -6,11 +6,11 @@ export const desc = 'Delete a template';
 export const builder = (yargs: any) => epilogue(yargs)
   .options({
     name: {
-      describe: 'Name of the template to delete',
+      description: 'Name of the template to delete',
       type: 'string',
     },
     id: {
-      describe: 'ID of the template to delete',
+      description: 'ID of the template to delete',
       type: 'string',
     },
   })

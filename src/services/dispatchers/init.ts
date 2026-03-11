@@ -1,12 +1,11 @@
 import { existsSync } from 'fs';
 import { mkdir, writeFile } from 'fs/promises';
-import * as osPath from 'path';
+import * as path from 'path';
 import { ActionType } from '@extrahorizon/javascript-sdk';
 import { getSwaggerDocumentationUrl } from '../../helpers/util';
 import { DispatchersFile, readAndValidateDispatcherConfig } from './util/readDispatcherFile';
 
-export async function init(name: string, path: string) {
-  const filePath = osPath.join(path, 'dispatchers.json');
+export async function init(name: string, filePath: string) {
   const exists = existsSync(filePath);
 
   const fileContent: DispatchersFile & { '$schema': string; } = {
@@ -18,7 +17,8 @@ export async function init(name: string, path: string) {
     const existingDispatchers = await readAndValidateDispatcherConfig(filePath);
     fileContent.dispatchers.push(...existingDispatchers);
   } else {
-    await mkdir(`${path}`, { recursive: true });
+    const dirPath = path.dirname(filePath);
+    await mkdir(dirPath, { recursive: true });
   }
 
   await writeFile(filePath, JSON.stringify(fileContent, null, 2));
