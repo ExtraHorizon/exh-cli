@@ -41,7 +41,7 @@
     "typescript": "4.5.5"
   },
   "dependencies": {
-    "@extrahorizon/javascript-sdk": "8.9.1-dev-155-ab27db9",
+    "@extrahorizon/javascript-sdk": "8.9.1",
     "ajv": "8.18.0",
     "archiver": "^7.0.1",
     "chalk": "^4.0.0",

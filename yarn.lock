@@ -444,10 +444,10 @@
     "@extrahorizon/eslint-config-base" "^1.6.0"
     eslint-plugin-jest "^26.4.5"
 
-"@extrahorizon/javascript-sdk@8.9.1-dev-155-ab27db9":
-  version "8.9.1-dev-155-ab27db9"
-  resolved "https://registry.yarnpkg.com/@extrahorizon/javascript-sdk/-/javascript-sdk-8.9.1-dev-155-ab27db9.tgz#a0135c52a823c29c3a97410ac673dbc4bef52256"
-  integrity sha512-POl90wkbKBh0bF6F7+id7w+UZjdlcgIJGv0QvoO4VLQDFH3LQLDRp/ymruc5D9m57dLOPFsBi9RNhREgnuSh+Q==
+"@extrahorizon/javascript-sdk@8.9.1":
+  version "8.9.1"
+  resolved "https://registry.yarnpkg.com/@extrahorizon/javascript-sdk/-/javascript-sdk-8.9.1.tgz#d32b568dd119032b098a5ef9609c9d54ba8760a7"
+  integrity sha512-kK1lP6nD46FGuYxL8R1A6kEPCYEkMGxbjkp/kFAK3qkW0wuYRduTNViiz/acpfYqlOXr9VJvDBOy+Qf3nI4z+g==
   dependencies:
     axios "0.30.3"
     buffer "6.0.3"
@@ -1073,9 +1073,9 @@ ajv@8.18.0:
     require-from-string "^2.0.2"
 
 ajv@^6.10.0, ajv@^6.12.4:
-  version "6.12.6"
-  resolved "https://registry.yarnpkg.com/ajv/-/ajv-6.12.6.tgz#baf5a62e802b07d977034586f8c3baf5adf26df4"
-  integrity sha512-j3fVLgvTo527anyYyJOGTYJbG+vnnQYvE0m5mmkc1TK+nxAppkCLMIL0aZ4dblVCNoGShhm+kzE4ZUykBoMg4g==
+  version "6.14.0"
+  resolved "https://registry.yarnpkg.com/ajv/-/ajv-6.14.0.tgz#fd067713e228210636ebb08c60bd3765d6dbe73a"
+  integrity sha512-IWrosm/yrn43eiKqkfkHis7QioDleaXQHdDVPKg0FSwwd/DuvyX79TZnFOnYpB7dcsFAMmtFztZuXPDvSePkFw==
   dependencies:
     fast-deep-equal "^3.1.1"
     fast-json-stable-stringify "^2.0.0"
