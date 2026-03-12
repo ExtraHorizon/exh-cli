@@ -1,5 +1,7 @@
 import { handler } from '../../src/commands/sync';
+import { ServiceSettingsFile } from '../../src/services/settings/util/readServiceSettingsFile';
 import { dispatcherRepositoryMock as mockDispatcherRepository, type DispatcherRepositoryMock } from '../__helpers__/dispatcherRepositoryMock';
+import { fileServiceRepositoryMock as mockFileRepository, type FileRepositoryMock } from '../__helpers__/fileRepositoryMock';
 import { functionRepositoryMock as mockFunctionRepository, type FunctionRepositoryMock } from '../__helpers__/functionRepositoryMock';
 import { mockLocalizationRepository, type LocalizationRepositoryMock } from '../__helpers__/localizationRepositoryMock';
 import { schemaRepositoryMock as mockSchemaRepository, type SchemaRepositoryMock } from '../__helpers__/schemaRepositoryMock';
@@ -7,6 +9,7 @@ import { minimalSchema } from '../__helpers__/schemas';
 import { createTempDirectoryManager, type TempDirectoryManager } from '../__helpers__/tempDirectoryManager';
 import { templateRepositoryMock as mockTemplateRepository, type TemplateRepositoryMock } from '../__helpers__/templateRepositoryMock';
 import { templateV2RepositoryMock as mockTemplateV2Repository, type TemplateV2RepositoryMock } from '../__helpers__/templateV2RepositoryMock';
+import { userRepositoryMock as mockUserRepository, type UserRepositoryMock } from '../__helpers__/userRepositoryMock';
 
 describe('exh sync', () => {
   let tempDirectory: TempDirectoryManager;
@@ -16,6 +19,8 @@ describe('exh sync', () => {
   let templateV2RepositoryMock: TemplateV2RepositoryMock;
   let dispatcherRepositoryMock: DispatcherRepositoryMock;
   let functionRepositoryMock: FunctionRepositoryMock;
+  let fileRepositoryMock: FileRepositoryMock;
+  let userRepositoryMock: UserRepositoryMock;
 
   beforeAll(() => {
     localizationRepositoryMock = mockLocalizationRepository();
@@ -24,6 +29,8 @@ describe('exh sync', () => {
     templateV2RepositoryMock = mockTemplateV2Repository();
     dispatcherRepositoryMock = mockDispatcherRepository();
     functionRepositoryMock = mockFunctionRepository();
+    fileRepositoryMock = mockFileRepository();
+    userRepositoryMock = mockUserRepository();
   });
 
   beforeEach(async () => {
@@ -137,5 +144,24 @@ describe('exh sync', () => {
       runtime: functionConfig.runtime,
       code: expect.any(String),
     }));
+  });
+
+  it('Syncs settings within the default \'service-settings.json\' file', async () => {
+    const serviceSettings: ServiceSettingsFile = {
+      users: {
+        passwordPolicy: {
+          minimumLength: 8,
+          numberRequired: true,
+        },
+      },
+      files: {
+        disableForceDownloadForMimeTypes: ['application/pdf'],
+      },
+    };
+    await tempDirectory.createJsonFile('service-settings', serviceSettings);
+
+    await handler({ path: tempDirectory.getPath() });
+    expect(fileRepositoryMock.updateFileServiceSettings).toHaveBeenCalledWith(serviceSettings.files);
+    expect(userRepositoryMock.updatePasswordPolicySpy).toHaveBeenCalledWith(serviceSettings.users?.passwordPolicy);
   });
 });

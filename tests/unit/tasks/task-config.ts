@@ -1,6 +1,7 @@
 import { readFile, access, stat } from 'fs/promises';
+import { FunctionPermissionMode } from '@extrahorizon/javascript-sdk';
 import { limits } from '../../../src/constants';
-import { loadSingleConfigFile, permissionModes, TaskConfig, validateConfig } from '../../../src/services/tasks/taskConfig';
+import { loadSingleConfigFile, TaskConfig, validateConfig } from '../../../src/services/tasks/taskConfig';
 import { noEntryPointConfig, noNameConfig, noPathConfig, noRuntimeConfig, simpleVariableConfig, validFullConfig, wrongPathConfig } from '../../__helpers__/task-configs/test-configs';
 
 jest.mock('fs/promises');
@@ -145,7 +146,7 @@ describe('Validating config', () => {
   });
 
   test('Invalid execution permission should fail', async () => {
-    const testConfig = { ...validFullConfig, executionPermission: 'whatever' as permissionModes };
+    const testConfig = { ...validFullConfig, executionPermission: 'whatever' as FunctionPermissionMode };
     await expect(validateConfig(testConfig)).rejects.toThrowError(/^"executionPermission" must be equal to one of the allowed values/);
   });
 

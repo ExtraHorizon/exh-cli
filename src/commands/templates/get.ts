@@ -6,11 +6,11 @@ export const desc = 'Fetch a template';
 export const builder = (yargs: any) => epilogue(yargs)
   .options({
     name: {
-      describe: 'Name of the template',
+      description: 'Name of the template',
       type: 'string',
     },
     id: {
-      describe: 'ID of the template',
+      description: 'ID of the template',
       type: 'string',
     },
   })

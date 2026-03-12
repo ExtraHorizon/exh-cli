@@ -4,7 +4,6 @@ import * as path from 'path';
 import Ajv from 'ajv';
 import * as chalk from 'chalk';
 import * as yargs from 'yargs';
-import { EXH_CONFIG_FILE } from '../constants';
 import { CommandError } from './error';
 
 /* Alas, global epilogues are not supported yet in yargs */
@@ -35,40 +34,6 @@ export async function asyncExec(cmd: string): Promise<string> {
       res(stdout);
     });
   });
-}
-
-export function loadAndAssertCredentials() {
-  const credentials = {};
-  let errorMessage = '';
-
-  try {
-    const credentialsFile = fs.readFileSync(EXH_CONFIG_FILE, 'utf-8');
-    const credentialFileLines = credentialsFile.split(/\r?\n/);
-
-    for (const credentialFileLine of credentialFileLines) {
-      const [key, value] = credentialFileLine.split('=');
-
-      if (key && value) {
-        credentials[key.trim()] = value.trim();
-      }
-    }
-  } catch (e) {
-    errorMessage += 'Couldn\'t open ~/.exh/credentials. ';
-  }
-
-  const requiredEnvVariables = ['API_HOST', 'API_OAUTH_CONSUMER_KEY', 'API_OAUTH_CONSUMER_SECRET', 'API_OAUTH_TOKEN', 'API_OAUTH_TOKEN_SECRET'];
-  for (const key of requiredEnvVariables) {
-    // Set the environment variable if it's present in the credentials file, but not in the environment variables
-    if (credentials[key] && !process.env[key]) {
-      process.env[key] = credentials[key];
-    }
-  }
-
-  const missingEnvironmentVariables = requiredEnvVariables.filter(key => !process.env[key]);
-  if (missingEnvironmentVariables.length > 0) {
-    errorMessage += `Missing environment variables: ${missingEnvironmentVariables.join(',')}`;
-    throw new Error(`Failed to retrieve all credentials. ${errorMessage}`);
-  }
 }
 
 // Return a string like: https://swagger.extrahorizon.com/cli/${cliVersion}/${subPath}

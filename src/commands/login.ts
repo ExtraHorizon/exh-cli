@@ -7,27 +7,27 @@ export const builder = (yargs: any) => epilogue(yargs).options({
   host: {
     demandOption: true,
     type: 'string',
-    describe: 'the address of your ExH cloud instance (eg. https://api.dev.my-instance.extrahorizon.io)',
+    description: 'the address of your ExH cloud instance (eg. https://api.dev.my-instance.extrahorizon.io)',
   },
   email: {
     demandOption: true,
     type: 'string',
-    describe: 'email address of your ExH account',
+    description: 'email address of your ExH account',
   },
   password: {
     demandOption: true,
     type: 'string',
-    describe: 'password of your ExH account',
+    description: 'password of your ExH account',
   },
   consumerKey: {
     demandOption: true,
     type: 'string',
-    describe: 'Consumer key',
+    description: 'Consumer key',
   },
   consumerSecret: {
     demandOption: true,
     type: 'string',
-    describe: 'Consumer secret',
+    description: 'Consumer secret',
   },
 });
 

@@ -1,4 +1,4 @@
-import { mkdir, readFile, rm, writeFile } from 'fs/promises';
+import { mkdir, readFile, rm, writeFile, access } from 'fs/promises';
 import { join } from 'path';
 import { generateId } from './utils';
 
@@ -57,6 +57,22 @@ export async function createTempDirectoryManager() {
       } catch (error: any) {
         if (error?.code === 'ENOENT') {
           return null;
+        }
+        throw error;
+      }
+    },
+    async exists(name: string) {
+      if (!dir) {
+        throw new Error('Temp directory already removed');
+      }
+
+      const filePath = join(dir, name);
+      try {
+        await access(filePath);
+        return true;
+      } catch (error: any) {
+        if (error?.code === 'ENOENT') {
+          return false;
         }
         throw error;
       }
