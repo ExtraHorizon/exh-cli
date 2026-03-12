@@ -105,7 +105,7 @@ export async function createStatus(id: string, name: string, data: StatusData) {
  * @param {*} data  a status object
  */
 export async function updateStatus(id: string, name: string, data: StatusData) {
-  return getSdk().data.statuses.update(id, name, data);
+  return getSdk().data.statuses.update(id, name, { data });
 }
 
 /**
