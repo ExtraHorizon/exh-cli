@@ -9,46 +9,46 @@ export const builder = (yargs: any) => epilogue(yargs)
   .options({
     path: {
       demandOption: false,
-      describe: `Path of the configuration json file containing task parameters. If a directory is given instead, all sub-directories will be searched for a task-config.json file & synced. 
+      description: `Path of the configuration json file containing task parameters. If a directory is given instead, all sub-directories will be searched for a task-config.json file & synced. 
       If this option is not used, each parameter (name, code, entryPoint, runtime, ...) will need to be supplied separately`,
       type: 'string',
     },
     name: {
       demandOption: false,
-      describe: 'Name of the task',
+      description: 'Name of the task',
       type: 'string',
     },
     code: {
       demandOption: false,
-      describe: 'The path to a directory containing the built task. exh-cli will compress the directory and upload it',
+      description: 'The path to a directory containing the built task. exh-cli will compress the directory and upload it',
       type: 'string',
     },
     entryPoint: {
       demandOption: false,
-      describe: "The code function that should be invoked. For example 'index.handler' for Nodejs",
+      description: "The code function that should be invoked. For example 'index.handler' for Nodejs",
       type: 'string',
     },
     runtime: {
       demandOption: false,
-      describe: 'Runtime to use for the task',
+      description: 'Runtime to use for the task',
       choices: runtimeChoices,
       type: 'string',
     },
     description: {
-      describe: 'A description for this task',
+      description: 'A description for this task',
       type: 'string',
       default: '',
     },
     timeLimit: {
-      describe: 'The execution time limit for this task (in seconds). Min: 3 max: 900',
+      description: 'The execution time limit for this task (in seconds). Min: 3 max: 900',
       type: 'number',
     },
     memoryLimit: {
-      describe: 'The allocated memory for this task (in MB). Min: 128 max: 10240',
+      description: 'The allocated memory for this task (in MB). Min: 128 max: 10240',
       type: 'number',
     },
     env: {
-      describe: 'Environment Variables set for this task. This option can be used multiple times.',
+      description: 'Environment Variables set for this task. This option can be used multiple times.',
       type: 'string',
       default: [],
     },

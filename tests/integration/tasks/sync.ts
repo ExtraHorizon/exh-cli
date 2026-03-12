@@ -62,11 +62,12 @@ describe('exh tasks sync', () => {
   });
 
   it('Creates a Function with a managed user', async () => {
-    const permissions: string[] = [];
-
     functionMock = functionRepositoryMock();
-    const userMock = userRepositoryMock(functionMock.functionConfig.name, permissions);
+    const userMock = userRepositoryMock();
     const authMock = mockAuthRepository();
+
+    const functionUser = generateFunctionUser(functionMock.functionConfig.name);
+    userMock.createUserSpy.mockResolvedValue(functionUser);
 
     const functionConfig = {
       ...functionMock.functionConfig,
@@ -86,6 +87,11 @@ describe('exh tasks sync', () => {
 
     expectConsoleLogToContain(chalk.green('Successfully created task', functionMock.functionConfig.name));
 
+    expect(userMock.createUserSpy).toHaveBeenCalledWith(expect.objectContaining({
+      activationMode: 'manual',
+      email: `exh.tasks+${functionConfig.name}@extrahorizon.com`.toLowerCase(),
+    }));
+
     expect(functionMock.createSpy).toHaveBeenCalledWith(expect.objectContaining({
       environmentVariables: expect.objectContaining({
         // The undefined values are retrieved from process.env, the fact that the variables are set should be evidence enough
@@ -99,7 +105,7 @@ describe('exh tasks sync', () => {
     expect(groupSpy).toHaveBeenCalledWith(chalk.white(`🔄  Syncing role: exh.tasks.${functionConfig.name}`));
     expectConsoleLogToContain(chalk.green('✅  Successfully synced role'));
 
-    expect(groupSpy).toHaveBeenCalledWith(chalk.white(`🔄  Syncing user: ${userMock.user.email.toLowerCase()}`));
+    expect(groupSpy).toHaveBeenCalledWith(chalk.white(`🔄  Syncing user: ${functionUser.email.toLowerCase()}`));
     expectConsoleLogToContain(chalk.green('✅  Successfully synced user'));
   });
 
@@ -316,7 +322,7 @@ describe('exh tasks sync', () => {
 
   it('Supports not defining environment variables when using executionCredentials', async () => {
     functionMock = functionRepositoryMock();
-    userRepositoryMock(functionMock.functionConfig.name, []);
+    userRepositoryMock();
     mockAuthRepository();
 
     delete functionMock.functionConfig.environment;

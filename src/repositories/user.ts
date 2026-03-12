@@ -1,4 +1,10 @@
-import { RegisterUserData, rqlBuilder } from '@extrahorizon/javascript-sdk';
+import {
+  EmailTemplates,
+  PasswordPolicy,
+  RegisterUserData,
+  rqlBuilder,
+  VerificationSettings,
+} from '@extrahorizon/javascript-sdk';
 import { getSdk } from '../exh';
 
 export async function findUserByEmail(email: string) {
@@ -42,4 +48,16 @@ export async function addGlobalRoleToUser(userId: string, roleId: string) {
     rqlBuilder().eq('id', userId).build(),
     { roles: [roleId] }
   );
+}
+
+export async function updateVerificationSettings(settings: Partial<VerificationSettings>) {
+  return await getSdk().users.settings.updateVerificationSettings(settings);
+}
+
+export async function updateEmailTemplates(emailTemplates: Partial<EmailTemplates>) {
+  return await getSdk().users.setEmailTemplates(emailTemplates);
+}
+
+export async function updatePasswordPolicy(passwordPolicy: Partial<PasswordPolicy>) {
+  return await getSdk().users.updatePasswordPolicy(passwordPolicy);
 }

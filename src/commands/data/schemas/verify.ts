@@ -8,11 +8,11 @@ export const desc = 'Syntactically verify a local schema';
 export const builder = (yargs: any) => epilogue(yargs)
   .options({
     file: {
-      describe: 'schema json file which needs to be verified',
+      description: 'schema json file which needs to be verified',
       type: 'string',
     },
     dir: {
-      describe: 'directory containing schemas to be verified',
+      description: 'directory containing schemas to be verified',
       type: 'string',
     },
   })

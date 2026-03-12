@@ -1,69 +1,38 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-
-  "if": {
-    "description": "Try to determine if we have V1 schema",
-    "anyOf": [
-      {
-        "type": "object",
-        "required": ["version"],
-        "properties": { "version": { "const": 1 }}
-      },
-      {
-        "type": "object",
-        "required": ["schema"],
-        "properties": {
-          "version": { "const": 1 },
-          "schema": true
-        }
-      },
-      {
-        "type": "object",
-        "required": ["fields"],
-        "properties": {
-          "version": { "const": 1 },
-          "fields": true
-        }
-      }
-    ]
-  },
-  "then": { "$ref": "#/definitions/TemplateV1" },
-  "else": { "$ref": "#/definitions/TemplateV2" },
-
-  "definitions": {
-    "TemplateV2": {
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "extendsTemplate": { "type": "string" },
+    "inputs": {
       "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "version": { "const": 2 },
-        "$schema": { "type": "string" },
-        "description": {
-          "type": "string",
-          "minLength": 1
-        },
-        "extendsTemplate": { "type": "string" },
-        "inputs": {
-          "type": "object",
-          "additionalProperties": { "$ref": "#/definitions/TypeConfigurationV2" }
-        },
-        "outputs": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string",
-            "minLength": 1
-          }
-        },
-        "variables": {
-          "type": "object",
-          "additionalProperties": { "type": "string" }
-        }
+      "additionalProperties": { "$ref": "#/definitions/TypeConfigurationV2" }
+    },
+    "outputs": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1
       }
     },
+    "variables": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    }
+  },
+  "definitions": {
     "TypeConfigurationV2": {
       "type": "object",
-      "required": ["type"],
+      "required": [ "type" ],
       "properties": {
-        "type": { "enum": ["object", "array", "string", "number", "boolean"] }
+        "type": {
+          "enum": [ "object",  "array",  "string",  "number", "boolean"  ]
+        }
       },
       "allOf": [
         {
@@ -116,7 +85,7 @@
     "ObjectConfigurationV2": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["type", "properties"],
+      "required": [ "type", "properties" ],
       "properties": {
         "type": { "const": "object" },
         "properties": {
@@ -131,13 +100,13 @@
       "required": ["type", "items"],
       "properties": {
         "type": { "const": "array" },
-        "items": { "$ref": "#/definitions/TypeConfigurationV2" }
+        "items": {"$ref": "#/definitions/TypeConfigurationV2" }
       }
     },
     "StringConfigurationV2": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["type"],
+      "required": [ "type" ],
       "properties": {
         "type": { "const": "string" }
       }
@@ -145,7 +114,7 @@
     "NumberConfigurationV2": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["type"],
+      "required": ["type" ],
       "properties": {
         "type": { "const": "number" }
       }
@@ -153,152 +122,9 @@
     "BooleanConfigurationV2": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["type"],
+      "required": [ "type" ],
       "properties": {
         "type": { "const": "boolean" }
-      }
-    },
-    "TemplateV1": {
-      "type": "object",
-      "required": ["description", "schema", "fields"],
-      "properties": {
-        "version": { "const": 1 },
-        "$schema": { "type": "string" },
-        "extends_template": { "type": "string" },
-        "description": { "type": "string" },
-        "schema": { "$ref": "#/definitions/ObjectConfiguration" },
-        "fields": {
-          "type": "object",
-          "additionalProperties": { "type": "string" }
-        }
-      }
-    },
-    "TypeConfiguration": {
-      "type": "object",
-      "required": ["type"],
-      "properties": {
-        "type": { "enum": ["object", "array", "string", "number", "boolean", "object_id", "date"] }
-      },
-      "allOf": [
-        {
-          "if": {
-            "type": "object",
-            "properties": {
-              "type": { "const": "object" }
-            }
-          },
-          "then": { "$ref": "#/definitions/ObjectConfiguration" }
-        },
-        {
-          "if": {
-            "type": "object",
-            "properties": {
-              "type": { "const": "array" }
-            }
-          },
-          "then": { "$ref": "#/definitions/ArrayConfiguration" }
-        },
-        {
-          "if": {
-            "type": "object",
-            "properties": {
-              "type": { "const": "string" }
-            }
-          },
-          "then": { "$ref": "#/definitions/StringConfiguration" }
-        },
-        {
-          "if": {
-            "type": "object",
-            "properties": {
-              "type": { "const": "number" }
-            }
-          },
-          "then": { "$ref": "#/definitions/NumberConfiguration" }
-        },
-        {
-          "if": {
-            "type": "object",
-            "properties": {
-              "type": { "const": "boolean" }
-            }
-          },
-          "then": { "$ref": "#/definitions/BooleanConfiguration" }
-        },
-        {
-          "if": {
-            "type": "object",
-            "properties": {
-              "type": { "const": "object_id" }
-            }
-          },
-          "then": { "$ref": "#/definitions/ObjectIdConfiguration" }
-        },
-        {
-          "if": {
-            "type": "object",
-            "properties": {
-              "type": { "const": "date" }
-            }
-          },
-          "then": { "$ref": "#/definitions/DateConfiguration" }
-        }
-      ]
-    },
-    "ObjectConfiguration": {
-      "type": "object",
-      "required": ["type"],
-      "properties": {
-        "type": { "const": "object" },
-        "fields": {
-          "type": "object",
-          "additionalProperties": {
-            "$ref": "#/definitions/TypeConfiguration"
-          }
-        }
-      }
-    },
-    "ArrayConfiguration": {
-      "type": "object",
-      "required": ["type", "type_configuration"],
-      "properties": {
-        "type": { "const": "array" },
-        "type_configuration": { "$ref": "#/definitions/TypeConfiguration" }
-      }
-    },
-    "StringConfiguration": {
-      "type": "object",
-      "required": ["type"],
-      "properties": {
-        "type": { "const": "string" }
-      }
-    },
-    "NumberConfiguration": {
-      "type": "object",
-      "required": ["type"],
-      "properties": {
-        "type": { "const": "number" }
-      }
-    },
-    "BooleanConfiguration": {
-      "type": "object",
-      "required": ["type"],
-      "properties": {
-        "type": { "const": "boolean" }
-      }
-    },
-    "ObjectIdConfiguration": {
-      "type": "object",
-      "required": ["type"],
-      "properties": {
-        "type": { "const": "object_id" }
-      }
-    },
-    "DateConfiguration": {
-      "type": "object",
-      "required": ["type"],
-      "properties": {
-        "type": { "const": "date" }
       }
     }
   }

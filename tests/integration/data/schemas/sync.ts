@@ -1,5 +1,5 @@
+import { Transition } from '@extrahorizon/javascript-sdk';
 import { handler } from '../../../../src/commands/data/schemas/sync';
-import type { Transition } from '../../../../src/repositories/schemas';
 import { schemaRepositoryMock, type SchemaRepositoryMock } from '../../../__helpers__/schemaRepositoryMock';
 import { defaultSchemaReturnId, minimalSchema, validSchema } from '../../../__helpers__/schemas';
 import { createTempDirectoryManager, type TempDirectoryManager } from '../../../__helpers__/tempDirectoryManager';

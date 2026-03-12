@@ -1,9 +1,8 @@
-import { readFile } from 'fs/promises';
-import { Dispatcher, DispatcherCreation, rqlBuilder } from '@extrahorizon/javascript-sdk';
+import { Dispatcher, DispatcherCreation, MailActionCreation, rqlBuilder } from '@extrahorizon/javascript-sdk';
 import { blue, green, yellow } from 'chalk';
-import * as dispatcherSchema from '../config-json-schemas/Dispatchers.json';
-import { ajvValidate } from '../helpers/util';
-import * as dispatcherRepository from '../repositories/dispatchers';
+import * as dispatcherRepository from '../../repositories/dispatchers';
+import * as templateRepository from '../../repositories/templatesV2';
+import { readAndValidateDispatcherConfig } from './util/readDispatcherFile';
 
 export const cliManagedTag = 'EXH_CLI_MANAGED';
 
@@ -30,20 +29,49 @@ export async function sync(path: string, clean = false) {
 }
 
 async function synchronizeDispatcher(localDispatcher: DispatcherCreation, exhDispatcher?: Dispatcher) {
-  // Ensure all Dispatchers have the EXH_CLI_MANAGED tag
-  // eslint-disable-next-line no-param-reassign
-  localDispatcher.tags = localDispatcher.tags || [];
-  const hasCliManagedTag = localDispatcher.tags.includes(cliManagedTag);
-
-  if (!hasCliManagedTag) {
-    localDispatcher.tags.push(cliManagedTag);
-  }
+  const dispatcherWithTag = ensureCliManagedTag(localDispatcher);
+  const dispatcherWithResolvedTemplateIds = await resolveTemplateIds(dispatcherWithTag);
 
   if (!exhDispatcher) {
-    await createDispatcher(localDispatcher);
+    await createDispatcher(dispatcherWithResolvedTemplateIds);
   } else {
-    await updateDispatcher(localDispatcher, exhDispatcher);
+    await updateDispatcher(dispatcherWithResolvedTemplateIds, exhDispatcher);
   }
+}
+
+function ensureCliManagedTag(dispatcher: DispatcherCreation): DispatcherCreation {
+  const tags = dispatcher.tags ?? [];
+  if (tags.includes(cliManagedTag)) {
+    return dispatcher;
+  }
+
+  return { ...dispatcher, tags: [...tags, cliManagedTag] };
+}
+
+async function resolveTemplateIds(dispatcher: DispatcherCreation): Promise<DispatcherCreation> {
+  const resolvedActions: DispatcherCreation['actions'] = [];
+
+  for (const action of dispatcher.actions) {
+    if (action.type !== 'mail') {
+      resolvedActions.push(action);
+      continue;
+    }
+
+    const mailAction = action as MailActionCreation & { templateName?: string; };
+    if (!mailAction.templateName) {
+      resolvedActions.push(action);
+      continue;
+    }
+
+    const template = await templateRepository.findByName(mailAction.templateName);
+    if (!template) {
+      throw new Error(`Template "${mailAction.templateName}" not found for Action "${action.name}"`);
+    }
+
+    resolvedActions.push({ ...action, templateId: template.id });
+  }
+
+  return { ...dispatcher, actions: resolvedActions };
 }
 
 async function createDispatcher(dispatcher: DispatcherCreation) {
@@ -114,24 +142,4 @@ async function synchronizeActions(localDispatcher: DispatcherCreation, exhDispat
       console.groupEnd();
     }
   }
-}
-
-type DispatchersFile = DispatcherCreation[] | { dispatchers: DispatcherCreation[]; };
-
-async function readAndValidateDispatcherConfig(path: string) {
-  let config: any;
-  try {
-    const buffer = await readFile(path);
-    config = JSON.parse(buffer.toString());
-  } catch (error) {
-    throw new Error(`Failed to read Dispatchers from ${path}: ${error.message}`);
-  }
-
-  ajvValidate<DispatchersFile>(dispatcherSchema, config);
-
-  if (Array.isArray(config)) {
-    return config;
-  }
-
-  return config.dispatchers;
 }
