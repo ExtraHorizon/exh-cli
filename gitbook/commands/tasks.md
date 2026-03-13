@@ -8,14 +8,12 @@ There is also a section with [examples](https://docs.extrahorizon.com/extrahoriz
 
 ### Create a new task
 
-The Extra Horizon CLI provides a great way for you to bootstrap your new task. Doing `exh tasks create-repo your-task-name` will create a fresh folder for you on your local machine called `your-task-name` & set the task name. It contains a sample task and will make sure you hit the ground running. The folder can also be initialised as a git repository by using the `--git` flag.
-
-Check out the README.md file of your freshly created repository to see how to run, build & test your new task.
+The Extra Horizon CLI provides a great way for you to bootstrap your new task. Doing `exh tasks init your-task-name` will create a fresh folder for you on your local machine called `your-task-name`. It contains a sample task and will make sure you hit the ground running.
 
 If you have your own template repository you want to start from, you can even specify the repository using the `repo` option. For example:
 
 ```
-exh tasks create-repo my-task-name --repo=https://github.com/mycompany/my-template
+exh tasks init my-task-name --repo=https://github.com/mycompany/my-template
 ```
 
 {% hint style="info" %}
@@ -28,17 +26,9 @@ If you're using Github, you can also use the template to directly create a repos
 
 Specify the repository template to clone. By default, we utilize the task template from Extra Horizon.
 
-`--git`
+`--path`
 
-Initialize the cloned folder as a new Git repository.
-
-### List tasks
-
-This command lists all tasks currently configured in the task service.
-
-```
-exh tasks list
-```
+Path where the new directory should be created. Defaults to `./tasks`
 
 ### Synchronize a task
 
@@ -88,7 +78,7 @@ but this can be very tedious to use. Instead you can create a `task-config.json`
       "VIEW_DOCUMENTS:my_second_schema"
     ]
   },
-  "$schema": "https://swagger.extrahorizon.com/cli/1.12.0/config-json-schemas/TaskConfig.json"
+  "$schema": "https://swagger.extrahorizon.com/cli/1.13.0/config-json-schemas/TaskConfig.json"
 }
 ```
 
@@ -228,6 +218,14 @@ Specify the path to the configuration JSON file containing task parameters. If a
 #### Example
 
 Take a look at our [hello world example](https://docs.extrahorizon.com/extrahorizon/services/automation/task-service/examples/hello-world-js) for a nodeJS function.
+
+### List tasks
+
+This command lists all tasks currently configured in the task service.
+
+```
+exh tasks list
+```
 
 ### Delete a task
 

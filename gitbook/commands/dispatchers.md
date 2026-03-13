@@ -6,15 +6,31 @@ In Extra Horizon, you can create Dispatchers which trigger Actions based on inco
 For information regarding Dispatchers and the Dispatcher Service please refer to the [Dispatcher Service documentation](https://docs.extrahorizon.com/extrahorizon/services/automation/dispatchers-service).
 {% endhint %}
 
+## Create a new dispatcher <a href="#schema-initialization" id="schema-initialization"></a>
+
+To create a new dispatcher, you can use the `init` command. This command will generate a minimal dispatcher for you to start out with.
+
+This example will create a new dispatcher at the top of `dispatchers.json` file. If the `dispatchers.json` file does not exist, it will be created.
+
+```
+exh dispatchers init <dispatcher-name>
+```
+
+After editing the dispatcher file to your liking, you can use the `exh dispatchers sync` command to upload your new dispatcher to your Extra Horizon cloud.
+
+#### **Arguments**
+
+`--file`
+
+Optional. Path to the JSON file containing the dispatchers. Defaults to `./dispatchers.json`. If the specified file does not exist, it is created.
+
 ## Synchronizing Dispatchers
 
-### Command
+This command provides the functionality to read a locally declared Dispatchers file and synchronize the contents with existing Dispatchers.
 
 ```
 exh dispatchers sync
 ```
-
-This command provides the functionality to read a locally declared Dispatchers file and synchronize the contents with existing Dispatchers.
 
 A tag with value `EXH_CLI_MANAGED` will be appended to Dispatchers created with the CLI.
 
@@ -24,7 +40,7 @@ The CLI will only consider Dispatchers with the `EXH_CLI_MANAGED` tag for update
 
 `--file`
 
-This required argument must point to the JSON file containing the array of Dispatchers to be synchronized.
+Optional. Path to the JSON file containing the dispatchers. Defaults to `./dispatchers.json`.
 
 `--clean`
 
@@ -39,12 +55,12 @@ The `--clean` argument performs a destructive operation that can not be reverted
 {% tabs %}
 {% tab title="CLI" %}
 ```bash
-exh dispatchers sync --file=./path/to/dispatchers.json --clean
+exh dispatchers sync --clean
 ```
 {% endtab %}
 {% endtabs %}
 
-### File format
+#### File format
 
 Dispatchers must be provided in a `.json` file as defined in the [arguments](dispatchers.md#arguments) section. This file must contain an array of Dispatcher objects as shown in the [example](dispatchers.md#example-1) below.
 
@@ -82,13 +98,13 @@ For detailed information regarding the structure of a Dispatcher, please refer t
             "cc": ["jane.doe@example.com"],
             "bcc": ["bcc@example.com"]
           },
-          "templateId": "abcdef0123456789abcdef013456789ab"
+          "templateName": "myTemplateName"
         }
       ],
       "tags": ["tag1", "tag2"]
     }
   ],
-  "$schema": "https://swagger.extrahorizon.com/cli/1.12.0/config-json-schemas/Dispatchers.json"
+  "$schema": "https://swagger.extrahorizon.com/cli/1.13.0/config-json-schemas/Dispatchers.json"
 }
 ```
 {% endcode %}

@@ -11,6 +11,7 @@
 * [Dispatchers](commands/dispatchers.md)
 * [Templates](commands/templates.md)
 * [Localizations](commands/localizations.md)
+* [Settings](commands/settings.md)
 * [Sync](commands/sync.md)
 
 ## other

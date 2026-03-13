@@ -59,6 +59,7 @@ Commands:
   exh dispatchers <command>    Manage Dispatchers within Extra Horizon
   exh localizations <command>  Manage localizations
   exh login                    Retrieve credentials from ExH
+  exh settings <command>       Manage Service Settings within Extra Horizon
   exh sync                     Sync your ExH configuration to the cloud
                                environment
   exh tasks <command>          Manage tasks

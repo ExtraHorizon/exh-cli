@@ -4,7 +4,7 @@ description: Organising your Extra Horizon configuration
 
 # Sync
 
-The `exh` client has a global sync command for synchronizing your Schema, Tasks, Templates, Dispatchers and Localizations using a single command.
+The `exh` client has a global sync command for synchronizing your Schemas, Tasks, Templates, Localizations, Dispatchers and settings using a single command.
 
 ```
 exh sync
@@ -22,13 +22,14 @@ will allow you to specify exactly which directory you want to sync, by default t
 
 The Extra Horizon CLI by default will execute the relevant commands for these subfolders:
 
-| Command                                                      | Path                 |
-| ------------------------------------------------------------ | -------------------- |
-| [Schemas Sync](commands.md#schema-sync)                      | `./schemas`          |
-| [Templates Sync](templates.md#synchronizing-template)        | `./templates`        |
-| [Tasks Sync](tasks.md#synchronize-a-task)                    | `./tasks`            |
-| [Localizations Sync](localizations.md)                       | `./localizations`    |
-| [Dispatchers Sync](dispatchers.md#synchronizing-dispatchers) | `./dispatchers.json` |
+| Command                                                      | Path                      |
+| ------------------------------------------------------------ | ------------------------- |
+| [Schemas Sync](commands.md#schema-sync)                      | `./schemas`               |
+| [Tasks Sync](tasks.md#synchronize-a-task)                    | `./tasks`                 |
+| [Templates Sync](templates.md#synchronizing-template)        | `./templates`             |
+| [Localizations Sync](localizations.md)                       | `./localizations`         |
+| [Dispatchers Sync](dispatchers.md#synchronizing-dispatchers) | `./dispatchers.json`      |
+| [Settings Sync](settings.md#synchronize-settings)            | `./service-settings.json` |
 
 ### Custom configuration
 
@@ -40,13 +41,13 @@ In case this is not the directory layout you prefer, these locations can be cust
     "./path/to/my-schemas",
     "./another/path/to/schemas"
   ],
-  "templates": [
-    "./path/to/templates",
-    "./another/path/to/templates"
-  ],
   "tasks": [
     "./path/to/tasks",
     "./another/path/to/tasks"
+  ],
+  "templates": [
+    "./path/to/templates",
+    "./another/path/to/templates"
   ],
   "localizations": [
     "./path/to/localizations",
@@ -56,5 +57,7 @@ In case this is not the directory layout you prefer, these locations can be cust
 ```
 
 {% hint style="info" %}
-Dispatchers are expected to always exist within a root file named `dispatchers.json`
+Dispatchers are expected to always exist within a root file named `dispatchers.json`&#x20;
+
+Service settings are expected to always exist within a root file name `service-settings.json`
 {% endhint %}

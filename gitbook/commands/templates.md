@@ -2,45 +2,39 @@
 
 In the Extra Horizon cloud, you can create mail templates which the mail service can use to send well-formed emails. You can manage these templates with the Extra Horizon client as well.
 
-## Listing templates
+{% hint style="info" %}
+For information regarding Templates and the Templates Service please refer to the [Templates Service documentation](https://docs.extrahorizon.com/extrahorizon/services/other/template-service).
+{% endhint %}
 
-List the id, name and the description of all templates:
+## Create a new template
 
-```
-exh templates list
-```
-
-To get more information than the three properties listed use the `get` command on a single template.
-
-## Get a single template
-
-To get the full template by `name`
+To start with a new template, you can use the `init` command. This command will generate the files for a minimal email template for you to start out with.
 
 ```
-exh templates get --name=mytemplate
+exh templates init <template-name>
 ```
 
-Or by `id`
+This command creates a new template folder named `<template-name>` in `./templates/`. \
+The folder contains:
 
-```
-exh templates get --id=620d0eaacff47e000714b13d
-```
+* `template.json`
+* `body.hbs`
 
-#### Arguments
+After editing the template to your liking, you can use the `exh templates sync` command to upload your new template to your Extra Horizon cloud.
 
-`--name`
+#### **Arguments**
 
-This argument is used to specify the name of the template to retrieve
+`--path`
 
-`--id`
-
-This argument is used to specify the id of the template to retrieve
+This optional argument is used to specify the path where the template directory should be created. By default, the `./templates/` directory will be used.
 
 ## Synchronizing templates
 
-If you want to create a new template, you need to create a json file which defines how it should look like.
+This command provides the functionality to read a locally declared Templates and synchronize the contents with existing Templates.
 
-Building on that functionality, the CLI offers additional functionality to more easily manage templates and allowing templates to build upon other templates. Once you've built these templates, you can use `exh templates sync [options]` to synchronise these templates to the cloud.
+```
+exh templates sync
+```
 
 #### Arguments
 
@@ -52,7 +46,7 @@ This argument is used to specify the path to the JSON file or the directory that
 
 This argument is used to specify a directory that contains template files/directories to be synced.
 
-### Creating templates <a href="#markdown-header-template-folder-vs-template-file" id="markdown-header-template-folder-vs-template-file"></a>
+### Template Files
 
 Templates can be a single json file but in the case where you have multiple pieces of content you can also split the template up into multiple files and put those files in a folder. For example if you have an `html` file which you want to include in the template: it's easier to maintain if you put the `html` file separate instead of inlining it into a json file.
 
@@ -71,7 +65,7 @@ This is the easiest case. Everything is contained in the json file. The CLI will
     "subject": "Welcome to Extra Horizon",
     "body": "Dear {{@inputs.first_name}}, Welcome to Extra Horizon!"
   },
-  "$schema": "https://swagger.extrahorizon.com/cli/1.12.0/config-json-schemas/Template.json"
+  "$schema": "https://swagger.extrahorizon.com/cli/1.13.0/config-json-schemas/Template.json"
 }
 ```
 {% endcode %}
@@ -99,7 +93,7 @@ Example:
   "outputs": {
     "subject": "Your password reset"
   },
-  "$schema": "https://swagger.extrahorizon.com/cli/1.12.0/config-json-schemas/Template.json"
+  "$schema": "https://swagger.extrahorizon.com/cli/1.13.0/config-json-schemas/Template.json"
 }
 ```
 {% endcode %}
@@ -272,7 +266,7 @@ A simplified template to extend from: (containing a `first_name` and `message` r
   "outpus": {
     "body": "Dear {{@inputs.first_name}},\n\n{{@inputs.message}}\n\nKind regards,\nThe team"
   },
-  "$schema": "https://swagger.extrahorizon.com/cli/1.12.0/config-json-schemas/Template.json"
+  "$schema": "https://swagger.extrahorizon.com/cli/1.13.0/config-json-schemas/Template.json"
 }
 ```
 {% endcode %}
@@ -291,7 +285,7 @@ A template extending the above template: (passing along its own input `name` to 
     "first_name": "{{@inputs.name}}",
     "message": "We have successfully received your registration. You can now use our services."
   },
-  "$schema": "https://swagger.extrahorizon.com/cli/1.12.0/config-json-schemas/Template.json"
+  "$schema": "https://swagger.extrahorizon.com/cli/1.13.0/config-json-schemas/Template.json"
 }
 ```
 {% endcode %}
@@ -316,6 +310,40 @@ Will result in the following template:
 
 * The templates from which you extend, do not necessarily need to be in your folder. If the CLI didn't find the template in the specified sync folder, it will query the Extra Horizon cloud. If the template cannot be found there either, an error will be thrown.
 * The `sync` command will either create or update a template (if the name already exists). It will never delete a template.
+
+## Listing templates
+
+List the id, name and the description of all templates:
+
+```
+exh templates list
+```
+
+To get more information than the three properties listed use the `get` command on a single template.
+
+## Get a single template
+
+To get the full template by `name`
+
+```
+exh templates get --name=mytemplate
+```
+
+Or by `id`
+
+```
+exh templates get --id=620d0eaacff47e000714b13d
+```
+
+#### Arguments
+
+`--name`
+
+This argument is used to specify the name of the template to retrieve
+
+`--id`
+
+This argument is used to specify the id of the template to retrieve
 
 ## Deleting templates
 

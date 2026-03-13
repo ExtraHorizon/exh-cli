@@ -8,8 +8,6 @@ See the [Localization Service](https://docs.extrahorizon.com/extrahorizon/servic
 
 The CLI is the preferred way to manage localizations. It allows you to create simple JSON files with key-value pairs, one file for each language you want to support. With a single command these files are  transformed to localizations and are then synchronized with your cluster.
 
-### Command
-
 ```
 exh localizations sync
 ```
