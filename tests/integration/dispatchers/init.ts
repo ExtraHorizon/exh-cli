@@ -42,7 +42,7 @@ describe('exh dispatchers init', () => {
             ],
           },
         ],
-        $schema: 'https://swagger.extrahorizon.com/cli/1.13.0/config-json-schemas/Dispatchers.json',
+        $schema: 'https://swagger.extrahorizon.com/cli/1.13.1/config-json-schemas/Dispatchers.json',
       }
     );
   });
@@ -84,7 +84,7 @@ describe('exh dispatchers init', () => {
             ],
           },
         ],
-        $schema: 'https://swagger.extrahorizon.com/cli/1.13.0/config-json-schemas/Dispatchers.json',
+        $schema: 'https://swagger.extrahorizon.com/cli/1.13.1/config-json-schemas/Dispatchers.json',
       }
     );
   });
@@ -102,7 +102,7 @@ describe('exh dispatchers init', () => {
   it('Throws an error when providing an invalid Dispatcher file path', async () => {
     const filePath = tempDir.getPath('dispatchers.json');
 
-    const fileContentWithoutDispatchersArray = { $schema: 'https://swagger.extrahorizon.com/cli/1.13.0/config-json-schemas/Dispatchers.json' };
+    const fileContentWithoutDispatchersArray = { $schema: 'https://swagger.extrahorizon.com/cli/1.13.1/config-json-schemas/Dispatchers.json' };
     await writeFile(filePath, JSON.stringify(fileContentWithoutDispatchersArray, null, 2));
 
     const name = 'test-dispatcher';

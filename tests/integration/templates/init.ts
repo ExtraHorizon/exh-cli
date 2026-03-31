@@ -32,7 +32,7 @@ describe('exh templates init', () => {
       outputs: {
         subject: 'Welcome {{@inputs.first_name}}',
       },
-      $schema: 'https://swagger.extrahorizon.com/cli/1.13.0/config-json-schemas/Template.json',
+      $schema: 'https://swagger.extrahorizon.com/cli/1.13.1/config-json-schemas/Template.json',
     });
   });
 
