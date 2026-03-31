@@ -65,7 +65,7 @@ This is the easiest case. Everything is contained in the json file. The CLI will
     "subject": "Welcome to Extra Horizon",
     "body": "Dear {{@inputs.first_name}}, Welcome to Extra Horizon!"
   },
-  "$schema": "https://swagger.extrahorizon.com/cli/1.13.0/config-json-schemas/Template.json"
+  "$schema": "https://swagger.extrahorizon.com/cli/1.13.1/config-json-schemas/Template.json"
 }
 ```
 {% endcode %}
@@ -93,7 +93,7 @@ Example:
   "outputs": {
     "subject": "Your password reset"
   },
-  "$schema": "https://swagger.extrahorizon.com/cli/1.13.0/config-json-schemas/Template.json"
+  "$schema": "https://swagger.extrahorizon.com/cli/1.13.1/config-json-schemas/Template.json"
 }
 ```
 {% endcode %}

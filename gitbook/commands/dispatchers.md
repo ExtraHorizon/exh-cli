@@ -104,7 +104,7 @@ For detailed information regarding the structure of a Dispatcher, please refer t
       "tags": ["tag1", "tag2"]
     }
   ],
-  "$schema": "https://swagger.extrahorizon.com/cli/1.13.0/config-json-schemas/Dispatchers.json"
+  "$schema": "https://swagger.extrahorizon.com/cli/1.13.1/config-json-schemas/Dispatchers.json"
 }
 ```
 {% endcode %}

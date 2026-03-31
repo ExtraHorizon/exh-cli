@@ -54,12 +54,12 @@ Read more about the settings for each block on the following pages:
   "files": {
     "disableForceDownloadForMimeTypes": ["image/png"]
   },
-  "$schema": "https://swagger.extrahorizon.com/cli/1.13.0/config-json-schemas/ServiceSettings.json",
+  "$schema": "https://swagger.extrahorizon.com/cli/1.13.1/config-json-schemas/ServiceSettings.json",
 }
 ```
 {% endcode %}
 
-{% hint style="danger" %}
+{% hint style="warning" %}
 For the User Service email templates, only templates from Template Service V2 are supported, V1 templates cannot be targeted this way.
 {% endhint %}
 

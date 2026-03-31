@@ -35,7 +35,7 @@ When creating a data schema, you'll typically make a JSON file containing a spec
     }
   },
   
-  "$schema": "https://swagger.extrahorizon.com/cli/1.13.0/config-json-schemas/Schema.json"
+  "$schema": "https://swagger.extrahorizon.com/cli/1.13.1/config-json-schemas/Schema.json"
 }
 ```
 
@@ -206,6 +206,6 @@ An example of a schema making use of some of the features of the Data Service:
     }
   },
   
-  "$schema": "https://swagger.extrahorizon.com/cli/1.13.0/config-json-schemas/Schema.json"
+  "$schema": "https://swagger.extrahorizon.com/cli/1.13.1/config-json-schemas/Schema.json"
 }
 ```
