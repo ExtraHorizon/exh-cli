@@ -1,5 +1,8 @@
 # Extra Horizon CLI changelog
 
+### v1.13.1
+* Bumped version of `braces-expansion` for vulnerability warning (vulnerable code was not used though)
+
 ### v1.13.0
 * Introduced `exh settings sync`, by default enabling synchronization of service settings from a `service-settings.json` file.
 * Added `exh dispatchers init`, which creates a dispatcher in a new `dispatchers.json` file or appends a new dispatcher to an existing configuration.

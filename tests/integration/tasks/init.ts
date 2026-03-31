@@ -32,7 +32,7 @@ describe('exh tasks init', () => {
     const taskConfig = await tempDir.readJsonFile('my-task/task-config');
     expect(taskConfig?.name).toBe('my-task');
     expect(taskConfig?.description).toBe('my-task task');
-    expect(taskConfig?.$schema).toBe('https://swagger.extrahorizon.com/cli/1.13.0/config-json-schemas/TaskConfig.json');
+    expect(taskConfig?.$schema).toBe('https://swagger.extrahorizon.com/cli/1.13.1/config-json-schemas/TaskConfig.json');
 
     const gitFolderExists = await tempDir.exists('my-task/.git');
     expect(gitFolderExists).toBe(false);
