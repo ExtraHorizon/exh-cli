@@ -1,5 +1,7 @@
 # Extra Horizon CLI changelog
 
+### v1.13.2
+
 ### v1.13.1
 * Bumped version of `braces-expansion` for vulnerability warning (vulnerable code was not used though)
 
