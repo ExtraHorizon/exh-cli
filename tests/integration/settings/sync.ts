@@ -1,5 +1,4 @@
 import { handler } from '../../../src/commands/settings/sync';
-import { spyOnConsole } from '../../__helpers__/consoleSpy';
 import { fileServiceRepositoryMock as mockFileRepository, type FileRepositoryMock } from '../../__helpers__/fileRepositoryMock';
 import { createTempDirectoryManager, type TempDirectoryManager } from '../../__helpers__/tempDirectoryManager';
 import { generateTemplateV2 } from '../../__helpers__/templates';
@@ -7,8 +6,6 @@ import { templateV2RepositoryMock as mockTemplateRepository, type TemplateV2Repo
 import { userRepositoryMock as mockUserRepository, type UserRepositoryMock } from '../../__helpers__/userRepositoryMock';
 
 describe('exh settings sync', () => {
-  const { expectConsoleLogToContain } = spyOnConsole();
-
   let userServiceMock: UserRepositoryMock;
   let fileServiceMock: FileRepositoryMock;
   let templateServiceV2Mock: TemplateV2RepositoryMock;
@@ -82,13 +79,11 @@ describe('exh settings sync', () => {
     templateServiceV2Mock.findByNameSpy.mockResolvedValueOnce(null);
     templateServiceV2Mock.findByNameSpy.mockResolvedValueOnce(template);
 
-    await handler({ file: settingsFile });
+    const error = await handler({ file: settingsFile })
+      .catch(e => e.message);
 
-    expectConsoleLogToContain('⚠️  Template with name "activationEmailTemplateName" not found. Skipping activationEmailTemplateName.');
-    expect(userServiceMock.updateEmailTemplatesSpy).toHaveBeenCalledTimes(1);
-    expect(userServiceMock.updateEmailTemplatesSpy).toHaveBeenCalledWith({
-      reactivationPinEmailTemplateName: template.name,
-    });
+    expect(error).toBe('❌  Template with name "activationEmailTemplateName" not found.');
+    expect(userServiceMock.updateEmailTemplatesSpy).toHaveBeenCalledTimes(0);
   });
 
   it('Updates the email templates', async () => {
