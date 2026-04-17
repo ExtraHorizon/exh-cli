@@ -1,6 +1,5 @@
 import * as userRepository from '../../src/repositories/user';
 import {
-  generateEmailTemplates,
   generatePasswordPolicy, generateTestGlobalRole, generateTestUser, generateVerificationSettings,
 } from './users';
 
@@ -32,7 +31,11 @@ export const userRepositoryMock = () => {
     .mockResolvedValue(generateVerificationSettings());
 
   const updateEmailTemplatesSpy = jest.spyOn(userRepository, 'updateEmailTemplates')
-    .mockResolvedValue(generateEmailTemplates());
+    .mockResolvedValue({
+      activationEmailTemplateName: 'activation_email_template',
+      reactivationEmailTemplateName: 'reactivation_email_template',
+      passwordResetEmailTemplateName: 'password_reset_email_template',
+    });
 
   const updatePasswordPolicySpy = jest.spyOn(userRepository, 'updatePasswordPolicy')
     .mockResolvedValue(generatePasswordPolicy());

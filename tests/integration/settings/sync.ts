@@ -1,5 +1,4 @@
 import { handler } from '../../../src/commands/settings/sync';
-import { spyOnConsole } from '../../__helpers__/consoleSpy';
 import { fileServiceRepositoryMock as mockFileRepository, type FileRepositoryMock } from '../../__helpers__/fileRepositoryMock';
 import { createTempDirectoryManager, type TempDirectoryManager } from '../../__helpers__/tempDirectoryManager';
 import { generateTemplateV2 } from '../../__helpers__/templates';
@@ -7,8 +6,6 @@ import { templateV2RepositoryMock as mockTemplateRepository, type TemplateV2Repo
 import { userRepositoryMock as mockUserRepository, type UserRepositoryMock } from '../../__helpers__/userRepositoryMock';
 
 describe('exh settings sync', () => {
-  const { expectConsoleLogToContain } = spyOnConsole();
-
   let userServiceMock: UserRepositoryMock;
   let fileServiceMock: FileRepositoryMock;
   let templateServiceV2Mock: TemplateV2RepositoryMock;
@@ -73,8 +70,8 @@ describe('exh settings sync', () => {
     const settingsFile = await tempDirectoryManager.createJsonFile('service-settings', {
       users: {
         emailTemplates: {
-          activationEmailTemplateName: 'activationEmailTemplate',
-          reactivationPinEmailTemplateName: 'reactivationPinEmailTemplate',
+          activationEmailTemplateName: 'activationEmailTemplateName',
+          reactivationPinEmailTemplateName: template.name,
         },
       },
     });
@@ -82,13 +79,11 @@ describe('exh settings sync', () => {
     templateServiceV2Mock.findByNameSpy.mockResolvedValueOnce(null);
     templateServiceV2Mock.findByNameSpy.mockResolvedValueOnce(template);
 
-    await handler({ file: settingsFile });
+    const error = await handler({ file: settingsFile })
+      .catch(e => e);
 
-    expectConsoleLogToContain('⚠️  Template with name "activationEmailTemplate" not found. Skipping activationEmailTemplateId.');
-    expect(userServiceMock.updateEmailTemplatesSpy).toHaveBeenCalledTimes(1);
-    expect(userServiceMock.updateEmailTemplatesSpy).toHaveBeenCalledWith({
-      reactivationPinEmailTemplateId: template.id,
-    });
+    expect(error.message).toBe('❌  Template with name "activationEmailTemplateName" not found.');
+    expect(userServiceMock.updateEmailTemplatesSpy).toHaveBeenCalledTimes(0);
   });
 
   it('Updates the email templates', async () => {
@@ -96,7 +91,7 @@ describe('exh settings sync', () => {
     const settingsFile = await tempDirectoryManager.createJsonFile('service-settings', {
       users: {
         emailTemplates: {
-          activationEmailTemplateName: 'activationEmailTemplateId',
+          activationEmailTemplateName: template.name,
         },
       },
     });
@@ -108,7 +103,7 @@ describe('exh settings sync', () => {
     expect(userServiceMock.updateEmailTemplatesSpy).toHaveBeenCalledTimes(1);
     expect(userServiceMock.updateEmailTemplatesSpy).toHaveBeenCalledWith(
       expect.objectContaining({
-        activationEmailTemplateId: template.id,
+        activationEmailTemplateName: template.name,
       })
     );
   });

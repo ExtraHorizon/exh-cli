@@ -1,9 +1,9 @@
-import { EmailTemplates } from '@extrahorizon/javascript-sdk';
+import { FileServiceSettingsUpdate } from '@extrahorizon/javascript-sdk';
 import { blue, green, yellow } from 'chalk';
 import { updateFileServiceSettings } from '../../repositories/files';
 import * as templateV2Repository from '../../repositories/templatesV2';
 import { updateEmailTemplates, updatePasswordPolicy, updateVerificationSettings } from '../../repositories/user';
-import { readAndValidateServiceSettingsConfig, ServiceSettingsFile } from './util/readServiceSettingsFile';
+import { EmailTemplateSettings, PasswordPolicySettings, readAndValidateServiceSettingsConfig, ServiceSettingsFile, UserServiceSettings } from './util/readServiceSettingsFile';
 
 export async function sync(path: string) {
   console.log(yellow('Syncing service settings'));
@@ -15,7 +15,7 @@ export async function sync(path: string) {
   console.log(green('✓ Synced service settings'));
 }
 
-async function syncUserSettings(userServiceSettings?: ServiceSettingsFile['users']) {
+async function syncUserSettings(userServiceSettings?: UserServiceSettings) {
   if (!userServiceSettings || Object.keys(userServiceSettings).length === 0) {
     return;
   }
@@ -27,7 +27,7 @@ async function syncUserSettings(userServiceSettings?: ServiceSettingsFile['users
   console.log(green('✓ Synced user service settings'));
 }
 
-async function syncFileServiceSettings(fileServiceSettings?: ServiceSettingsFile['files']) {
+async function syncFileServiceSettings(fileServiceSettings?: FileServiceSettingsUpdate) {
   if (!fileServiceSettings || Object.keys(fileServiceSettings).length === 0) {
     return;
   }
@@ -37,7 +37,7 @@ async function syncFileServiceSettings(fileServiceSettings?: ServiceSettingsFile
   console.log(green('✓ Synced file service settings'));
 }
 
-async function syncPasswordPolicy(passwordPolicy?: ServiceSettingsFile['users']['passwordPolicy']) {
+async function syncPasswordPolicy(passwordPolicy?: PasswordPolicySettings) {
   if (!passwordPolicy || Object.keys(passwordPolicy).length === 0) {
     return;
   }
@@ -47,15 +47,17 @@ async function syncPasswordPolicy(passwordPolicy?: ServiceSettingsFile['users'][
   console.log(green('✓ Synced password policy'));
 }
 
-async function syncEmailTemplates(emailTemplateNames?: ServiceSettingsFile['users']['emailTemplates']) {
-  if (!emailTemplateNames || Object.keys(emailTemplateNames).length === 0) {
+async function syncEmailTemplates(emailTemplates?: EmailTemplateSettings) {
+  if (!emailTemplates || Object.keys(emailTemplates).length < 1) {
     return;
   }
 
-  const emailTemplates = await convertEmailTemplateNamesToIds(emailTemplateNames);
+  for (const name of Object.values(emailTemplates)) {
+    const template = await templateV2Repository.findByName(name);
 
-  if (Object.keys(emailTemplates).length === 0) {
-    return;
+    if (!template) {
+      throw new Error(`❌  Template with name "${name}" not found.`);
+    }
   }
 
   console.log(blue('Syncing email templates'));
@@ -71,34 +73,4 @@ async function syncVerificationSettings(verificationSettings?: ServiceSettingsFi
   console.log(blue('Syncing verification settings'));
   await updateVerificationSettings(verificationSettings);
   console.log(green('✓ Synced verification settings'));
-}
-
-async function convertEmailTemplateNamesToIds(emailTemplateNames: ServiceSettingsFile['users']['emailTemplates']) {
-  const emailTemplates: Partial<EmailTemplates> = {};
-
-  const templateNameIdMap = {
-    activationEmailTemplateName: 'activationEmailTemplateId',
-    reactivationEmailTemplateName: 'reactivationEmailTemplateId',
-    passwordResetEmailTemplateName: 'passwordResetEmailTemplateId',
-    oidcUnlinkEmailTemplateName: 'oidcUnlinkEmailTemplateId',
-    oidcUnlinkPinEmailTemplateName: 'oidcUnlinkPinEmailTemplateId',
-    activationPinEmailTemplateName: 'activationPinEmailTemplateId',
-    reactivationPinEmailTemplateName: 'reactivationPinEmailTemplateId',
-    passwordResetPinEmailTemplateName: 'passwordResetPinEmailTemplateId',
-  };
-
-  for (const [nameProperty, idProperty] of Object.entries(templateNameIdMap)) {
-    if (emailTemplateNames[nameProperty]) {
-      const template = await templateV2Repository.findByName(emailTemplateNames[nameProperty]);
-
-      if (!template) {
-        console.log(yellow(`⚠️  Template with name "${emailTemplateNames[nameProperty]}" not found. Skipping ${idProperty}.`));
-        continue;
-      }
-
-      emailTemplates[idProperty] = template.id;
-    }
-  }
-
-  return emailTemplates;
 }
