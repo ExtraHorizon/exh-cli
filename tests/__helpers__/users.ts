@@ -55,14 +55,14 @@ export const generateVerificationSettings = (): VerificationSettings => ({
 });
 
 export const generateEmailTemplates = (): Partial<EmailTemplates> => ({
-  activationEmailTemplateId: '69a837094548684b3d64c9f1',
-  reactivationEmailTemplateId: '69a837094548684b3d64c9f3',
-  passwordResetEmailTemplateId: '69a837094548684b3d64c9f4',
-  oidcUnlinkEmailTemplateId: '69a837094548684b3d64c9f5',
-  oidcUnlinkPinEmailTemplateId: '69a837094548684b3d64c9f5',
-  activationPinEmailTemplateId: '69a837094548684b3d64c9f1',
-  reactivationPinEmailTemplateId: '69a837094548684b3d64c9f3',
-  passwordResetPinEmailTemplateId: '69a837094548684b3d64c9f4',
+  activationEmailTemplateName: 'activationEmailTemplateName',
+  reactivationEmailTemplateName: 'reactivationEmailTemplateName',
+  passwordResetEmailTemplateName: 'passwordResetEmailTemplateName',
+  oidcUnlinkEmailTemplateName: 'oidcUnlinkEmailTemplateName',
+  oidcUnlinkPinEmailTemplateName: 'oidcUnlinkPinEmailTemplateName',
+  activationPinEmailTemplateName: 'activationPinEmailTemplateName',
+  reactivationPinEmailTemplateName: 'reactivationPinEmailTemplateName',
+  passwordResetPinEmailTemplateName: 'passwordResetPinEmailTemplateName',
 });
 
 export const generatePasswordPolicy = (): PasswordPolicy => ({

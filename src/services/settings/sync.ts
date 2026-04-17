@@ -64,6 +64,10 @@ async function syncEmailTemplates(emailTemplates?: ServiceSettingsFile['users'][
     validEmailTemplates[key] = value;
   }
 
+  if (Object.keys(validEmailTemplates).length === 0) {
+    return;
+  }
+
   console.log(blue('Syncing email templates'));
   await updateEmailTemplates(validEmailTemplates);
   console.log(green('✓ Synced email templates'));
