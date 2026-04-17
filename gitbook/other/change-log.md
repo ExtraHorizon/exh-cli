@@ -1,10 +1,10 @@
 # Extra Horizon CLI changelog
 
 ### v1.13.2
-
-### Fixed
-- Bumped Axios version to `0.31.0` to resolve vulnerabilities `CVE-2026-40175` and `CVE-2025-62718`
-- Bumped lodash version to `4.18.1` to resolve vulnerabilities `CVE-2026-4800` and `CVE-2026-2950`
+* Updated the ExH SDK to `8.6.0`
+* The following vulnerabilities were resolved, but not applicable:
+  * Bumped Axios version to resolve `CVE-2026-40175` and `CVE-2025-62718`
+  * Bumped lodash version to resolve `CVE-2026-4800` and `CVE-2026-2950`
 
 ### v1.13.1
 * Bumped version of `braces-expansion` for vulnerability warning (vulnerable code was not used though)
