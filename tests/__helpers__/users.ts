@@ -54,7 +54,7 @@ export const generateVerificationSettings = (): VerificationSettings => ({
   limitHashForgotPasswordRequests: true,
 });
 
-export const generateEmailTemplates = (): EmailTemplates => ({
+export const generateEmailTemplates = (): Partial<EmailTemplates> => ({
   activationEmailTemplateId: '69a837094548684b3d64c9f1',
   reactivationEmailTemplateId: '69a837094548684b3d64c9f3',
   passwordResetEmailTemplateId: '69a837094548684b3d64c9f4',
