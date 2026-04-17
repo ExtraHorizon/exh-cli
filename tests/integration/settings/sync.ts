@@ -80,9 +80,9 @@ describe('exh settings sync', () => {
     templateServiceV2Mock.findByNameSpy.mockResolvedValueOnce(template);
 
     const error = await handler({ file: settingsFile })
-      .catch(e => e.message);
+      .catch(e => e);
 
-    expect(error).toBe('❌  Template with name "activationEmailTemplateName" not found.');
+    expect(error.message).toBe('❌  Template with name "activationEmailTemplateName" not found.');
     expect(userServiceMock.updateEmailTemplatesSpy).toHaveBeenCalledTimes(0);
   });
 
