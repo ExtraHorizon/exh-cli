@@ -47,19 +47,25 @@ async function syncPasswordPolicy(passwordPolicy?: ServiceSettingsFile['users'][
   console.log(green('✓ Synced password policy'));
 }
 
-async function syncEmailTemplates(emailTemplateNames?: ServiceSettingsFile['users']['emailTemplates']) {
-  if (!emailTemplateNames || Object.keys(emailTemplateNames).length === 0) {
+async function syncEmailTemplates(emailTemplates?: ServiceSettingsFile['users']['emailTemplates']) {
+  if (!emailTemplates || Object.keys(emailTemplates).length === 0) {
     return;
   }
 
-  const emailTemplates = await convertEmailTemplateNamesToIds(emailTemplateNames);
+  const validEmailTemplates: Partial<EmailTemplates> = {};
+  for (const [key, value] of Object.entries(emailTemplates)) {
+    const template = await templateV2Repository.findByName(emailTemplates[key]);
 
-  if (Object.keys(emailTemplates).length === 0) {
-    return;
+    if (!template) {
+      console.log(yellow(`⚠️  Template with name "${emailTemplates[key]}" not found. Skipping ${key}.`));
+      continue;
+    }
+
+    validEmailTemplates[key] = value;
   }
 
   console.log(blue('Syncing email templates'));
-  await updateEmailTemplates(emailTemplates);
+  await updateEmailTemplates(validEmailTemplates);
   console.log(green('✓ Synced email templates'));
 }
 
@@ -71,34 +77,4 @@ async function syncVerificationSettings(verificationSettings?: ServiceSettingsFi
   console.log(blue('Syncing verification settings'));
   await updateVerificationSettings(verificationSettings);
   console.log(green('✓ Synced verification settings'));
-}
-
-async function convertEmailTemplateNamesToIds(emailTemplateNames: ServiceSettingsFile['users']['emailTemplates']) {
-  const emailTemplates: Partial<EmailTemplates> = {};
-
-  const templateNameIdMap = {
-    activationEmailTemplateName: 'activationEmailTemplateId',
-    reactivationEmailTemplateName: 'reactivationEmailTemplateId',
-    passwordResetEmailTemplateName: 'passwordResetEmailTemplateId',
-    oidcUnlinkEmailTemplateName: 'oidcUnlinkEmailTemplateId',
-    oidcUnlinkPinEmailTemplateName: 'oidcUnlinkPinEmailTemplateId',
-    activationPinEmailTemplateName: 'activationPinEmailTemplateId',
-    reactivationPinEmailTemplateName: 'reactivationPinEmailTemplateId',
-    passwordResetPinEmailTemplateName: 'passwordResetPinEmailTemplateId',
-  };
-
-  for (const [nameProperty, idProperty] of Object.entries(templateNameIdMap)) {
-    if (emailTemplateNames[nameProperty]) {
-      const template = await templateV2Repository.findByName(emailTemplateNames[nameProperty]);
-
-      if (!template) {
-        console.log(yellow(`⚠️  Template with name "${emailTemplateNames[nameProperty]}" not found. Skipping ${idProperty}.`));
-        continue;
-      }
-
-      emailTemplates[idProperty] = template.id;
-    }
-  }
-
-  return emailTemplates;
 }

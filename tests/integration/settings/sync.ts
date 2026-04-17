@@ -73,8 +73,8 @@ describe('exh settings sync', () => {
     const settingsFile = await tempDirectoryManager.createJsonFile('service-settings', {
       users: {
         emailTemplates: {
-          activationEmailTemplateName: 'activationEmailTemplate',
-          reactivationPinEmailTemplateName: 'reactivationPinEmailTemplate',
+          activationEmailTemplateName: 'activationEmailTemplateName',
+          reactivationPinEmailTemplateName: template.name,
         },
       },
     });
@@ -84,10 +84,10 @@ describe('exh settings sync', () => {
 
     await handler({ file: settingsFile });
 
-    expectConsoleLogToContain('⚠️  Template with name "activationEmailTemplate" not found. Skipping activationEmailTemplateId.');
+    expectConsoleLogToContain('⚠️  Template with name "activationEmailTemplateName" not found. Skipping activationEmailTemplateName.');
     expect(userServiceMock.updateEmailTemplatesSpy).toHaveBeenCalledTimes(1);
     expect(userServiceMock.updateEmailTemplatesSpy).toHaveBeenCalledWith({
-      reactivationPinEmailTemplateId: template.id,
+      reactivationPinEmailTemplateName: template.name,
     });
   });
 
@@ -96,7 +96,7 @@ describe('exh settings sync', () => {
     const settingsFile = await tempDirectoryManager.createJsonFile('service-settings', {
       users: {
         emailTemplates: {
-          activationEmailTemplateName: 'activationEmailTemplateId',
+          activationEmailTemplateName: template.name,
         },
       },
     });
@@ -108,7 +108,7 @@ describe('exh settings sync', () => {
     expect(userServiceMock.updateEmailTemplatesSpy).toHaveBeenCalledTimes(1);
     expect(userServiceMock.updateEmailTemplatesSpy).toHaveBeenCalledWith(
       expect.objectContaining({
-        activationEmailTemplateId: template.id,
+        activationEmailTemplateName: template.name,
       })
     );
   });
