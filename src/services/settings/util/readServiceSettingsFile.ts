@@ -1,23 +1,41 @@
 import { readFile } from 'fs/promises';
-import { FileServiceSettingsUpdate, PasswordPolicy, VerificationSettings } from '@extrahorizon/javascript-sdk';
+import { FileServiceSettingsUpdate } from '@extrahorizon/javascript-sdk';
 import * as serviceSettingsSchema from '../../../config-json-schemas/ServiceSettings.json';
 import { ajvValidate } from '../../../helpers/util';
 
+export interface PasswordPolicySettings {
+  minimumLength?: number;
+  maximumLength?: number;
+  upperCaseRequired?: boolean;
+  lowerCaseRequired?: boolean;
+  symbolRequired?: boolean;
+  numberRequired?: boolean;
+}
+
+export interface VerificationSettings {
+  enablePinCodeActivationRequests?: boolean;
+  enablePinCodeForgotPasswordRequests?: boolean;
+}
+
+export interface EmailTemplateSettings {
+  activationEmailTemplateName?: string;
+  reactivationEmailTemplateName?: string;
+  passwordResetEmailTemplateName?: string;
+  oidcUnlinkEmailTemplateName?: string;
+  oidcUnlinkPinEmailTemplateName?: string;
+  activationPinEmailTemplateName?: string;
+  reactivationPinEmailTemplateName?: string;
+  passwordResetPinEmailTemplateName?: string;
+}
+
+export interface UserServiceSettings {
+  passwordPolicy?: PasswordPolicySettings;
+  verification?: VerificationSettings;
+  emailTemplates?: EmailTemplateSettings;
+}
+
 export interface ServiceSettingsFile {
-  users?: {
-    passwordPolicy?: Partial<PasswordPolicy>;
-    verification?: Partial<Pick<VerificationSettings, 'enablePinCodeActivationRequests' | 'enablePinCodeForgotPasswordRequests'>>;
-    emailTemplates?: Partial<{
-      activationEmailTemplateName: string;
-      reactivationEmailTemplateName: string;
-      passwordResetEmailTemplateName: string;
-      oidcUnlinkEmailTemplateName: string;
-      oidcUnlinkPinEmailTemplateName: string;
-      activationPinEmailTemplateName: string;
-      reactivationPinEmailTemplateName: string;
-      passwordResetPinEmailTemplateName: string;
-    }>;
-  };
+  users?: UserServiceSettings;
   files?: FileServiceSettingsUpdate;
 }
 

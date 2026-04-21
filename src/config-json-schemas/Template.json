@@ -11,7 +11,7 @@
     "extendsTemplate": { "type": "string" },
     "inputs": {
       "type": "object",
-      "additionalProperties": { "$ref": "#/definitions/TypeConfigurationV2" }
+      "additionalProperties": { "$ref": "#/definitions/TypeConfiguration" }
     },
     "outputs": {
       "type": "object",
@@ -26,7 +26,7 @@
     }
   },
   "definitions": {
-    "TypeConfigurationV2": {
+    "TypeConfiguration": {
       "type": "object",
       "required": [ "type" ],
       "properties": {
@@ -42,7 +42,7 @@
               "type": { "const": "object" }
             }
           },
-          "then": { "$ref": "#/definitions/ObjectConfigurationV2" }
+          "then": { "$ref": "#/definitions/ObjectConfiguration" }
         },
         {
           "if": {
@@ -51,7 +51,7 @@
               "type": { "const": "array" }
             }
           },
-          "then": { "$ref": "#/definitions/ArrayConfigurationV2" }
+          "then": { "$ref": "#/definitions/ArrayConfiguration" }
         },
         {
           "if": {
@@ -60,7 +60,7 @@
               "type": { "const": "string" }
             }
           },
-          "then": { "$ref": "#/definitions/StringConfigurationV2" }
+          "then": { "$ref": "#/definitions/StringConfiguration" }
         },
         {
           "if": {
@@ -69,7 +69,7 @@
               "type": { "const": "number" }
             }
           },
-          "then": { "$ref": "#/definitions/NumberConfigurationV2" }
+          "then": { "$ref": "#/definitions/NumberConfiguration" }
         },
         {
           "if": {
@@ -78,11 +78,11 @@
               "type": { "const": "boolean" }
             }
           },
-          "then": { "$ref": "#/definitions/BooleanConfigurationV2" }
+          "then": { "$ref": "#/definitions/BooleanConfiguration" }
         }
       ]
     },
-    "ObjectConfigurationV2": {
+    "ObjectConfiguration": {
       "type": "object",
       "additionalProperties": false,
       "required": [ "type", "properties" ],
@@ -90,20 +90,20 @@
         "type": { "const": "object" },
         "properties": {
           "type": "object",
-          "additionalProperties": { "$ref": "#/definitions/TypeConfigurationV2" }
+          "additionalProperties": { "$ref": "#/definitions/TypeConfiguration" }
         }
       }
     },
-    "ArrayConfigurationV2": {
+    "ArrayConfiguration": {
       "type": "object",
       "additionalProperties": false,
       "required": ["type", "items"],
       "properties": {
         "type": { "const": "array" },
-        "items": {"$ref": "#/definitions/TypeConfigurationV2" }
+        "items": {"$ref": "#/definitions/TypeConfiguration" }
       }
     },
-    "StringConfigurationV2": {
+    "StringConfiguration": {
       "type": "object",
       "additionalProperties": false,
       "required": [ "type" ],
@@ -111,7 +111,7 @@
         "type": { "const": "string" }
       }
     },
-    "NumberConfigurationV2": {
+    "NumberConfiguration": {
       "type": "object",
       "additionalProperties": false,
       "required": ["type" ],
@@ -119,7 +119,7 @@
         "type": { "const": "number" }
       }
     },
-    "BooleanConfigurationV2": {
+    "BooleanConfiguration": {
       "type": "object",
       "additionalProperties": false,
       "required": [ "type" ],
