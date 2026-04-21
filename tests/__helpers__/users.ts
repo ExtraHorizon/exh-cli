@@ -1,4 +1,4 @@
-import { EmailTemplates, PasswordPolicy, UserData, VerificationSettings } from '@extrahorizon/javascript-sdk';
+import { PasswordPolicy, UserData, VerificationSettings } from '@extrahorizon/javascript-sdk';
 import { generateId } from './utils';
 
 export const generateFunctionUser = (functionName: string): UserData => ({
@@ -52,17 +52,6 @@ export const generateVerificationSettings = (): VerificationSettings => ({
   enablePinCodeForgotPasswordRequests: true,
   limitHashActivationRequests: true,
   limitHashForgotPasswordRequests: true,
-});
-
-export const generateEmailTemplates = (): EmailTemplates => ({
-  activationEmailTemplateId: '69a837094548684b3d64c9f1',
-  reactivationEmailTemplateId: '69a837094548684b3d64c9f3',
-  passwordResetEmailTemplateId: '69a837094548684b3d64c9f4',
-  oidcUnlinkEmailTemplateId: '69a837094548684b3d64c9f5',
-  oidcUnlinkPinEmailTemplateId: '69a837094548684b3d64c9f5',
-  activationPinEmailTemplateId: '69a837094548684b3d64c9f1',
-  reactivationPinEmailTemplateId: '69a837094548684b3d64c9f3',
-  passwordResetPinEmailTemplateId: '69a837094548684b3d64c9f4',
 });
 
 export const generatePasswordPolicy = (): PasswordPolicy => ({
