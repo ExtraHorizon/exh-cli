@@ -65,7 +65,7 @@ This is the easiest case. Everything is contained in the json file. The CLI will
     "subject": "Welcome to Extra Horizon",
     "body": "Dear {{@inputs.first_name}}, Welcome to Extra Horizon!"
   },
-  "$schema": "https://swagger.extrahorizon.com/cli/1.13.1/config-json-schemas/Template.json"
+  "$schema": "https://swagger.extrahorizon.com/cli/1.13.2/config-json-schemas/Template.json"
 }
 ```
 {% endcode %}
@@ -93,7 +93,7 @@ Example:
   "outputs": {
     "subject": "Your password reset"
   },
-  "$schema": "https://swagger.extrahorizon.com/cli/1.13.1/config-json-schemas/Template.json"
+  "$schema": "https://swagger.extrahorizon.com/cli/1.13.2/config-json-schemas/Template.json"
 }
 ```
 {% endcode %}
@@ -266,7 +266,7 @@ A simplified template to extend from: (containing a `first_name` and `message` r
   "outpus": {
     "body": "Dear {{@inputs.first_name}},\n\n{{@inputs.message}}\n\nKind regards,\nThe team"
   },
-  "$schema": "https://swagger.extrahorizon.com/cli/1.13.0/config-json-schemas/Template.json"
+  "$schema": "https://swagger.extrahorizon.com/cli/1.13.2/config-json-schemas/Template.json"
 }
 ```
 {% endcode %}
@@ -285,7 +285,7 @@ A template extending the above template: (passing along its own input `name` to 
     "first_name": "{{@inputs.name}}",
     "message": "We have successfully received your registration. You can now use our services."
   },
-  "$schema": "https://swagger.extrahorizon.com/cli/1.13.0/config-json-schemas/Template.json"
+  "$schema": "https://swagger.extrahorizon.com/cli/1.13.2/config-json-schemas/Template.json"
 }
 ```
 {% endcode %}
