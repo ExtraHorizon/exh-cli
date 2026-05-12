@@ -1,5 +1,8 @@
 # Extra Horizon CLI changelog
 
+### v1.13.3
+* 
+
 ### v1.13.2
 * Updated the ExH SDK to `8.6.0`
 * The following vulnerabilities were resolved, but not applicable:
