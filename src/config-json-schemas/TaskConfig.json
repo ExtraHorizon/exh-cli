@@ -48,6 +48,7 @@
         "dotnet8",
         "dotnet7",
         "dotnet6",
+        "ruby4.0",
         "ruby3.4",
         "ruby3.3",
         "ruby3.2",
