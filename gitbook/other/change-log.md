@@ -4,6 +4,7 @@
 * Updated the ExH SDK to `8.11.0` to fix a security warning from `axios` (vulnerable code was not in use)
 * Bumped version of `braces-expansion` for vulnerability warning
 * Bumped version of `fast-uri` for vulnerability warning
+* Updated the supported Task Service runtime options to include `ruby4.0`
 
 ### v1.13.2
 * Updated the ExH SDK to `8.6.0`
