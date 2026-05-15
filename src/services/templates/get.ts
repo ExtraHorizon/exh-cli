@@ -28,7 +28,7 @@ export async function getFromV1(name?: string, id?: string) {
       return await templateRepository.findById(id);
     }
   } catch (error) {
-    if (!(error instanceof ServiceNotFoundError) || !(error instanceof ServiceUnreachableError)) {
+    if (!(error instanceof ServiceNotFoundError) && !(error instanceof ServiceUnreachableError)) {
       // Template service V1 might not be available anymore
       throw error;
     }
@@ -47,7 +47,7 @@ export async function getFromV2(name?: string, id?: string) {
       return await templateV2Repository.findById(id);
     }
   } catch (error) {
-    if (!(error instanceof ServiceNotFoundError) || !(error instanceof ServiceUnreachableError)) {
+    if (!(error instanceof ServiceNotFoundError) && !(error instanceof ServiceUnreachableError)) {
       // Template service V2 might not be available yet
       throw error;
     }

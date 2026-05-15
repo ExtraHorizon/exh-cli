@@ -28,7 +28,7 @@ async function removeFromV1(name?: string, id?: string) {
     await templateRepository.remove(template.id);
     return true;
   } catch (error) {
-    if (!(error instanceof ServiceNotFoundError) || !(error instanceof ServiceUnreachableError)) {
+    if (!(error instanceof ServiceNotFoundError) && !(error instanceof ServiceUnreachableError)) {
       // Template service V1 might not be available anymore
       throw error;
     }
