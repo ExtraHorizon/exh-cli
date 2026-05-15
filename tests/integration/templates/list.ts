@@ -1,4 +1,4 @@
-import { ServiceNotFoundError } from '@extrahorizon/javascript-sdk';
+import { ServiceNotFoundError, ServiceUnreachableError } from '@extrahorizon/javascript-sdk';
 import { handler } from '../../../src/commands/templates/list';
 import { spyOnConsole } from '../../__helpers__/consoleSpy';
 import { templateRepositoryMock, type TemplateRepositoryMock } from '../../__helpers__/templateRepositoryMock';
@@ -75,6 +75,26 @@ describe('exh templates list', () => {
     // Both not found
     repositoryMockV1.findAllSpy.mockRejectedValueOnce(serviceNotFoundError);
     repositoryMockV2.findAllSpy.mockRejectedValueOnce(serviceNotFoundError);
+    await handler({ isTTY: false });
+    expectConsoleLogToContain('No templates found');
+  });
+
+  it('Ignore the ServiceUnreachableError for template service V1 or V2', async () => {
+    const serviceUnreachableError = new ServiceUnreachableError({ name: '', message: '' });
+
+    // V1 not found
+    repositoryMockV1.findAllSpy.mockRejectedValueOnce(serviceUnreachableError);
+    await handler({ isTTY: false });
+    expectConsoleLogToContain(templateV2);
+
+    // V2 not found
+    repositoryMockV2.findAllSpy.mockRejectedValueOnce(serviceUnreachableError);
+    await handler({ isTTY: false });
+    expectConsoleLogToContain(templateV1);
+
+    // Both not found
+    repositoryMockV1.findAllSpy.mockRejectedValueOnce(serviceUnreachableError);
+    repositoryMockV2.findAllSpy.mockRejectedValueOnce(serviceUnreachableError);
     await handler({ isTTY: false });
     expectConsoleLogToContain('No templates found');
   });

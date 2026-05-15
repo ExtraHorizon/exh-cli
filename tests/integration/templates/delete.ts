@@ -1,4 +1,4 @@
-import { ServiceNotFoundError } from '@extrahorizon/javascript-sdk';
+import { ServiceNotFoundError, ServiceUnreachableError } from '@extrahorizon/javascript-sdk';
 import { handler } from '../../../src/commands/templates/delete';
 import { spyOnConsole } from '../../__helpers__/consoleSpy';
 import { templateRepositoryMock, type TemplateRepositoryMock } from '../../__helpers__/templateRepositoryMock';
@@ -103,12 +103,56 @@ describe('exh templates delete', () => {
     expectConsoleLogToContain('Template deleted');
   });
 
+  it('Ignores the ServiceUnreachableError for template service V2', async () => {
+    const serviceUnreachableError = new ServiceUnreachableError({ name: '', message: '' });
+    repositoryMockV2.findByNameSpy.mockRejectedValueOnce(serviceUnreachableError);
+    repositoryMockV2.findByIdSpy.mockRejectedValueOnce(serviceUnreachableError);
+
+    await handler({ name: 'TemplateA' });
+
+    // Gracefully falls back to V1 without throwing an error
+    expect(repositoryMockV2.findByNameSpy).toHaveBeenCalledWith('TemplateA');
+    expect(repositoryMock.findByNameSpy).toHaveBeenCalledWith('TemplateA');
+    expect(repositoryMock.removeSpy).toHaveBeenCalledWith(templateV1.id);
+    expectConsoleLogToContain('Template deleted');
+
+    // By id
+    await handler({ id: 'template-id' });
+
+    expect(repositoryMockV2.findByIdSpy).toHaveBeenCalledWith('template-id');
+    expect(repositoryMock.findByIdSpy).toHaveBeenCalledWith('template-id');
+    expect(repositoryMock.removeSpy).toHaveBeenCalledWith(templateV1.id);
+    expectConsoleLogToContain('Template deleted');
+  });
+
   it('Ignores the ServiceNotFoundError for template service V1', async () => {
     const serviceNotFoundError = new ServiceNotFoundError({ name: '', message: '' });
     repositoryMockV2.findByNameSpy.mockResolvedValueOnce(undefined);
     repositoryMockV2.findByIdSpy.mockResolvedValueOnce(undefined);
     repositoryMock.findByNameSpy.mockRejectedValueOnce(serviceNotFoundError);
     repositoryMock.findByIdSpy.mockRejectedValueOnce(serviceNotFoundError);
+
+    await handler({ name: 'TemplateA' });
+
+    // Prints the same error message as if the template was not found, without throwing an error
+    expect(repositoryMockV2.findByNameSpy).toHaveBeenCalledWith('TemplateA');
+    expect(repositoryMock.findByNameSpy).toHaveBeenCalledWith('TemplateA');
+    expectConsoleLogToContain('Template not found!');
+
+    await handler({ id: 'template-id' });
+
+    // Prints the same error message as if the template was not found, without throwing an error
+    expect(repositoryMockV2.findByIdSpy).toHaveBeenCalledWith('template-id');
+    expect(repositoryMock.findByIdSpy).toHaveBeenCalledWith('template-id');
+    expectConsoleLogToContain('Template not found!');
+  });
+
+  it('Ignores the ServiceUnreachableError for template service V1', async () => {
+    const serviceUnreachableError = new ServiceUnreachableError({ name: '', message: '' });
+    repositoryMockV2.findByNameSpy.mockResolvedValueOnce(undefined);
+    repositoryMockV2.findByIdSpy.mockResolvedValueOnce(undefined);
+    repositoryMock.findByNameSpy.mockRejectedValueOnce(serviceUnreachableError);
+    repositoryMock.findByIdSpy.mockRejectedValueOnce(serviceUnreachableError);
 
     await handler({ name: 'TemplateA' });
 
