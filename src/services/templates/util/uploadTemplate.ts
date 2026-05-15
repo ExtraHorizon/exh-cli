@@ -11,9 +11,9 @@ export async function uploadTemplate(template: any) {
 }
 
 async function uploadV1Template(template: any) {
-  const existingTemplate = await templateRepository.findByName(template.name);
-
   try {
+    const existingTemplate = await templateRepository.findByName(template.name);
+
     if (!existingTemplate) {
       console.log(`Creating new template '${template.name}'`);
       await templateRepository.create(template);
@@ -27,9 +27,9 @@ async function uploadV1Template(template: any) {
 }
 
 async function uploadV2Template(template: any) {
-  const existingTemplate = await templateV2Repository.findByName(template.name);
-
   try {
+    const existingTemplate = await templateV2Repository.findByName(template.name);
+
     if (!existingTemplate) {
       console.log(`Creating new template '${template.name}'`);
       await templateV2Repository.create(template);

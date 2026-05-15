@@ -1,4 +1,4 @@
-import { ServiceNotFoundError } from '@extrahorizon/javascript-sdk';
+import { ServiceNotFoundError, ServiceUnreachableError } from '@extrahorizon/javascript-sdk';
 import * as chalk from 'chalk';
 import * as templateRepository from '../../repositories/templates';
 import * as templateV2Repository from '../../repositories/templatesV2';
@@ -28,7 +28,7 @@ async function removeFromV1(name?: string, id?: string) {
     await templateRepository.remove(template.id);
     return true;
   } catch (error) {
-    if (!(error instanceof ServiceNotFoundError)) {
+    if (!(error instanceof ServiceNotFoundError) && !(error instanceof ServiceUnreachableError)) {
       // Template service V1 might not be available anymore
       throw error;
     }

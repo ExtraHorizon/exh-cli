@@ -1,15 +1,16 @@
-import { ServiceNotFoundError } from '@extrahorizon/javascript-sdk';
+import { ServiceNotFoundError, ServiceUnreachableError } from '@extrahorizon/javascript-sdk';
 import * as chalk from 'chalk';
 import * as templateRepository from '../../repositories/templates';
 import * as templateV2Repository from '../../repositories/templatesV2';
 
 export async function list(isTTY: boolean) {
   const templates = [];
+
   try {
     const templatesV1 = await templateRepository.findAll();
     templates.push(...templatesV1);
   } catch (error) {
-    if (!(error instanceof ServiceNotFoundError)) {
+    if (!(error instanceof ServiceNotFoundError) && !(error instanceof ServiceUnreachableError)) {
       // Template service V1 might not be available anymore
       throw error;
     }
@@ -19,7 +20,7 @@ export async function list(isTTY: boolean) {
     const templatesV2 = await templateV2Repository.findAll();
     templates.push(...templatesV2);
   } catch (error) {
-    if (!(error instanceof ServiceNotFoundError)) {
+    if (!(error instanceof ServiceNotFoundError) && !(error instanceof ServiceUnreachableError)) {
       // Template service V2 might not be available yet
       throw error;
     }
