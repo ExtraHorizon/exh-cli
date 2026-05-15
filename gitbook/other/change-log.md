@@ -1,5 +1,7 @@
 # Extra Horizon CLI changelog
 
+### v1.14.0
+
 ### v1.13.3
 * Updated the ExH SDK to `8.11.0` to fix a security warning from `axios` (vulnerable code was not in use)
 * Bumped version of `braces-expansion` for vulnerability warning
