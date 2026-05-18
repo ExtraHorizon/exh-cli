@@ -2,7 +2,7 @@
 
 ### v1.13.4
 * Updated the `templates` syncing feedback to make the synchronization state clearer
-* Updated the `templates` commands to correctly handle cases where the Template Service v1 is unavailable.`
+* Updated the `templates` commands to correctly handle cases where the Template Service v1 is unavailable
 
 ### v1.13.3
 * Updated the ExH SDK to `8.11.0` to fix a security warning from `axios` (vulnerable code was not in use)
