@@ -444,10 +444,10 @@
     "@extrahorizon/eslint-config-base" "^1.6.0"
     eslint-plugin-jest "^26.4.5"
 
-"@extrahorizon/javascript-sdk@8.12.0-feat-170-8c1c1e0":
-  version "8.12.0-feat-170-8c1c1e0"
-  resolved "https://registry.yarnpkg.com/@extrahorizon/javascript-sdk/-/javascript-sdk-8.12.0-feat-170-8c1c1e0.tgz#b2e3018cfdc0c99d8a755bc3cee60466e7c6be30"
-  integrity sha512-fPvymDn+2E1NHNe1oNlswlOUuHpUkssH0EcF1rDWBSyC0bU1OaJKR9G1NBCvM+AwgJh/L6Cp3NU0r2ERoHtTWA==
+"@extrahorizon/javascript-sdk@8.12.0":
+  version "8.12.0"
+  resolved "https://registry.yarnpkg.com/@extrahorizon/javascript-sdk/-/javascript-sdk-8.12.0.tgz#9983e66a6f139d0b1d96f6003332f3f4b0f0b894"
+  integrity sha512-sMDwLx2Kmn+tEvzK3zdyyPvYAzXBhevHNJ2US2lgFTAUjhTjYQz+0rGUNpY+0Tb27FVPvpjXzrQMIyc46QF45Q==
   dependencies:
     axios "0.32.0"
     buffer "6.0.3"
