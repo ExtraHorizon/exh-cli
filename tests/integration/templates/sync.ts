@@ -60,7 +60,7 @@ describe('exh templates sync', () => {
 
       await handler({ template: filePath });
 
-      expectConsoleLogToContain('Creating', 'myTemplate');
+      expectConsoleLogToContain("Syncing template: 'myTemplate'");
       expect(v1RepositoryMock.createSpy).toHaveBeenCalledWith({
         ...minimalV1Config,
         name: 'myTemplate',
@@ -74,7 +74,7 @@ describe('exh templates sync', () => {
 
       await handler({ template: filePath });
 
-      expectConsoleLogToContain('Updating', 'myTemplate');
+      expectConsoleLogToContain("Syncing template: 'myTemplate'");
       expect(v1RepositoryMock.updateSpy).toHaveBeenCalledWith(existingTemplate.id, {
         ...minimalV1Config,
         name: 'myTemplate',
@@ -88,7 +88,7 @@ describe('exh templates sync', () => {
 
       await handler({ template: dirPath });
 
-      expectConsoleLogToContain('Creating', 'a-dir-template');
+      expectConsoleLogToContain("Syncing template: 'a-dir-template'");
       expect(v1RepositoryMock.createSpy).toHaveBeenCalledWith({
         ...minimalV1Config,
         name: 'a-dir-template',
@@ -128,7 +128,7 @@ describe('exh templates sync', () => {
 
       await handler({ template: filePath });
 
-      expectConsoleLogToContain('Creating', 'myExtendingTemplate');
+      expectConsoleLogToContain("Syncing template: 'myExtendingTemplate'");
       expect(v1RepositoryMock.createSpy).toHaveBeenCalledWith({
         name: 'myExtendingTemplate',
         description: 'Template extending another template',
@@ -152,7 +152,7 @@ describe('exh templates sync', () => {
 
       await handler({ template: filePath });
 
-      expectConsoleLogToContain('Creating', 'myV2Template');
+      expectConsoleLogToContain("Syncing template: 'myV2Template'");
       expect(v2RepositoryMock.createSpy).toHaveBeenCalledWith({
         ...minimalV2Config,
         name: 'myV2Template',
@@ -166,7 +166,7 @@ describe('exh templates sync', () => {
 
       await handler({ template: filePath });
 
-      expectConsoleLogToContain('Updating', 'myV2Template');
+      expectConsoleLogToContain("Syncing template: 'myV2Template'");
       expect(v2RepositoryMock.updateSpy).toHaveBeenCalledWith(existingTemplate.id, {
         ...minimalV2Config,
         name: 'myV2Template',
@@ -183,7 +183,7 @@ describe('exh templates sync', () => {
 
       await handler({ template: filePath });
 
-      expectConsoleLogToContain('Updating', 'myV2Template');
+      expectConsoleLogToContain("Syncing template: 'myV2Template'");
       expect(v2RepositoryMock.updateSpy).toHaveBeenCalledWith(existingTemplate.id, {
         ...minimalV2Config,
         name: 'myV2Template',
@@ -200,7 +200,7 @@ describe('exh templates sync', () => {
 
       await handler({ template: dirPath });
 
-      expectConsoleLogToContain('Creating', 'a-dir-template');
+      expectConsoleLogToContain("Syncing template: 'a-dir-template'");
       expect(v2RepositoryMock.createSpy).toHaveBeenCalledWith({
         ...minimalV2Config,
         name: 'a-dir-template',
@@ -223,7 +223,7 @@ describe('exh templates sync', () => {
 
       await handler({ template: filePath });
 
-      expectConsoleLogToContain('Creating', 'myV2Template');
+      expectConsoleLogToContain("Syncing template: 'myV2Template'");
       expect(v2RepositoryMock.createSpy).toHaveBeenCalledWith({
         ...minimalV2Config,
         name: 'myV2Template',
@@ -245,7 +245,7 @@ describe('exh templates sync', () => {
 
       await handler({ template: filePath });
 
-      expectConsoleLogToContain('Creating', 'myV2Template');
+      expectConsoleLogToContain("Syncing template: 'myV2Template'");
       expect(v2RepositoryMock.createSpy).toHaveBeenCalledWith({
         ...minimalV2Config,
         name: 'myV2Template',
@@ -271,7 +271,7 @@ describe('exh templates sync', () => {
 
       await handler({ template: filePath });
 
-      expectConsoleLogToContain('Creating', 'envVarTemplate');
+      expectConsoleLogToContain("Syncing template: 'envVarTemplate'");
       expect(v2RepositoryMock.createSpy).toHaveBeenCalledWith({
         ...minimalV2Config,
         name: 'envVarTemplate',
@@ -338,7 +338,7 @@ describe('exh templates sync', () => {
 
       await handler({ template: filePath });
 
-      expectConsoleLogToContain('Creating', 'myExtendingTemplate');
+      expectConsoleLogToContain("Syncing template: 'myExtendingTemplate'");
       expect(v2RepositoryMock.createSpy).toHaveBeenCalledWith({
         name: 'myExtendingTemplate',
         description: 'Template extending another template',
@@ -364,7 +364,7 @@ describe('exh templates sync', () => {
 
       await handler({ template: dirPath });
 
-      expectConsoleLogToContain('Creating', 'a-dir-template');
+      expectConsoleLogToContain("Syncing template: 'a-dir-template'");
       expect(v2RepositoryMock.createSpy).toHaveBeenCalledWith({
         name: 'a-dir-template',
         description: 'A simple template',
@@ -503,7 +503,7 @@ describe('exh templates sync', () => {
 
       await handler({ path: tempDir.getPath() });
 
-      expectConsoleLogToContain('Creating', 'myExtendingTemplate');
+      expectConsoleLogToContain("Syncing template: 'myExtendingTemplate'");
       expect(v2RepositoryMock.createSpy).toHaveBeenCalledWith({
         name: 'myExtendingTemplate',
         description: 'Template extending another template',
@@ -550,9 +550,9 @@ describe('exh templates sync', () => {
 
     await handler({ path: dirPath });
 
-    expectConsoleLogToContain('Creating', 'file-template-1');
-    expectConsoleLogToContain('Creating', 'file-template-2');
-    expectConsoleLogToContain('Creating', 'dir-template');
+    expectConsoleLogToContain("Syncing template: 'file-template-1'");
+    expectConsoleLogToContain("Syncing template: 'file-template-2'");
+    expectConsoleLogToContain("Syncing template: 'dir-template'");
     expect(v1RepositoryMock.createSpy).toHaveBeenCalledWith({ ...minimalV1Config, name: 'file-template-1' });
     expect(v2RepositoryMock.createSpy).toHaveBeenCalledWith({ ...minimalV2Config, name: 'file-template-2' });
     expect(v1RepositoryMock.createSpy).toHaveBeenCalledWith({
