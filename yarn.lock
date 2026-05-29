@@ -444,17 +444,17 @@
     "@extrahorizon/eslint-config-base" "^1.6.0"
     eslint-plugin-jest "^26.4.5"
 
-"@extrahorizon/javascript-sdk@8.12.0":
-  version "8.12.0"
-  resolved "https://registry.yarnpkg.com/@extrahorizon/javascript-sdk/-/javascript-sdk-8.12.0.tgz#9983e66a6f139d0b1d96f6003332f3f4b0f0b894"
-  integrity sha512-sMDwLx2Kmn+tEvzK3zdyyPvYAzXBhevHNJ2US2lgFTAUjhTjYQz+0rGUNpY+0Tb27FVPvpjXzrQMIyc46QF45Q==
+"@extrahorizon/javascript-sdk@8.12.1":
+  version "8.12.1"
+  resolved "https://registry.yarnpkg.com/@extrahorizon/javascript-sdk/-/javascript-sdk-8.12.1.tgz#0f958b1faf39bb8a723a60c1b0abcbbf181dd63a"
+  integrity sha512-qpFGvGnjDF4CnD21cKaHU6PP4tfoTuI2Pfcg86QWrVfOyQJsz0y6BjQM23/P3iwOjrIlbbcNYOsnv2XNw3hKMA==
   dependencies:
     axios "0.32.0"
     buffer "6.0.3"
     fflate "0.8.2"
     form-data "4.0.4"
     platform-specific "1.1.0"
-    qs "6.14.2"
+    qs "6.15.2"
     typescript-json-decoder "1.0.11"
 
 "@humanwhocodes/config-array@^0.9.2":
@@ -3472,10 +3472,10 @@ pure-rand@^6.0.0:
   resolved "https://registry.yarnpkg.com/pure-rand/-/pure-rand-6.0.4.tgz#50b737f6a925468679bff00ad20eade53f37d5c7"
   integrity sha512-LA0Y9kxMYv47GIPJy6MI84fqTd2HmYZI83W/kM/SkKfDlajnZYfmXFTxkbY+xSBPkLJxltMa9hIkmdc29eguMA==
 
-qs@6.14.2:
-  version "6.14.2"
-  resolved "https://registry.yarnpkg.com/qs/-/qs-6.14.2.tgz#b5634cf9d9ad9898e31fba3504e866e8efb6798c"
-  integrity sha512-V/yCWTTF7VJ9hIh18Ugr2zhJMP01MY7c5kh4J870L7imm6/DIzBsNLTXzMwUA3yZ5b/KBqLx8Kp3uRvd7xSe3Q==
+qs@6.15.2:
+  version "6.15.2"
+  resolved "https://registry.yarnpkg.com/qs/-/qs-6.15.2.tgz#fd55426d710403ddccc45e0f9eab16db7727ece9"
+  integrity sha512-Rzq0KEyX/w/tEybncDgdkZrJgVUsUMk3xjh3t5bv3S1HTAtg+uOYt72+ZfwiQwKdysThkTBdL/rTi6HDmX9Ddw==
   dependencies:
     side-channel "^1.1.0"
 

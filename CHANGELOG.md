@@ -1,5 +1,8 @@
 # Extra Horizon CLI changelog
 
+### v1.13.5
+* Updated the ExH SDK to `8.12.1` to fix a security warning from `qs` (vulnerable code was not in use)
+
 ### v1.13.4
 * Updated the `templates` syncing feedback to make the synchronization state clearer
 * Updated the `templates` commands to correctly handle cases where the Template Service v1 is unavailable
