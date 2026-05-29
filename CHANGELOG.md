@@ -1,5 +1,7 @@
 # Extra Horizon CLI changelog
 
+### v1.13.5
+
 ### v1.13.4
 * Updated the `templates` syncing feedback to make the synchronization state clearer
 * Updated the `templates` commands to correctly handle cases where the Template Service v1 is unavailable
