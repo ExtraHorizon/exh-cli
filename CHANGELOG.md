@@ -1,6 +1,7 @@
 # Extra Horizon CLI changelog
 
 ### v1.13.6
+* Improved the reporting of errors from the API, including additional information when available
 * Fixed a bug in `exh data schemas sync` where permission mode arrays were not being correctly compared
 * Updated the ExH SDK to `8.13.0` to fix a security warning from `form-data` (vulnerable code was not in use)
 
