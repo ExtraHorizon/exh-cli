@@ -1,7 +1,7 @@
 # Extra Horizon CLI changelog
 
 ### v1.13.6
-
+* Updated the ExH SDK to `8.13.0` to fix a security warning from `form-data` (vulnerable code was not in use)
 
 ### v1.13.5
 * Updated the ExH SDK to `8.12.1` to fix a security warning from `qs` (vulnerable code was not in use)
