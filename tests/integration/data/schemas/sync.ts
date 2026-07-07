@@ -83,6 +83,33 @@ describe('exh data schemas sync', () => {
       }));
   });
 
+  // Regression test, permission mode arrays were not being updated correctly
+  // This was due to how the compare logic handled arrays
+  it('Detects and updates changes to the permission mode arrays', async () => {
+    repositoryMock.fetchSchemaByNameSpy.mockResolvedValueOnce({
+      id: 'anyid',
+      ...validSchema,
+      readMode: ['creator'],
+    });
+
+    const path = await tempDirectoryManager.createTempJsonFile({
+      ...validSchema,
+      readMode: ['creator', 'linkedUsers'],
+    });
+
+    await handler({
+      file: path,
+      dir: undefined,
+      dry: false,
+      ignoreVerificationErrors: false,
+    });
+
+    expect(repositoryMock.updateSchemaSpy)
+      .toHaveBeenCalledWith('anyid', expect.objectContaining({
+        readMode: ['creator', 'linkedUsers'],
+      }));
+  });
+
   it('Ignores the $schema property', async () => {
     const schemaConfiguration = {
       ...minimalSchema,

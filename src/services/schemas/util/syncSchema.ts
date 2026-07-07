@@ -290,12 +290,26 @@ export class SyncSchema {
 function deepDiff(object: any, other: any) {
   // transform iterates over object
   return _.transform(object, (result, value, key) => {
+    /* eslint-disable no-param-reassign */
+
     // compare to value in other object at same key
     if (!_.isEqual(value, other[key])) {
-      // check if recursion is neccessary
-      /* eslint-disable-next-line no-param-reassign */
-      result[key] = _.isObject(value) && _.isObject(other[key]) ? deepDiff(value, other[key]) : value;
+      // Check if recursion is necessary
+      if (_.isObject(value) && _.isObject(other[key])) {
+        if ((_.isArray(value) && !_.isObject(value[0])) || (_.isArray(other[key]) && !_.isObject(other[key][0]))) {
+          // If a value is an array of non-objects, we don't want to recurse into it
+          // For instance, for an array of strings, we want to replace the entire array if it is different
+          result[key] = value;
+        } else {
+          // Recurse into (arrays of) objects
+          result[key] = deepDiff(value, other[key]);
+        }
+      } else {
+        result[key] = value;
+      }
     }
+
+    /* eslint-enable no-param-reassign */
   });
 }
 
