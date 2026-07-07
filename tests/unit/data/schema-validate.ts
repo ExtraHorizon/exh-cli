@@ -587,3 +587,155 @@ test('Using an array for the createMode is not allowed', () => {
     }
   }
 });
+
+test('The name must be between 3 and 50 characters', () => {
+  const verifyTooShort = new SchemaVerify(ajv, {
+    ...minimalSchema,
+    name: 'ab',
+  }, metaschema);
+
+  for (const check of verifyTooShort.RunChecks()) {
+    if (check.id === TestId.META_SCHEMA) {
+      expect(check.ok).toBe(false);
+    } else {
+      expect(check.errors).toStrictEqual([]);
+      expect(check.ok).toBe(true);
+    }
+  }
+
+  const verifyTooLong = new SchemaVerify(ajv, {
+    ...minimalSchema,
+    name: 'a'.repeat(51),
+  }, metaschema);
+
+  for (const check of verifyTooLong.RunChecks()) {
+    if (check.id === TestId.META_SCHEMA) {
+      expect(check.ok).toBe(false);
+    } else {
+      expect(check.errors).toStrictEqual([]);
+      expect(check.ok).toBe(true);
+    }
+  }
+});
+
+test('The description must be between 3 and 100 characters', () => {
+  const verifyTooShort = new SchemaVerify(ajv, {
+    ...minimalSchema,
+    description: 'ab',
+  }, metaschema);
+
+  for (const check of verifyTooShort.RunChecks()) {
+    if (check.id === TestId.META_SCHEMA) {
+      expect(check.ok).toBe(false);
+    } else {
+      expect(check.errors).toStrictEqual([]);
+      expect(check.ok).toBe(true);
+    }
+  }
+
+  const verifyTooLong = new SchemaVerify(ajv, {
+    ...minimalSchema,
+    description: 'a'.repeat(101),
+  }, metaschema);
+
+  for (const check of verifyTooLong.RunChecks()) {
+    if (check.id === TestId.META_SCHEMA) {
+      expect(check.ok).toBe(false);
+    } else {
+      expect(check.errors).toStrictEqual([]);
+      expect(check.ok).toBe(true);
+    }
+  }
+});
+
+test('The name of a manual transition must be between 1 and 50 characters', () => {
+  const verifyTooShort = new SchemaVerify(ajv, {
+    ...minimalSchema,
+    statuses: { new: {}, processed: {} },
+    transitions: [
+      {
+        name: '',
+        type: 'manual',
+        fromStatuses: ['new'],
+        toStatus: 'processed',
+      },
+    ],
+  }, metaschema);
+
+  for (const check of verifyTooShort.RunChecks()) {
+    if (check.id === TestId.META_SCHEMA) {
+      expect(check.ok).toBe(false);
+    } else {
+      expect(check.errors).toStrictEqual([]);
+      expect(check.ok).toBe(true);
+    }
+  }
+
+  const verifyTooLong = new SchemaVerify(ajv, {
+    ...minimalSchema,
+    statuses: { new: {}, processed: {} },
+    transitions: [
+      {
+        name: 'a'.repeat(51),
+        type: 'manual',
+        fromStatuses: ['new'],
+        toStatus: 'processed',
+      },
+    ],
+  }, metaschema);
+
+  for (const check of verifyTooLong.RunChecks()) {
+    if (check.id === TestId.META_SCHEMA) {
+      expect(check.ok).toBe(false);
+    } else {
+      expect(check.errors).toStrictEqual([]);
+      expect(check.ok).toBe(true);
+    }
+  }
+});
+
+test('The name of an automatic transition must be between 1 and 50 characters', () => {
+  const verifyTooShort = new SchemaVerify(ajv, {
+    ...minimalSchema,
+    statuses: { new: {}, processed: {} },
+    transitions: [
+      {
+        name: '',
+        type: 'automatic',
+        fromStatuses: ['new'],
+        toStatus: 'processed',
+      },
+    ],
+  }, metaschema);
+
+  for (const check of verifyTooShort.RunChecks()) {
+    if (check.id === TestId.META_SCHEMA) {
+      expect(check.ok).toBe(false);
+    } else {
+      expect(check.errors).toStrictEqual([]);
+      expect(check.ok).toBe(true);
+    }
+  }
+
+  const verifyTooLong = new SchemaVerify(ajv, {
+    ...minimalSchema,
+    statuses: { new: {}, processed: {} },
+    transitions: [
+      {
+        name: 'a'.repeat(51),
+        type: 'automatic',
+        fromStatuses: ['new'],
+        toStatus: 'processed',
+      },
+    ],
+  }, metaschema);
+
+  for (const check of verifyTooLong.RunChecks()) {
+    if (check.id === TestId.META_SCHEMA) {
+      expect(check.ok).toBe(false);
+    } else {
+      expect(check.errors).toStrictEqual([]);
+      expect(check.ok).toBe(true);
+    }
+  }
+});
