@@ -3,5 +3,10 @@ import { epilogue } from '../helpers/util';
 
 export const command = 'dispatchers <command>';
 export const desc = 'Manage Dispatchers within Extra Horizon';
-export const builder = (yargs: Argv) => epilogue(yargs).commandDir('dispatchers');
+
+export const builder = (yargs: Argv) => epilogue(yargs)
+  .commandDir('dispatchers')
+  .strict()
+  .demandCommand(1);
+
 export const handler = () => { /* empty */ };
