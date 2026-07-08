@@ -35,7 +35,7 @@ The Extra Horizon CLI by default will execute the relevant commands for these su
 
 In case this is not the directory layout you prefer, these locations can be customized by creating a `repo-config.json` in the top directory. Example:
 
-```
+```json
 {
   "schemas": [
     "./path/to/my-schemas",
