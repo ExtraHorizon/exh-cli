@@ -2,6 +2,7 @@
 
 ### v1.13.6
 * Improved the reporting of errors from the API, including additional information when available
+* Improved the reporting of using unknown or incomplete commands, including usage information
 * Fixed some inconsistencies in the data schema validation, now better aligned with the backend
 * Fixed a bug in `exh data schemas sync` where permission mode arrays were not being correctly compared
 * Updated the ExH SDK to `8.13.0` to fix a security warning from `form-data` (vulnerable code was not in use)
