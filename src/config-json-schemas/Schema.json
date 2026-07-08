@@ -3,8 +3,16 @@
   "type": "object",
   "properties": {
     "$schema": { "type": "string" },
-    "name": { "type": "string" },
-    "description": { "type": "string" },
+    "name": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 50
+    },
+    "description": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 100
+    },
     "createMode": {
       "oneOf": [
         {
@@ -88,8 +96,14 @@
         "linkedUsersPatientEnlistments"
       ]
     },
-    "defaultLimit": { "type": "integer" },
-    "maximumLimit": { "type": "integer" },
+    "defaultLimit": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "maximumLimit": {
+      "type": "integer",
+      "minimum": 1
+    },
     "statuses": {
       "type": "object",
       "patternProperties": {
@@ -175,7 +189,8 @@
           "const": "manual"
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,49}$"
         },
         "description": {
           "type": "string"
@@ -237,7 +252,10 @@
       "type": "object",
       "properties": {
         "type": { "const": "automatic" },
-        "name": { "type": "string" },
+        "name": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,49}$"
+        },
         "description": { "type": "string" },
         "fromStatuses": {
           "type": "array",

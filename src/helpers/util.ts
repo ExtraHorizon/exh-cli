@@ -1,6 +1,7 @@
 import { exec } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
+import { ApiError } from '@extrahorizon/javascript-sdk';
 import Ajv from 'ajv';
 import * as chalk from 'chalk';
 import * as yargs from 'yargs';
@@ -13,11 +14,24 @@ export function epilogue(y: yargs.Argv): yargs.Argv {
       console.log(err.message);
       process.exit(1);
     }
+
     if (err) {
-      console.log(chalk.red(err.message));
+      console.log(chalk.red(`${err.name}: ${err.message}`));
     } else {
       console.log(chalk.red(msg));
     }
+
+    // If there is an ApiError with extra information, print the extra information
+    if (err instanceof ApiError && err.response) {
+      for (const [key, value] of Object.entries(err.response)) {
+        if (['code', 'name', 'message'].includes(key)) {
+          continue;
+        }
+
+        console.log(chalk.red(`  ${key}:`), value);
+      }
+    }
+
     console.log('\nUsage:');
     console.log(argv.help());
     process.exit(1);
