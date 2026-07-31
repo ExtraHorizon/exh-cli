@@ -1,48 +1,19 @@
 # Installation
 
-## Installation <a href="#installation" id="installation"></a>
+## Install Node.js
 
-#### Configuring .npmrc
+The CLI is available as [a JavaScript package](https://www.npmjs.com/package/@extrahorizon/exh-cli) and requires [Node.js](https://nodejs.org/) to run. If you have Node.js installed you can install the CLI using a JavaScript package manager. For instance, you can use [npm](https://docs.npmjs.com/about-npm), which comes with Node.js, or alternative package managers like [Yarn](https://yarnpkg.com/).
 
-Assuming you've created a project (using `npm init` or equivalent), you need to create a file called `.npmrc` at the root level of your project and add the following lines:
+[Installation instructions for Node.js and npm can be found here.](https://nodejs.org/en/download)
 
-```
-@extrahorizon:registry=https://npm.pkg.github.com
-//npm.pkg.github.com/:_authToken=AUTH_TOKEN
-```
+## Install the CLI
 
-Replace `AUTH_TOKEN` with your personal access token. You can get a new one at [https://github.com/settings/tokens/new](https://github.com/settings/tokens/new). Make sure you enable the `read:packages` scope.
-
-Explanation from GitHub on how to add your token can be found here [https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry#authenticating-to-github-packages](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry#authenticating-to-github-packages)
-
-{% hint style="info" %}
-You can also add the `.npmrc` to your home directory. In which case it will apply to all your projects.
-{% endhint %}
-
-#### Install CLI
-
-Next, install exh-cli in your project as a developer dependency.
+We recommend installing the CLI globally. Installing the CLI globally makes sure it can be used in all your projects. For that reason all examples in this documentation will assume a global installation.
 
 {% tabs %}
 {% tab title="npm" %}
 ```
-npm install -D @extrahorizon/exh-cli
-```
-{% endtab %}
-
-{% tab title="yarn" %}
-```
-yarn add -D @extrahorizon/exh-cli
-```
-{% endtab %}
-{% endtabs %}
-
-In you want to use exh-cli in all your projects, you can also install it globally using
-
-{% tabs %}
-{% tab title="npm" %}
-```
-npm install -g @extrahorizon/exh-cli
+npm install --global @extrahorizon/exh-cli
 ```
 {% endtab %}
 
@@ -53,37 +24,52 @@ yarn global add @extrahorizon/exh-cli
 {% endtab %}
 {% endtabs %}
 
+For more advanced uses, the CLI can be installed in your project as a development dependency.
+
+{% tabs %}
+{% tab title="npm" %}
+```
+npm install --save-dev @extrahorizon/exh-cli
+```
+{% endtab %}
+
+{% tab title="yarn" %}
+```
+yarn add --dev @extrahorizon/exh-cli
+```
+{% endtab %}
+{% endtabs %}
+
 #### Check if the installation worked
 
-When installed globally, trying running the following command in your Terminal to verify wether it's installed correctly.
+When installed globally, trying running the following command in your Terminal to verify whether it's installed correctly.
 
-{% code lineNumbers="true" %}
 ```
 exh --help 
 ```
-{% endcode %}
 
 this should give you the following response:
 
-{% code lineNumbers="true" %}
 ```
 exh <command>
 
 Commands:
-  exh completion             Install shell completion for bash & zsh
-  exh data <command>         Manage data
-  exh dispatchers <command>  Manage Dispatchers within Extra Horizon
-  exh login                  Retrieve credentials from ExH
-  exh sync                   Upload all schemas, templates & tasks to the cloud
-                             environment
-  exh tasks <command>        Manage tasks
-  exh templates <command>    Manage templates
+  exh completion               Install shell completion for bash & zsh
+  exh data <command>           Manage data
+  exh dispatchers <command>    Manage Dispatchers within Extra Horizon
+  exh localizations <command>  Manage localizations
+  exh login                    Retrieve credentials from ExH
+  exh settings <command>       Manage Service Settings within Extra Horizon
+  exh sync                     Sync your ExH configuration to the cloud
+                               environment
+  exh tasks <command>          Manage tasks
+  exh templates <command>      Manage templates
+  exh whoami                   Shows the currently logged in user
 
 Options:
   --help     Show help                                                 [boolean]
   --version  Show version number                                       [boolean]
 ```
-{% endcode %}
 
 {% hint style="info" %}
 If the command isn't recognized, it might be because the yarn global bin folder isn't in your PATH.
@@ -91,7 +77,23 @@ If the command isn't recognized, it might be because the yarn global bin folder 
 
 In case your are using bash, you can add `export PATH="$PATH:$(yarn global bin)"` to your `~/.bash_profile` and reload it with `source ~/.bash_profile`
 
-#### Completion
+When installed as a development dependency, run the following command to verify the CLI is working correctly:
+
+{% tabs %}
+{% tab title="npx" %}
+```
+npx exh --help
+```
+{% endtab %}
+
+{% tab title="yarn" %}
+```
+yarn exh --help
+```
+{% endtab %}
+{% endtabs %}
+
+## Completion
 
 Enable auto-complete for shell commands with:
 

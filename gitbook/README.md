@@ -14,19 +14,20 @@ To get started with the ExtraHorizon CLI (exh-cli) you'll need to install it and
 You can always use the `--help` option in order to get help on a certain command. For example
 
 ```
-exh --help
-
+> exh --help
 exh <command>
 
 Commands:
-  exh completion             Install shell completion for bash & zsh
-  exh data <command>         Manage data
-  exh dispatchers <command>  Manage Dispatchers within Extra Horizon
-  exh login                  Retrieve credentials from ExH
-  exh sync                   Upload all schemas, templates & tasks to the cloud
-                             environment
-  exh tasks <command>        Manage tasks
-  exh templates <command>    Manage templates
+  exh completion               Install shell completion for bash & zsh
+  exh data <command>           Manage data
+  exh dispatchers <command>    Manage Dispatchers within Extra Horizon
+  exh localizations <command>  Manage localizations
+  exh login                    Retrieve credentials from ExH
+  exh sync                     Sync your ExH configuration to the cloud
+                               environment
+  exh tasks <command>          Manage tasks
+  exh templates <command>      Manage templates
+  exh whoami                   Shows the currently logged in user
 
 Options:
   --help     Show help                                                 [boolean]
@@ -36,8 +37,7 @@ Options:
 and then you can dig down further asking help for a specific command such as
 
 ```
-exh data schemas --help
-
+> exh data schemas --help
 exh data schemas <command>
 
 Manage data schemas
