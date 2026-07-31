@@ -1,5 +1,8 @@
 # Extra Horizon CLI changelog
 
+### v1.13.7
+* Updated the ExH SDK to `8.14.1` to resolve security warnings from `axios` (vulnerable code was not in use)
+
 ### v1.13.6
 * Improved the reporting of errors from the API, including additional information when available
 * Improved the reporting of using unknown or incomplete commands, including usage information

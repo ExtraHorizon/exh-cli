@@ -340,12 +340,12 @@
     "@extrahorizon/eslint-config-base" "^1.6.0"
     eslint-plugin-jest "^26.4.5"
 
-"@extrahorizon/javascript-sdk@8.13.0":
-  version "8.13.0"
-  resolved "https://registry.yarnpkg.com/@extrahorizon/javascript-sdk/-/javascript-sdk-8.13.0.tgz#075a7fecff47a6c6f60a5ccdca7a49402fc9048f"
-  integrity sha512-7NTR3rTVHcO9U2z/NJj+FSnHLef/UQOTrhWC5IgarvJRMkFfMuuBud6QWSthTc4d3aKrJgWACk3RxCFmRaWM0w==
+"@extrahorizon/javascript-sdk@8.14.1":
+  version "8.14.1"
+  resolved "https://registry.yarnpkg.com/@extrahorizon/javascript-sdk/-/javascript-sdk-8.14.1.tgz#acf91ad47664548022b5a7d18af8b7a9e82950c0"
+  integrity sha512-ph3b67h3RdceldnyTP63S0/SrZHEY7JiWAqbMamSYtkLVO52vNdcjyK2YCfsqdDW99GkUJ0zzLsFm6+JFkZ+Aw==
   dependencies:
-    axios "0.32.0"
+    axios "0.33.0"
     buffer "6.0.3"
     fflate "0.8.2"
     form-data "4.0.6"
@@ -1108,10 +1108,10 @@ asynckit@^0.4.0:
   resolved "https://registry.yarnpkg.com/asynckit/-/asynckit-0.4.0.tgz#c79ed97f7f34cb8f2ba1bc9790bcc366474b4b79"
   integrity sha1-x57Zf380y48robyXkLzDZkdLS3k=
 
-axios@0.32.0:
-  version "0.32.0"
-  resolved "https://registry.yarnpkg.com/axios/-/axios-0.32.0.tgz#7859220c955272a72df8c0789ebd1219aba6d1d9"
-  integrity sha512-sGQArzERW2SI8IRkjuJ5y91Sm9QjiRq4Ay4kOLqpbBt5CeKDNq4g6nirJdyD+palK3yEDXnJiVXsesX66AjwyA==
+axios@0.33.0:
+  version "0.33.0"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-0.33.0.tgz#91fc5e231db5b81ab6474c0a945a603c55601f6e"
+  integrity sha512-juz19g7B3UWT9r3+tgRFQf2Bdy6IKDVroiyuVOUrkILVKHpqHL++K1l8ybvfdEP9B/VE72vk8vllbnedVCm/og==
   dependencies:
     follow-redirects "^1.15.4"
     form-data "^4.0.4"
@@ -1203,17 +1203,17 @@ baseline-browser-mapping@^2.10.42:
   integrity sha512-c/jurFrDLyui7o1J86yLkRu4LMsTYcBohveus7/I2Hzdn9KIP2bdJPTue/lR1KH46enoPbD77GKeSYNdyPoD3Q==
 
 brace-expansion@^1.1.7:
-  version "1.1.14"
-  resolved "https://registry.yarnpkg.com/brace-expansion/-/brace-expansion-1.1.14.tgz#d9de602370d91347cd9ddad1224d4fd701eb348b"
-  integrity sha512-MWPGfDxnyzKU7rNOW9SP/c50vi3xrmrua/+6hfPbCS2ABNWfx24vPidzvC7krjU/RTo235sV776ymlsMtGKj8g==
+  version "1.1.18"
+  resolved "https://registry.yarnpkg.com/brace-expansion/-/brace-expansion-1.1.18.tgz#3ce74d89885136be1535341f8c3d4425c29a5cab"
+  integrity sha512-Edep/X9fGqVNmzKBVsDYIOtD+z1tuezV70LBjdCst9Tqu76lsnvRiZ6oTic1n+/BIwX6QDGAO94PN4N2SADvtw==
   dependencies:
     balanced-match "^1.0.0"
     concat-map "0.0.1"
 
 brace-expansion@^2.0.1, brace-expansion@^2.0.2:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/brace-expansion/-/brace-expansion-2.1.0.tgz#4f41a41190216ee36067ec381526fe9539c4f0ae"
-  integrity sha512-TN1kCZAgdgweJhWWpgKYrQaMNHcDULHkWwQIspdtjV4Y5aurRdZpjAqn6yX3FPqTA9ngHCc4hJxMAMgGfve85w==
+  version "2.1.4"
+  resolved "https://registry.yarnpkg.com/brace-expansion/-/brace-expansion-2.1.4.tgz#589dab11c0018d0366be64cd8bf12c8dbecc8326"
+  integrity sha512-hGfVzPxthbf3+2yjg/RBs60cB0FhqBS/zvdV/4wn4/BmN0bNMMHPc4V/BbFieqf1TKAGGAHnY4eSjajCl0f2Xg==
   dependencies:
     balanced-match "^1.0.0"
 
