@@ -6,51 +6,42 @@
 This section assumes some basic familiarity with the data service and the concept of schemas. To get more information on those topics, please read through [Data service](https://docs.extrahorizon.com/extrahorizon/for-developers/manage-data/data-service) in the ExtraHorizon documentation.
 {% endhint %}
 
-When creating a data schema, you'll typically make a JSON file containing a specification of how your data should look like and how it should behave in transitions. This JSON file can then be easily managed through version control. The exh-cli will help you to verify and synchronise the schema with the ExtraHorizon cloud. An example schema JSON file looks as follows:
+When creating a data schema, you'll typically make a JSON file containing a specification of how your data should look like and how it should behave in transitions. This JSON file can then be easily managed through version control. The exh-cli will help you to verify and synchronise the schema with the ExtraHorizon cloud. A minimal example of a schema JSON file looks as follows:
 
-```
+```json
 {
   "name": "MyFirstSchema",
-  "description": "Example of a schema",
-  "createMode": "permissionRequired",
-  "readMode": "allUsers",
-  "updateMode": "default",
-  "deleteMode": "permissionRequired",
+  "description": "Minimal schema example",
+  
+  "createMode": "allUsers",
+  "readMode": ["creator"],
+  "updateMode": ["creator"],
+  "deleteMode": ["creator"],
+  
   "statuses": {
-    "created": {},
-    "active": {},
-    "done": {},
+    "new": {}
   },
+  
   "creationTransition": {
     "type": "manual",
-    "toStatus": "created",
-    "conditions": [
-      {
-         ...
-      }
-    ]
+    "toStatus": "new"
   },
-  "transitions": [
-    {
-      "name": "activate",
-      "type": "automatic",
-      "fromStatuses": [
-        "created"
-      ],
-      "toStatus": "active"
-    },
-    ...
-  ],
+  
+  "transitions": [],
+  
   "properties": {
-    "firstproperty": {
-      "type": "string",
-    },
-    "secondproperty": {
-      "type": "number"
+    "firstProperty": {
+      "type": "string"
     }
-  }
+  },
+  
+  "$schema": "https://swagger.extrahorizon.com/cli/1.13.7/config-json-schemas/Schema.json"
 }
 ```
+
+{% hint style="info" %}
+The `$schema` field allows most editors to help you with type information and autocompletion in your schema configuration. Does your editor not support this? You might have some luck looking for a plugin providing [JSON schema](https://json-schema.org/) support.
+{% endhint %}
 
 ### Schema list
 
@@ -59,6 +50,24 @@ List the names of all the schemas which are currently configured in the cloud
 ```
 exh data schemas list
 ```
+
+### Schema initialization <a href="#schema-initialization" id="schema-initialization"></a>
+
+To create a new schema, you can use the `init` command. This command will generate a minimal schema file for you to start out with.
+
+This example will create a `<schema-name>.json` file in the `./schemas` directory, containing the basic structure of a schema:
+
+```
+exh data schemas init <schema-name>
+```
+
+After editing the schema file to your liking, you can use the `exh data schemas sync` command to upload your new schema to your Extra Horizon cloud.
+
+#### **Arguments**
+
+`--path`
+
+This argument is used to specify the path where the schema file should be created. By default, the `./schemas` directory will be used.
 
 ### Schema verify
 
@@ -82,13 +91,13 @@ exh data schemas verify --dir=<directory-path>
 
 This argument is used to specify the path to the JSON file that contains the schema to be verified.
 
-`--dir`&#x20;
+`--dir`
 
 This argument is used to specify the directory that contains all the schema files to be verified.
 
 ### Schema sync
 
-When you've created your schemas & verified that they are correct, you can upload them to the ExtraHorizon cloud & start working with them! This upload can be done using the `sync` command.&#x20;
+When you've created your schemas & verified that they are correct, you can upload them to the ExtraHorizon cloud & start working with them! This upload can be done using the `sync` command.
 
 ```
 exh data schemas sync --dir=<pathToSchemaDir> 
@@ -96,7 +105,7 @@ exh data schemas sync --dir=<pathToSchemaDir>
 
 This will upload the entire directory at once. The cli will:
 
-* Check whether the schema already exists and create a new one if it doesn't&#x20;
+* Check whether the schema already exists and create a new one if it doesn't
 * Look for differences between the schema in the cloud and your local schema and make sure that these differences are synchronized.
 
 Therefore, if you make any subsequent changes to the schemas, you can just run the sync again and the cli will make sure that the changes are properly synced.
@@ -107,7 +116,7 @@ Therefore, if you make any subsequent changes to the schemas, you can just run t
 
 This argument is used to specify the path to the JSON file that contains the schema to be synchronized.
 
-`--dir`&#x20;
+`--dir`
 
 This argument is used to specify the directory that contains all the schema files to be synchronized.
 
@@ -134,3 +143,69 @@ You'll need the ID of the schema you want to delete. This is _not_ the name of t
 `--id`
 
 This argument is used to specify the id of the schema to be deleted.
+
+### Schema example
+
+An example of a schema making use of some of the features of the Data Service:
+
+```json
+{
+  "name": "MyExampleSchema",
+  "description": "Example of a schema",
+  
+  "createMode": "allUsers",
+  "readMode": ["creator", "linkedUsers", "linkedGroupStaff"],
+  "updateMode": ["creator"],
+  "deleteMode": ["creator"],
+  
+  "statuses": {
+    "created": {},
+    "active": {}
+  },
+  
+  "creationTransition": {
+    "type": "manual",
+    "description": "The transition triggered while a document is created",
+    "toStatus": "created",
+    "conditions": [
+      {
+        "type": "input",
+        "description": "Making sure only 'firstProperty' can (and must) be supplied",
+        "configuration": {
+          "type": "object",
+          "properties": {
+            "firstProperty": {
+              "type": "string"
+            }
+          },
+          "required": ["firstProperty"]
+        }
+      }
+    ]
+  },
+  
+  "transitions": [
+    {
+      "type": "manual",
+      "name": "activate",
+      "description": "Allow moving from the 'created' to the 'active' status",
+      "fromStatuses": [
+        "created"
+      ],
+      "toStatus": "active"
+    }
+  ],
+  
+  "properties": {
+    "firstProperty": {
+      "type": "string",
+      "description": "Your explanation about the property here"
+    },
+    "secondProperty": {
+      "type": "number"
+    }
+  },
+  
+  "$schema": "https://swagger.extrahorizon.com/cli/1.13.7/config-json-schemas/Schema.json"
+}
+```

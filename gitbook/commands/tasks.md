@@ -8,14 +8,12 @@ There is also a section with [examples](https://docs.extrahorizon.com/extrahoriz
 
 ### Create a new task
 
-The Extra Horizon CLI provides a great way for you to bootstrap your new task. Doing `exh tasks create-repo your-task-name` will create a fresh folder for you on your local machine called `your-task-name` & set the task name. It contains a sample task and will make sure you hit the ground running. The folder can also be initialised as a git repository by using the `--git` flag.
-
-Check out the README.md file of your freshly created repository to see how to run, build & test your new task.
+The Extra Horizon CLI provides a great way for you to bootstrap your new task. Doing `exh tasks init your-task-name` will create a fresh folder for you on your local machine called `your-task-name`. It contains a sample task and will make sure you hit the ground running.
 
 If you have your own template repository you want to start from, you can even specify the repository using the `repo` option. For example:
 
 ```
-exh tasks create-repo my-task-name --repo=https://github.com/mycompany/my-template
+exh tasks init my-task-name --repo=https://github.com/mycompany/my-template
 ```
 
 {% hint style="info" %}
@@ -28,26 +26,18 @@ If you're using Github, you can also use the template to directly create a repos
 
 Specify the repository template to clone. By default, we utilize the task template from Extra Horizon.
 
-`--git`
+`--path`
 
-Initialize the cloned folder as a new Git repository.
-
-### List tasks
-
-This command lists all tasks currently configured in the task service.
-
-```
-exh tasks list
-```
+Path where the new directory should be created. Defaults to `./tasks`
 
 ### Synchronize a task
 
 When you have implemented your new task, you need to synchronize this task so it can run in Extra Horizon cloud. There is a single `sync` command to do this efficiently, however there is some extra configuration that you need to take care of.
 
-The backend needs some extra information in order to properly run your task, such as:
+The back end needs some extra information in order to properly run your task, such as:
 
 * Name & description of your task
-* Entrypoint of the task
+* Entry point of the task
 * Memory requirements
 * Execution time requirements
 * Environment variables
@@ -60,19 +50,35 @@ exh tasks sync --name test-filip --description "my test" --code ../sample-repo/t
 
 but this can be very tedious to use. Instead you can create a `task-config.json` configuration which resides in your code folder. This has the added advantage that any changes to the task configuration can be tracked together with your code. A sample `task-config.json` looks like:
 
-```
+```json
 {
   "name": "my-task",
   "description": "My sample task",
   "path": "build",
-  "entryPoint": "build/index",
-  "runtime": "nodejs14.x",
+  "entryPoint": "build/index.handler",
+  "runtime": "nodejs22.x",
   "timeLimit": 60,
   "memoryLimit": 128,
   "environment": {
     "setting1": "value1",
     "secret": "$MYSECRET"
-  }
+  },
+  "executionPermission": "permissionRequired",
+  "defaultPriority": 10,
+  "retryPolicy": {
+    "enabled": true,
+    "errorsToRetry": [
+      "CONNECTION_ERROR",
+      "DATABASE_ERROR"
+    ]
+  },
+  "executionCredentials": {
+    "permissions": [
+      "UPDATE_DOCUMENTS:my_first_schema",
+      "VIEW_DOCUMENTS:my_second_schema"
+    ]
+  },
+  "$schema": "https://swagger.extrahorizon.com/cli/1.13.7/config-json-schemas/TaskConfig.json"
 }
 ```
 
@@ -86,6 +92,113 @@ which will synchronize your task with the requested configuration.
 
 {% hint style="info" %}
 If you need to pass secrets to the task configuration, but do not want to commit this secret in a configuration file, you can use variables such as`$MYSECRET` in the above example. When parsing the configuration file, `exh` will replace this value with an environment variable of the same name. This way, CI systems are able to provision secrets while safeguarding their confidentiality.
+{% endhint %}
+
+#### Config
+
+`name`
+
+Specify the name of the task.
+
+`description`
+
+Specify the description of the task.
+
+`path`
+
+Provide the path to a directory containing the built task. `exh-cli` will compress the directory and upload it.
+
+`entryPoint`
+
+Specify the code function that should be invoked. For example, use 'index.handler' for Node.js.
+
+`runtime`
+
+Specify the [runtime](https://docs.extrahorizon.com/extrahorizon/services/automation/task-service/functions#runtime) to use for the task.
+
+`timeLimit`
+
+Specify the execution [time limit ](https://docs.extrahorizon.com/extrahorizon/services/automation/task-service/functions#timelimit)for this task (in seconds).
+
+`memoryLimit`
+
+Specify the allocated [memory](https://docs.extrahorizon.com/extrahorizon/services/automation/task-service/functions#memorylimit) for this task (in MB).
+
+`environment`
+
+Set environment variables for this task. This option can be used multiple times for multiple environment variables.
+
+`executionPermission`
+
+Specify the [permission mode](https://docs.extrahorizon.com/extrahorizon/services/automation/task-service/functions#executionoptions-properties) of the task.
+
+`defaultPriority`
+
+Specify the defaultPriority of the function.
+
+`retryPolicy`
+
+Specify the [retryPolicy](https://docs.extrahorizon.com/extrahorizon/services/automation/task-service/functions#retrypolicy) of the function.
+
+#### Execution Credentials
+
+By providing the property `executionCredentials` in the `task-config.json`, the CLI will automatically create a User and Global Role with the defined permissions for the Task. Credentials for this User will be injected into the Task's `environment` automatically.\
+\
+The Global Role and its permissions will be managed by the CLI and synchronized whenever the `executionCredentials.permissions` property is updated.
+
+**Properties**
+
+`executionCredentials.permissions` (_required_)
+
+The permissions that will be attached to the [Global Role](https://docs.extrahorizon.com/extrahorizon/services/access-management/user-service/global-roles) for the created user the Global Role will be created with a name like`exh.tasks.<your task name>`
+
+`executionCredentials.email`
+
+By default the CLI generates an email address like `exh.tasks+<your task name>@extrahorizon.com` for the User which is created for the Task. If you like you can change this behavior and provide your own email address to retain ownership of the user account.
+
+**Consuming the Execution Credentials in your Task**
+
+The properties needed for communicating with Extra Horizon will be available as environment variables:
+
+`API_HOST`, `API_OAUTH_CONSUMER_KEY`, `API_OAUTH_CONSUMER_SECRET`, `API_OAUTH_TOKEN` and `API_OAUTH_TOKEN_SECRET`&#x20;
+
+{% tabs %}
+{% tab title="JavaScript" %}
+```javascript
+const { createOAuth1Client } = require("@extrahorizon/javascript-sdk");
+
+const exh = createOAuth1Client({
+  host: process.env.API_HOST,
+  consumerKey: process.env.API_OAUTH_CONSUMER_KEY,
+  consumerSecret: process.env.API_OAUTH_CONSUMER_SECRET,
+  token: process.env.API_OAUTH_TOKEN,
+  tokenSecret: process.env.API_OAUTH_TOKEN_SECRET
+});
+
+const user = await exh.users.me();
+```
+{% endtab %}
+
+{% tab title="Python" %}
+```python
+from requests_oauthlib import OAuth1Session
+import os
+
+oauth1Client = OAuth1Session(
+  client_key=os.environ['API_OAUTH_CONSUMER_KEY'],
+  client_secret=os.environ['API_OAUTH_CONSUMER_SECRET'],
+  resource_owner_key=os.environ['API_OAUTH_TOKEN'],
+  resource_owner_secret=os.environ['API_OAUTH_TOKEN_SECRET']
+)
+
+result = oauth1Client.get(f'os.environ['API_HOST']/users/v1/me')
+me = result.json()
+```
+{% endtab %}
+{% endtabs %}
+
+{% hint style="warning" %}
+When providing `executionCredentials` the properties `API_HOST`, `API_OAUTH_CONSUMER_KEY`, `API_OAUTH_CONSUMER_SECRET`, `API_OAUTH_TOKEN`  and `API_OAUTH_TOKEN_SECRET` can not be provided to the `environment` property of the `task-config.json`
 {% endhint %}
 
 #### Synchronizing multiple tasks
@@ -102,45 +215,17 @@ When you're synchronizing a single task using a `task-config.json` file, any add
 
 Specify the path to the configuration JSON file containing task parameters. If a directory is provided instead, exh-cli will search for a task-config.json file within all subdirectories and synchronize them. If this option is not used, each parameter (name, code, entryPoint, runtime, etc.) must be supplied separately.
 
-`--name`
-
-Specify the name of the task.
-
-`--code`
-
-Provide the path to a directory containing the built task. exh-cli will compress the directory and upload it.
-
-`--entryPoint`
-
-Specify the code function that should be invoked. For example, use 'index.handler' for Node.js.
-
-`--runtime`
-
-Specify the [runtime](https://docs.extrahorizon.com/extrahorizon/services/automation/task-service/functions#runtime) to use for the task.
-
-`--description`
-
-Add a description for this task.
-
-`--timeLimit`
-
-Specify the execution [time limit ](https://docs.extrahorizon.com/extrahorizon/services/automation/task-service/functions#timelimit)for this task (in seconds).
-
-`--memoryLimit`
-
-Specify the allocated [memory](https://docs.extrahorizon.com/extrahorizon/services/automation/task-service/functions#memorylimit) for this task (in MB).
-
-`--env`
-
-Set environment variables for this task. This option can be used multiple times for multiple environment variables.
-
-`--executionPermission`
-
-Specify the [permission mode](https://docs.extrahorizon.com/extrahorizon/services/automation/task-service/functions#executionoptions-properties) of the task.
-
 #### Example
 
 Take a look at our [hello world example](https://docs.extrahorizon.com/extrahorizon/services/automation/task-service/examples/hello-world-js) for a nodeJS function.
+
+### List tasks
+
+This command lists all tasks currently configured in the task service.
+
+```
+exh tasks list
+```
 
 ### Delete a task
 
