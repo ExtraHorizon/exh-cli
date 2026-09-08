@@ -1,5 +1,8 @@
 # Extra Horizon CLI changelog
 
+### v1.13.8
+* Updated the ExH SDK to `8.14.3` to resolve security warnings from `qs` and `fflate` (vulnerable code was not in use)
+
 ### v1.13.7
 * Updated the ExH SDK to `8.14.1` to resolve security warnings from `axios` (vulnerable code was not in use)
 
